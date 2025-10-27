@@ -52,8 +52,8 @@ Thumbs.db
 # Application specific
 logs/
 *.log
-application.properties
-application-*.properties
+# application.properties - Keep this file for default configuration
+# application-*.properties - Keep environment-specific properties
 
 # Environment files
 .env
@@ -70,3 +70,4 @@ application-*.properties
 # Temporary files
 *.tmp
 *.temp
+*.tex 
