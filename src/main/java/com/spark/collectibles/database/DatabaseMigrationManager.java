@@ -68,12 +68,18 @@ public class DatabaseMigrationManager {
             logger.info("Migration location: classpath:db/migration");
             
             // Check for failed migrations and repair if needed
-            org.flywaydb.core.api.MigrationInfo[] failed = flyway.info().failed();
-            if (failed.length > 0) {
-                logger.warn("Found {} failed migrations, attempting repair...", failed.length);
-                for (org.flywaydb.core.api.MigrationInfo info : failed) {
+            org.flywaydb.core.api.MigrationInfo[] allMigrations = flyway.info().all();
+            boolean hasFailedMigrations = false;
+            for (org.flywaydb.core.api.MigrationInfo info : allMigrations) {
+                if (info.getState() == org.flywaydb.core.api.MigrationState.FAILED) {
+                    if (!hasFailedMigrations) {
+                        logger.warn("Found failed migrations, attempting repair...");
+                        hasFailedMigrations = true;
+                    }
                     logger.warn("  - Failed migration: {} - {}", info.getVersion(), info.getDescription());
                 }
+            }
+            if (hasFailedMigrations) {
                 flyway.repair();
                 logger.info("Flyway repair completed successfully");
             }
