@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: collectibles-postgres
+    environment:
+      POSTGRES_DB: collectibles_store
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Collectibles Store API
+  api:
+    build: .
+    container_name: collectibles-api
+    ports:
+      - "4567:4567"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: collectibles_store
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+      APP_PORT: 4567
+      APP_ENV: production
+      LOG_LEVEL: INFO
+      DB_MAX_CONNECTIONS: 10
+      DB_MIN_CONNECTIONS: 2
+      DB_CONNECTION_TIMEOUT: 30000
+      API_BASE_PATH: /api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4567/api/products"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  postgres_data:
+
+
