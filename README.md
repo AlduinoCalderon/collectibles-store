@@ -364,9 +364,21 @@ mvn clean package -Pproduction
 
 ### Docker Support
 
+The project uses a multi-stage Dockerfile that builds and runs the application:
+
 ```dockerfile
+# Stage 1: Build with Maven
+FROM maven:3.9-eclipse-temurin-11 AS build
+WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Stage 2: Run with JRE
 FROM openjdk:11-jre-slim
-COPY target/collectibles-store-1.0.0.jar app.jar
+WORKDIR /app
+COPY --from=build /app/target/collectibles-store-1.0.0.jar app.jar
 EXPOSE 4567
 ENTRYPOINT ["java", "-jar", "app.jar"]
 ```
