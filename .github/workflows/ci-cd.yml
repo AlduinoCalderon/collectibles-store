@@ -1,10 +1,21 @@
 name: CI/CD Pipeline
 
+
 on:
   push:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
+  schedule:
+    - cron: '*/5 * * * *'
+  healthcheck:
+    name: Health Check (Every 5 min)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Call /api/health endpoint
+        run: |
+          curl -f https://collectibles-store.onrender.com/api/health || echo "Health check failed"
 
 env:
   JAVA_VERSION: '11'

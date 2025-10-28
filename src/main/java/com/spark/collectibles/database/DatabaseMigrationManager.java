@@ -37,6 +37,9 @@ public class DatabaseMigrationManager {
      */
     private void initializeFlyway() {
         try {
+            String forceClean = System.getenv("FORCE_DB_CLEAN");
+            boolean allowClean = EnvironmentConfig.isDevelopment() || "true".equalsIgnoreCase(forceClean);
+            
             FluentConfiguration config = Flyway.configure()
                 .dataSource(
                     EnvironmentConfig.getDbUrl(),
@@ -47,13 +50,14 @@ public class DatabaseMigrationManager {
                 .baselineOnMigrate(true)
                 .validateOnMigrate(false)  // Disable strict validation to handle inconsistencies
                 .outOfOrder(false)
-                .cleanDisabled(!EnvironmentConfig.isDevelopment());  // Allow clean only in development
+                .cleanDisabled(!allowClean);  // Allow clean in development or when FORCE_DB_CLEAN=true
             
             flyway = new Flyway(config);
             logger.info("Flyway migration manager initialized");
-            logger.info("Environment: {}, Clean allowed: {}", 
+            logger.info("Environment: {}, Clean allowed: {}, FORCE_DB_CLEAN: {}", 
                 EnvironmentConfig.getAppEnv(), 
-                !config.isCleanDisabled());
+                allowClean,
+                forceClean);
             
         } catch (Exception e) {
             logger.error("Failed to initialize Flyway migration manager", e);
@@ -94,12 +98,24 @@ public class DatabaseMigrationManager {
             
             // Handle inconsistencies
             if (hasFailedMigrations || hasMissingMigrations) {
-                if (EnvironmentConfig.isDevelopment()) {
+                String forceClean = System.getenv("FORCE_DB_CLEAN");
+                boolean shouldClean = EnvironmentConfig.isDevelopment() || "true".equalsIgnoreCase(forceClean);
+                
+                if (shouldClean) {
                     logger.warn("Database is in inconsistent state. Cleaning and re-migrating...");
-                    flyway.clean();
-                    logger.info("Database cleaned successfully");
+                    logger.warn("FORCE_DB_CLEAN={}, isDevelopment={}", forceClean, EnvironmentConfig.isDevelopment());
+                    try {
+                        flyway.clean();
+                        logger.info("Database cleaned successfully - all tables and history removed");
+                    } catch (Exception e) {
+                        logger.error("Failed to clean database: {}", e.getMessage());
+                        logger.warn("Attempting repair instead...");
+                        flyway.repair();
+                        logger.info("Repair completed");
+                    }
                 } else {
                     logger.warn("Attempting to repair migration history...");
+                    logger.warn("If this fails repeatedly, set environment variable FORCE_DB_CLEAN=true to reset database");
                     flyway.repair();
                     logger.info("Repair completed");
                 }
