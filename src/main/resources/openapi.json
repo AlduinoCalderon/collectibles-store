@@ -1,0 +1,264 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Collectibles Store API",
+    "version": "1.0.0",
+    "description": "A RESTful API for managing collectible items."
+  },
+  "servers": [
+    { "url": "http://localhost:4567/api" }
+  ],
+  "paths": {
+    "/products": {
+      "get": {
+        "summary": "Get all products",
+        "description": "Retrieve a list of all products with their name and price.",
+        "responses": {
+          "200": {
+            "description": "List of products",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a product",
+        "description": "Create a new product.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Product" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "summary": "Get product by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Product" }
+              }
+            }
+          },
+          "404": { "description": "Product not found" }
+        }
+      },
+      "put": {
+        "summary": "Update product",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Product" }
+              }
+            }
+          },
+          "404": { "description": "Product not found" }
+        }
+      },
+      "delete": {
+        "summary": "Soft delete product",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Product soft deleted" },
+          "404": { "description": "Product not found" }
+        }
+      },
+      "options": {
+        "summary": "Check if product exists",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Product exists" },
+          "404": { "description": "Product not found" }
+        }
+      }
+    },
+    "/products/{id}/restore": {
+      "post": {
+        "summary": "Restore soft-deleted product",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Product restored" },
+          "404": { "description": "Product not found" }
+        }
+      }
+    },
+    "/products/{id}/hard": {
+      "delete": {
+        "summary": "Hard delete product",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Product permanently deleted" },
+          "404": { "description": "Product not found" }
+        }
+      }
+    },
+    "/products/search": {
+      "get": {
+        "summary": "Search products",
+        "parameters": [
+          { "name": "q", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching products",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/category/{category}": {
+      "get": {
+        "summary": "Get products by category",
+        "parameters": [
+          { "name": "category", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Products in category",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/price-range": {
+      "get": {
+        "summary": "Get products by price range",
+        "parameters": [
+          { "name": "min", "in": "query", "required": true, "schema": { "type": "number", "format": "float" } },
+          { "name": "max", "in": "query", "required": true, "schema": { "type": "number", "format": "float" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Products in price range",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/active": {
+      "get": {
+        "summary": "Get active products",
+        "responses": {
+          "200": {
+            "description": "Active products",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/stats": {
+      "get": {
+        "summary": "Get product statistics",
+        "responses": {
+          "200": {
+            "description": "Product statistics",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProductStats" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "price": { "type": "number", "format": "float" },
+          "currency": { "type": "string" },
+          "category": { "type": "string" },
+          "isActive": { "type": "boolean" },
+          "isDeleted": { "type": "boolean" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "deletedAt": { "type": "string", "format": "date-time", "nullable": true }
+        },
+        "required": ["id", "name", "description", "price", "currency", "isActive", "isDeleted", "createdAt", "updatedAt"]
+      },
+      "ProductInput": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "price": { "type": "number", "format": "float" },
+          "currency": { "type": "string" },
+          "category": { "type": "string" }
+        },
+        "required": ["name", "description", "price", "currency"]
+      },
+      "ProductStats": {
+        "type": "object",
+        "properties": {
+          "totalProducts": { "type": "integer" },
+          "activeProducts": { "type": "integer" },
+          "deletedProducts": { "type": "integer" }
+        }
+      }
+    }
+  }
+}
