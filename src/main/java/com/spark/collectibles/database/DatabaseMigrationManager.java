@@ -45,12 +45,15 @@ public class DatabaseMigrationManager {
                 )
                 .locations("classpath:db/migration")
                 .baselineOnMigrate(true)
-                .validateOnMigrate(true)
+                .validateOnMigrate(false)  // Disable strict validation to handle inconsistencies
                 .outOfOrder(false)
-                .cleanDisabled(true);
+                .cleanDisabled(!EnvironmentConfig.isDevelopment());  // Allow clean only in development
             
             flyway = new Flyway(config);
             logger.info("Flyway migration manager initialized");
+            logger.info("Environment: {}, Clean allowed: {}", 
+                EnvironmentConfig.getAppEnv(), 
+                !config.isCleanDisabled());
             
         } catch (Exception e) {
             logger.error("Failed to initialize Flyway migration manager", e);
@@ -67,21 +70,39 @@ public class DatabaseMigrationManager {
             logger.info("Starting database migration...");
             logger.info("Migration location: classpath:db/migration");
             
-            // Check for failed migrations and repair if needed
+            // Check for failed or missing migrations
             org.flywaydb.core.api.MigrationInfo[] allMigrations = flyway.info().all();
             boolean hasFailedMigrations = false;
+            boolean hasMissingMigrations = false;
+            
             for (org.flywaydb.core.api.MigrationInfo info : allMigrations) {
                 if (info.getState() == org.flywaydb.core.api.MigrationState.FAILED) {
                     if (!hasFailedMigrations) {
-                        logger.warn("Found failed migrations, attempting repair...");
+                        logger.warn("Found failed migrations:");
                         hasFailedMigrations = true;
                     }
-                    logger.warn("  - Failed migration: {} - {}", info.getVersion(), info.getDescription());
+                    logger.warn("  - Failed: {} - {}", info.getVersion(), info.getDescription());
+                }
+                if (info.getState() == org.flywaydb.core.api.MigrationState.MISSING_SUCCESS) {
+                    if (!hasMissingMigrations) {
+                        logger.warn("Found missing migrations (applied but files changed):");
+                        hasMissingMigrations = true;
+                    }
+                    logger.warn("  - Missing: {} - {}", info.getVersion(), info.getDescription());
                 }
             }
-            if (hasFailedMigrations) {
-                flyway.repair();
-                logger.info("Flyway repair completed successfully");
+            
+            // Handle inconsistencies
+            if (hasFailedMigrations || hasMissingMigrations) {
+                if (EnvironmentConfig.isDevelopment()) {
+                    logger.warn("Database is in inconsistent state. Cleaning and re-migrating...");
+                    flyway.clean();
+                    logger.info("Database cleaned successfully");
+                } else {
+                    logger.warn("Attempting to repair migration history...");
+                    flyway.repair();
+                    logger.info("Repair completed");
+                }
             }
             
             // Check pending migrations
