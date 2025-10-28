@@ -6,4 +6,4 @@ INSERT INTO products (id, name, description, price, currency, category, is_activ
 ('item5', 'Jersey firmado por Snoop Dogg', 'Un jersey autografiado por el legendario rapero Snoop Dogg.', 355.67, 'USD', 'Clothing', true, false),
 ('item6', 'Prenda de Cardi B autografiada', 'Un crop-top usado y autografiado por la famosa rapera Cardi B. en su última visita a México', 674.23, 'USD', 'Clothing', true, false),
 ('item7', 'Guitarra autografiada por Coldplay', 'Una guitarra eléctrica autografiada por la popular banda británica Coldplay, un día antes de su concierto en Monterrey en 2022.', 458.91, 'USD', 'Musical Instruments', true, false)
-ON CONFLICT (id) DO NOTHING;
+ON DUPLICATE KEY UPDATE id=id;

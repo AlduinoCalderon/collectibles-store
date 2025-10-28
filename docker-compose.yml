@@ -1,23 +1,24 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:15-alpine
-    container_name: collectibles-postgres
+  # MySQL Database
+  mysql:
+    image: mysql:8.3
+    container_name: collectibles-mysql
     environment:
-      POSTGRES_DB: collectibles_store
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      MYSQL_DATABASE: collectibles_store
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_HOST: '%'
     ports:
-      - "5432:5432"
+      - "3306:3306"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
       interval: 10s
       timeout: 5s
       retries: 5
+    command: --default-authentication-plugin=mysql_native_password
 
   # Collectibles Store API
   api:
@@ -26,10 +27,10 @@ services:
     ports:
       - "4567:4567"
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
+      DB_HOST: mysql
+      DB_PORT: 3306
       DB_NAME: collectibles_store
-      DB_USERNAME: postgres
+      DB_USERNAME: root
       DB_PASSWORD: password
       APP_PORT: 4567
       APP_ENV: production
@@ -39,16 +40,16 @@ services:
       DB_CONNECTION_TIMEOUT: 30000
       API_BASE_PATH: /api
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4567/api/products"]
+      test: ["CMD", "curl", "-f", "http://localhost:4567/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 60s
 
 volumes:
-  postgres_data:
+  mysql_data:
 
 

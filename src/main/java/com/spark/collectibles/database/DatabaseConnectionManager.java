@@ -58,7 +58,7 @@ public class DatabaseConnectionManager {
             config.setConnectionTestQuery("SELECT 1");
             config.setLeakDetectionThreshold(60000); // 60 seconds
             
-            // PostgreSQL specific settings
+            // MySQL specific settings for performance optimization
             config.addDataSourceProperty("cachePrepStmts", "true");
             config.addDataSourceProperty("prepStmtCacheSize", "250");
             config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

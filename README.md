@@ -10,7 +10,7 @@ This project is part of the Digital NAO Backend Development pathway, focusing on
 
 - **RESTful API Design**: Clean, intuitive endpoints following REST principles
 - **Product Management**: Complete CRUD operations for collectible items with soft delete functionality
-- **PostgreSQL Integration**: Robust database layer with connection pooling and migrations
+- **MySQL Integration**: Robust database layer with connection pooling and migrations
 - **Environment Configuration**: Flexible configuration management with .env support
 - **SOLID Principles**: Clean architecture following SOLID design principles
 - **Input Validation**: Comprehensive data validation and error handling
@@ -58,7 +58,7 @@ This project is part of the Digital NAO Backend Development pathway, focusing on
 
 - **Java 11**: Core programming language
 - **Spark Framework 2.9.4**: Lightweight web framework for Java
-- **PostgreSQL 12+**: Primary database
+- **MySQL 8+**: Primary database
 - **HikariCP 5.1.0**: High-performance connection pooling
 - **Flyway 10.8.1**: Database migration management
 - **Maven**: Dependency management and build automation
@@ -89,7 +89,7 @@ collectibles-store/
 │   │   │               ├── repository/
 │   │   │               │   ├── ProductRepository.java         # Repository interface
 │   │   │               │   └── impl/
-│   │   │               │       └── PostgreSQLProductRepository.java # PostgreSQL implementation
+│   │   │               │       └── PostgreSQLProductRepository.java # MySQL implementation
 │   │   │               ├── service/
 │   │   │               │   └── ProductService.java            # Business logic
 │   │   │               ├── routes/
@@ -126,7 +126,7 @@ collectibles-store/
 
 - **Java 11** or higher
 - **Maven 3.6** or higher
-- **PostgreSQL 12** or higher
+- **MySQL 8** or higher
 - **Docker** (optional, for containerized deployment)
 - **Git** (for version control)
 
@@ -138,22 +138,23 @@ collectibles-store/
    cd collectibles-store
    ```
 
-2. **Set up PostgreSQL database**
+2. **Set up MySQL database**
    ```bash
-   # Create database
-   createdb collectibles_store
+   # Create database using MySQL client
+   mysql -u root -p -e "CREATE DATABASE collectibles_store;"
    
-   # Or using psql
-   psql -U postgres -c "CREATE DATABASE collectibles_store;"
+   # Or login to MySQL and create database
+   mysql -u root -p
+   CREATE DATABASE collectibles_store;
    ```
 
 3. **Configure environment variables**
    ```bash
    # Set environment variables (optional - defaults are in application.properties)
    export DB_HOST=localhost
-   export DB_PORT=5432
+   export DB_PORT=3306
    export DB_NAME=collectibles_store
-   export DB_USERNAME=postgres
+   export DB_USERNAME=root
    export DB_PASSWORD=your_password
    ```
 
@@ -276,9 +277,9 @@ The API uses environment variables for configuration (with fallback to applicati
 ```bash
 # Database Configuration
 DB_HOST=localhost
-DB_PORT=5432
+DB_PORT=3306
 DB_NAME=collectibles_store
-DB_USERNAME=postgres
+DB_USERNAME=root
 DB_PASSWORD=password
 
 # Application Configuration
@@ -296,7 +297,7 @@ API_BASE_PATH=/api
 ```
 
 ### Database Schema
-The API uses PostgreSQL with the following main table:
+The API uses MySQL with the following main table:
 
 ```sql
 CREATE TABLE products (

@@ -46,9 +46,9 @@ public class EnvironmentConfig {
     private static void loadFromEnvironment() {
         // Database configuration
     setProperty("db.host", "DB_HOST", "localhost");
-    setProperty("db.port", "DB_PORT", "5432");
+    setProperty("db.port", "DB_PORT", "3306");
     setProperty("db.name", "DB_NAME", "collectibles_store");
-    setProperty("db.username", "DB_USERNAME", "postgres");
+    setProperty("db.username", "DB_USERNAME", "root");
     setProperty("db.password", "DB_PASSWORD", "password");
         
         // Application configuration
@@ -101,7 +101,7 @@ public class EnvironmentConfig {
     }
     
     public static String getDbUrl() {
-    return String.format("jdbc:postgresql://%s:%d/%s?useSSL=false&serverTimezone=UTC", getDbHost(), getDbPort(), getDbName());
+    return String.format("jdbc:mysql://%s:%d/%s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true", getDbHost(), getDbPort(), getDbName());
     }
     
     // Application configuration getters
