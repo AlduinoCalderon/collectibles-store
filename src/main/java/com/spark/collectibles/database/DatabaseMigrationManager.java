@@ -64,18 +64,36 @@ public class DatabaseMigrationManager {
      */
     public int migrate() {
         try {
-            logger.info("Starting database migration");
+            logger.info("Starting database migration...");
+            logger.info("Migration location: classpath:db/migration");
+            
+            // Check pending migrations
+            org.flywaydb.core.api.MigrationInfo[] pending = flyway.info().pending();
+            logger.info("Found {} pending migrations", pending.length);
+            for (org.flywaydb.core.api.MigrationInfo info : pending) {
+                logger.info("  - Pending migration: {} - {}", info.getVersion(), info.getDescription());
+            }
+            
+            // Execute migrations
             org.flywaydb.core.api.output.MigrateResult result = flyway.migrate();
             int migrationsApplied = result.migrationsExecuted;
+            
             if (migrationsApplied > 0) {
-                logger.info("Applied {} database migrations", migrationsApplied);
+                logger.info("Successfully applied {} database migrations", migrationsApplied);
             } else {
                 logger.info("Database is up to date, no migrations needed");
             }
+            
+            // Log current schema version
+            org.flywaydb.core.api.MigrationInfo current = flyway.info().current();
+            if (current != null) {
+                logger.info("Current schema version: {}", current.getVersion());
+            }
+            
             return migrationsApplied;
         } catch (Exception e) {
-            logger.error("Database migration failed", e);
-            throw new RuntimeException("Database migration failed", e);
+            logger.error("Database migration failed: {}", e.getMessage(), e);
+            throw new RuntimeException("Database migration failed: " + e.getMessage(), e);
         }
     }
     
