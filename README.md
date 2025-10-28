@@ -8,7 +8,7 @@ This project is part of the Digital NAO Backend Development pathway, focusing on
 
 ### Key Features
 
-- **RESTful API Design**: Clean, intuitive endpoints following REST principles with proper route grouping
+- **RESTful API Design**: Clean, intuitive endpoints following REST principles
 - **Product Management**: Complete CRUD operations for collectible items with soft delete functionality
 - **PostgreSQL Integration**: Robust database layer with connection pooling and migrations
 - **Environment Configuration**: Flexible configuration management with .env support
@@ -20,6 +20,9 @@ This project is part of the Digital NAO Backend Development pathway, focusing on
 - **Connection Pooling**: High-performance database connections with HikariCP
 - **Logging**: Comprehensive logging using Logback
 - **Maven Build**: Standard Maven project structure with dependency management
+- **Docker Support**: Containerized deployment ready
+- **API Documentation**: Interactive API docs with Scalar
+- **CI/CD Pipeline**: GitHub Actions workflow for automated testing and deployment
 
 ## 📋 API Endpoints
 
@@ -27,24 +30,29 @@ This project is part of the Digital NAO Backend Development pathway, focusing on
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/api/v1/products` | Retrieve all products with name and price |
-| `GET` | `/api/v1/products/:id` | Retrieve a specific product by ID with description |
-| `POST` | `/api/v1/products` | Create a new product |
-| `PUT` | `/api/v1/products/:id` | Update an existing product |
-| `DELETE` | `/api/v1/products/:id` | Soft delete a product |
-| `OPTIONS` | `/api/v1/products/:id` | Check if a product exists |
+| `GET` | `/api/products` | Retrieve all products with name and price |
+| `GET` | `/api/products/:id` | Retrieve a specific product by ID with description |
+| `POST` | `/api/products` | Create a new product |
+| `PUT` | `/api/products/:id` | Update an existing product |
+| `DELETE` | `/api/products/:id` | Soft delete a product |
+| `OPTIONS` | `/api/products/:id` | Check if a product exists |
 
 ### Advanced Product Operations
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/api/v1/products/search?q=query` | Search products by name or description |
-| `GET` | `/api/v1/products/category/:category` | Get products by category |
-| `GET` | `/api/v1/products/price-range?min=min&max=max` | Get products by price range |
-| `GET` | `/api/v1/products/active` | Get active products only |
-| `GET` | `/api/v1/products/stats` | Get product statistics |
-| `POST` | `/api/v1/products/:id/restore` | Restore soft-deleted product |
-| `DELETE` | `/api/v1/products/:id/hard` | Permanently delete a product |
+| `GET` | `/api/products/search?q=query` | Search products by name or description |
+| `GET` | `/api/products/category/:category` | Get products by category |
+| `GET` | `/api/products/price-range?min=min&max=max` | Get products by price range |
+| `GET` | `/api/products/active` | Get active products only |
+| `GET` | `/api/products/stats` | Get product statistics |
+| `POST` | `/api/products/:id/restore` | Restore soft-deleted product |
+| `DELETE` | `/api/products/:id/hard` | Permanently delete a product |
+
+### API Documentation
+
+- **Interactive API Docs**: Available at `/api/docs` (Scalar UI)
+- **OpenAPI Specification**: Available at `/api/openapi.json`
 
 ## 🛠️ Technology Stack
 
@@ -57,6 +65,8 @@ This project is part of the Digital NAO Backend Development pathway, focusing on
 - **Gson 2.10.1**: JSON serialization/deserialization
 - **Logback 1.4.14**: Logging framework
 - **JUnit 5**: Testing framework
+- **Docker**: Containerization
+- **Scalar**: Interactive API documentation
 
 ## 📦 Project Structure
 
@@ -97,11 +107,14 @@ collectibles-store/
 │   └── test/
 │       └── java/                                             # Test classes
 ├── docs/                                                     # Project documentation
-│   ├── api_documentation.md                                 # API documentation
-│   ├── development_decisions.md                             # Architectural decisions
-│   ├── github_setup_commands.md                             # GitHub setup guide
-│   └── project_summary.md                                   # Project summary
+│   ├── openapi.json                                         # OpenAPI specification
+│   ├── backlog.md                                           # Project backlog
+│   └── roadmap.md                                           # Development roadmap
+├── .github/
+│   └── workflows/
+│       └── ci-cd.yml                                        # GitHub Actions workflow
 ├── pom.xml                                                  # Maven configuration
+├── Dockerfile                                               # Docker configuration
 ├── README.md                                                # This file
 ├── run.bat                                                  # Windows run script
 └── run.sh                                                   # Unix/Linux run script
@@ -114,6 +127,7 @@ collectibles-store/
 - **Java 11** or higher
 - **Maven 3.6** or higher
 - **PostgreSQL 12** or higher
+- **Docker** (optional, for containerized deployment)
 - **Git** (for version control)
 
 ### Installation
@@ -160,12 +174,38 @@ collectibles-store/
    ```
 
 6. **Access the API**
-   The API will be available at: `http://localhost:4567`
+   - API: `http://localhost:4567`
+   - Interactive Docs: `http://localhost:4567/api/docs`
+   - OpenAPI Spec: `http://localhost:4567/api/openapi.json`
+
+### Docker Deployment
+
+1. **Build Docker image**
+   ```bash
+   docker build -t collectibles-store .
+   ```
+
+2. **Run with Docker Compose**
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Run standalone container**
+   ```bash
+   docker run -p 4567:4567 \
+     -e DB_HOST=your-db-host \
+     -e DB_PASSWORD=your-password \
+     collectibles-store
+   ```
 
 ### Running Tests
 
 ```bash
+# Run all tests
 mvn test
+
+# Run tests with coverage
+mvn test jacoco:report
 ```
 
 ## 📖 API Usage Examples
@@ -173,7 +213,7 @@ mvn test
 ### Create a Product
 
 ```bash
-curl -X POST http://localhost:4567/api/v1/products \
+curl -X POST http://localhost:4567/api/products \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Guitarra autografiada por Coldplay",
@@ -187,19 +227,19 @@ curl -X POST http://localhost:4567/api/v1/products \
 ### Get All Products
 
 ```bash
-curl -X GET http://localhost:4567/api/v1/products
+curl -X GET http://localhost:4567/api/products
 ```
 
 ### Get Product by ID
 
 ```bash
-curl -X GET http://localhost:4567/api/v1/products/item1
+curl -X GET http://localhost:4567/api/products/item1
 ```
 
 ### Update a Product
 
 ```bash
-curl -X PUT http://localhost:4567/api/v1/products/item1 \
+curl -X PUT http://localhost:4567/api/products/item1 \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Gorra autografiada por Peso Pluma - Limited Edition",
@@ -210,40 +250,22 @@ curl -X PUT http://localhost:4567/api/v1/products/item1 \
   }'
 ```
 
-### Check if Product Exists
-
-```bash
-curl -X OPTIONS http://localhost:4567/api/v1/products/item1
-```
-
-### Delete a Product (Soft Delete)
-
-```bash
-curl -X DELETE http://localhost:4567/api/v1/products/item1
-```
-
 ### Search Products
 
 ```bash
-curl -X GET "http://localhost:4567/api/v1/products/search?q=guitarra"
+curl -X GET "http://localhost:4567/api/products/search?q=guitarra"
 ```
 
 ### Get Products by Category
 
 ```bash
-curl -X GET http://localhost:4567/api/v1/products/category/Autographed%20Items
+curl -X GET http://localhost:4567/api/products/category/Autographed%20Items
 ```
 
 ### Get Products by Price Range
 
 ```bash
-curl -X GET "http://localhost:4567/api/v1/products/price-range?min=500&max=800"
-```
-
-### Get Product Statistics
-
-```bash
-curl -X GET http://localhost:4567/api/v1/products/stats
+curl -X GET "http://localhost:4567/api/products/price-range?min=500&max=800"
 ```
 
 ## 🔧 Configuration
@@ -270,7 +292,6 @@ DB_MIN_CONNECTIONS=2
 DB_CONNECTION_TIMEOUT=30000
 
 # API Configuration
-API_VERSION=v1
 API_BASE_PATH=/api
 ```
 
@@ -292,18 +313,6 @@ CREATE TABLE products (
     deleted_at TIMESTAMP NULL
 );
 ```
-
-### Maven Configuration
-
-The project uses Maven for dependency management. Key dependencies include:
-
-- **Spark Core**: Web framework
-- **PostgreSQL**: Database driver
-- **HikariCP**: Connection pooling
-- **Flyway**: Database migrations
-- **Gson**: JSON processing
-- **Logback**: Logging
-- **JUnit 5**: Testing
 
 ## 📊 Response Format
 
@@ -344,26 +353,6 @@ mvn test
 mvn test jacoco:report
 ```
 
-## 📝 Development Guidelines
-
-### Code Style
-- Follow Java naming conventions
-- Use meaningful variable and method names
-- Add Javadoc comments for public methods
-- Maintain consistent indentation (4 spaces)
-
-### Error Handling
-- Use appropriate HTTP status codes
-- Provide meaningful error messages
-- Log errors for debugging
-- Validate input data
-
-### API Design
-- Follow RESTful principles
-- Use consistent endpoint naming
-- Provide clear response formats
-- Include proper HTTP headers
-
 ## 🚀 Deployment
 
 ### Building for Production
@@ -372,7 +361,7 @@ mvn test jacoco:report
 mvn clean package -Pproduction
 ```
 
-### Docker Support (Optional)
+### Docker Support
 
 ```dockerfile
 FROM openjdk:11-jre-slim
@@ -381,11 +370,19 @@ EXPOSE 4567
 ENTRYPOINT ["java", "-jar", "app.jar"]
 ```
 
+### Render Deployment
+
+The project is configured for easy deployment on Render:
+
+1. Connect your GitHub repository to Render
+2. Set environment variables in Render dashboard
+3. Deploy automatically via GitHub Actions
+
 ## 📚 Documentation
 
 - [Project Backlog](docs/backlog.md) - User stories and requirements
 - [Project Roadmap](docs/roadmap.md) - Development timeline and milestones
-- [API Documentation](docs/api.md) - Detailed API reference
+- [OpenAPI Specification](docs/openapi.json) - Complete API specification
 
 ## 🤝 Contributing
 
