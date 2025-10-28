@@ -56,7 +56,7 @@ This project is part of the Digital NAO Backend Development pathway, focusing on
 
 ## 🛠️ Technology Stack
 
-- **Java 11**: Core programming language
+- **Java 17**: Core programming language
 - **Spark Framework 2.9.4**: Lightweight web framework for Java
 - **MySQL 8+**: Primary database
 - **HikariCP 5.1.0**: High-performance connection pooling
@@ -124,7 +124,7 @@ collectibles-store/
 
 ### Prerequisites
 
-- **Java 11** or higher
+- **Java 17** or higher
 - **Maven 3.6** or higher
 - **MySQL 8** or higher
 - **Docker** (optional, for containerized deployment)
@@ -368,7 +368,7 @@ The project uses a multi-stage Dockerfile that builds and runs the application:
 
 ```dockerfile
 # Stage 1: Build with Maven
-FROM maven:3.9-eclipse-temurin-11 AS build
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
@@ -376,7 +376,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Stage 2: Run with JRE
-FROM openjdk:11-jre-slim
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=build /app/target/collectibles-store-1.0.0.jar app.jar
 EXPOSE 4567
