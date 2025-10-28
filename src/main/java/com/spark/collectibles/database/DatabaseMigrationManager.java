@@ -65,17 +65,14 @@ public class DatabaseMigrationManager {
     public int migrate() {
         try {
             logger.info("Starting database migration");
-            
-            int migrationsApplied = flyway.migrate();
-            
+            org.flywaydb.core.api.output.MigrateResult result = flyway.migrate();
+            int migrationsApplied = result.migrationsExecuted;
             if (migrationsApplied > 0) {
                 logger.info("Applied {} database migrations", migrationsApplied);
             } else {
                 logger.info("Database is up to date, no migrations needed");
             }
-            
             return migrationsApplied;
-            
         } catch (Exception e) {
             logger.error("Database migration failed", e);
             throw new RuntimeException("Database migration failed", e);

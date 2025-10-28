@@ -1,4 +1,3 @@
--- Insert sample products based on items.json
 INSERT INTO products (id, name, description, price, currency, category, is_active, is_deleted) VALUES
 ('item1', 'Gorra autografiada por Peso Pluma', 'Una gorra autografiada por el famoso Peso Pluma.', 621.34, 'USD', 'Autographed Items', true, false),
 ('item2', 'Casco autografiado por Rosalía', 'Un casco autografiado por la famosa cantante Rosalía, una verdadera MOTOMAMI!', 734.57, 'USD', 'Autographed Items', true, false),
