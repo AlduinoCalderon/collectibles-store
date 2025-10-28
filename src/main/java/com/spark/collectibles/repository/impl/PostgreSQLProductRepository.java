@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +28,7 @@ public class PostgreSQLProductRepository implements ProductRepository {
     
     @Override
     public List<Product> findAll() {
-        String sql = "SELECT * FROM products WHERE is_deleted = false ORDER BY created_at DESC";
+    String sql = "SELECT * FROM products WHERE is_deleted = false ORDER BY created_at DESC";
         return executeQuery(sql);
     }
     
@@ -41,7 +40,7 @@ public class PostgreSQLProductRepository implements ProductRepository {
     
     @Override
     public Optional<Product> findById(String id) {
-        String sql = "SELECT * FROM products WHERE id = ? AND is_deleted = false";
+    String sql = "SELECT * FROM products WHERE id = ? AND is_deleted = false";
         return executeQueryForSingle(sql, id);
     }
     
@@ -62,12 +61,11 @@ public class PostgreSQLProductRepository implements ProductRepository {
     
     @Override
     public Product update(Product product) {
-        String sql = """
-            UPDATE products 
-            SET name = ?, description = ?, price = ?, currency = ?, 
-                category = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
-            WHERE id = ? AND is_deleted = false
-            """;
+        String sql =
+            "UPDATE products " +
+            "SET name = ?, description = ?, price = ?, currency = ?, " +
+            "category = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP " +
+            "WHERE id = ? AND is_deleted = 0";
         
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -97,11 +95,10 @@ public class PostgreSQLProductRepository implements ProductRepository {
     
     @Override
     public boolean softDeleteById(String id) {
-        String sql = """
-            UPDATE products 
-            SET is_deleted = true, is_active = false, deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-            WHERE id = ? AND is_deleted = false
-            """;
+        String sql =
+            "UPDATE products " +
+            "SET is_deleted = true, is_active = false, deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP " +
+            "WHERE id = ? AND is_deleted = false";
         
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -149,11 +146,10 @@ public class PostgreSQLProductRepository implements ProductRepository {
     
     @Override
     public boolean restoreById(String id) {
-        String sql = """
-            UPDATE products 
-            SET is_deleted = false, is_active = true, deleted_at = NULL, updated_at = CURRENT_TIMESTAMP
-            WHERE id = ? AND is_deleted = true
-            """;
+        String sql =
+            "UPDATE products " +
+            "SET is_deleted = false, is_active = true, deleted_at = NULL, updated_at = CURRENT_TIMESTAMP " +
+            "WHERE id = ? AND is_deleted = true";
         
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -177,49 +173,48 @@ public class PostgreSQLProductRepository implements ProductRepository {
     
     @Override
     public List<Product> findByCategory(String category) {
-        String sql = "SELECT * FROM products WHERE category = ? AND is_deleted = false ORDER BY created_at DESC";
+    String sql = "SELECT * FROM products WHERE category = ? AND is_deleted = false ORDER BY created_at DESC";
         return executeQuery(sql, category);
     }
     
     @Override
     public List<Product> findByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
-        String sql = "SELECT * FROM products WHERE price >= ? AND price <= ? AND is_deleted = false ORDER BY price ASC";
+    String sql = "SELECT * FROM products WHERE price >= ? AND price <= ? AND is_deleted = false ORDER BY price ASC";
         return executeQuery(sql, minPrice, maxPrice);
     }
     
     @Override
     public List<Product> search(String query) {
-        String sql = """
-            SELECT * FROM products 
-            WHERE (name ILIKE ? OR description ILIKE ?) 
-            AND is_deleted = false 
-            ORDER BY created_at DESC
-            """;
+        String sql =
+            "SELECT * FROM products " +
+            "WHERE (name LIKE ? OR description LIKE ?) " +
+            "AND is_deleted = false " +
+            "ORDER BY created_at DESC";
         String searchPattern = "%" + query + "%";
         return executeQuery(sql, searchPattern, searchPattern);
     }
     
     @Override
     public List<Product> findActive() {
-        String sql = "SELECT * FROM products WHERE is_active = true AND is_deleted = false ORDER BY created_at DESC";
+    String sql = "SELECT * FROM products WHERE is_active = true AND is_deleted = false ORDER BY created_at DESC";
         return executeQuery(sql);
     }
     
     @Override
     public long count() {
-        String sql = "SELECT COUNT(*) FROM products WHERE is_deleted = false";
+    String sql = "SELECT COUNT(*) FROM products WHERE is_deleted = false";
         return executeCountQuery(sql);
     }
     
     @Override
     public long countActive() {
-        String sql = "SELECT COUNT(*) FROM products WHERE is_active = true AND is_deleted = false";
+    String sql = "SELECT COUNT(*) FROM products WHERE is_active = true AND is_deleted = false";
         return executeCountQuery(sql);
     }
     
     @Override
     public boolean existsById(String id) {
-        String sql = "SELECT 1 FROM products WHERE id = ? AND is_deleted = false";
+    String sql = "SELECT 1 FROM products WHERE id = ? AND is_deleted = false";
         return executeExistsQuery(sql, id);
     }
     
@@ -233,10 +228,9 @@ public class PostgreSQLProductRepository implements ProductRepository {
      * Create a new product
      */
     private Product create(Product product) {
-        String sql = """
-            INSERT INTO products (id, name, description, price, currency, category, is_active, is_deleted, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """;
+        String sql =
+            "INSERT INTO products (id, name, description, price, currency, category, is_active, is_deleted, created_at, updated_at) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -376,8 +370,8 @@ public class PostgreSQLProductRepository implements ProductRepository {
         product.setPrice(resultSet.getBigDecimal("price"));
         product.setCurrency(resultSet.getString("currency"));
         product.setCategory(resultSet.getString("category"));
-        product.setActive(resultSet.getBoolean("is_active"));
-        product.setDeleted(resultSet.getBoolean("is_deleted"));
+    product.setActive(resultSet.getBoolean("is_active"));
+    product.setDeleted(resultSet.getBoolean("is_deleted"));
         
         Timestamp createdAt = resultSet.getTimestamp("created_at");
         if (createdAt != null) {
