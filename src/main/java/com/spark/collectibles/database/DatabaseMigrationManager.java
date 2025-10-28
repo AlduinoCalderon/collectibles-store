@@ -67,6 +67,17 @@ public class DatabaseMigrationManager {
             logger.info("Starting database migration...");
             logger.info("Migration location: classpath:db/migration");
             
+            // Check for failed migrations and repair if needed
+            org.flywaydb.core.api.MigrationInfo[] failed = flyway.info().failed();
+            if (failed.length > 0) {
+                logger.warn("Found {} failed migrations, attempting repair...", failed.length);
+                for (org.flywaydb.core.api.MigrationInfo info : failed) {
+                    logger.warn("  - Failed migration: {} - {}", info.getVersion(), info.getDescription());
+                }
+                flyway.repair();
+                logger.info("Flyway repair completed successfully");
+            }
+            
             // Check pending migrations
             org.flywaydb.core.api.MigrationInfo[] pending = flyway.info().pending();
             logger.info("Found {} pending migrations", pending.length);
