@@ -45,11 +45,11 @@ public class EnvironmentConfig {
      */
     private static void loadFromEnvironment() {
         // Database configuration
-        setProperty("db.host", "DB_HOST", "localhost");
-        setProperty("db.port", "DB_PORT", "5432");
-        setProperty("db.name", "DB_NAME", "collectibles_store");
-        setProperty("db.username", "DB_USERNAME", "postgres");
-        setProperty("db.password", "DB_PASSWORD", "password");
+    setProperty("db.host", "DB_HOST", "localhost");
+    setProperty("db.port", "DB_PORT", "5432");
+    setProperty("db.name", "DB_NAME", "collectibles_store");
+    setProperty("db.username", "DB_USERNAME", "postgres");
+    setProperty("db.password", "DB_PASSWORD", "password");
         
         // Application configuration
         setProperty("app.port", "APP_PORT", "4567");
@@ -62,7 +62,6 @@ public class EnvironmentConfig {
         setProperty("db.connection.timeout", "DB_CONNECTION_TIMEOUT", "30000");
         
         // API configuration
-        setProperty("api.version", "API_VERSION", "v1");
         setProperty("api.base.path", "API_BASE_PATH", "/api");
         
         logger.info("Configuration loaded successfully");
@@ -102,7 +101,7 @@ public class EnvironmentConfig {
     }
     
     public static String getDbUrl() {
-        return String.format("jdbc:postgresql://%s:%d/%s", getDbHost(), getDbPort(), getDbName());
+    return String.format("jdbc:postgresql://%s:%d/%s?useSSL=false&serverTimezone=UTC", getDbHost(), getDbPort(), getDbName());
     }
     
     // Application configuration getters
@@ -132,10 +131,6 @@ public class EnvironmentConfig {
     }
     
     // API configuration getters
-    public static String getApiVersion() {
-        return properties.getProperty("api.version");
-    }
-    
     public static String getApiBasePath() {
         return properties.getProperty("api.base.path");
     }
