@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Products - Collectibles Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        main {
+            padding: 30px;
+        }
+        
+        .filter-bar {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-bar input, .filter-bar select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .filter-bar input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-bar input[type="number"] {
+            width: 120px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            transition: transform 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .product-card p {
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+        
+        .product-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .category {
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        
+        footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .no-products {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏺 Collectibles Store</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/products">Browse Products</a>
+                <a href="/admin/products">Manage Products</a>
+                <a href="/api/docs">API Docs</a>
+            </nav>
+        </header>
+        
+        <main>
+            <h2>Browse Collectibles</h2>
+            
+            <div class="filter-bar">
+                <input type="text" id="searchQuery" placeholder="Search products..." value="{{searchQuery}}">
+                <select id="categoryFilter">
+                    <option value="">All Categories</option>
+                    {{#categories}}
+                    <option value="{{.}}" {{#selected}}selected{{/selected}}>{{.}}</option>
+                    {{/categories}}
+                </select>
+                <input type="number" id="minPrice" placeholder="Min Price" value="{{minPrice}}">
+                <input type="number" id="maxPrice" placeholder="Max Price" value="{{maxPrice}}">
+                <button class="btn" onclick="applyFilters()">Filter</button>
+                <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+            </div>
+            
+            <div id="productsContainer">
+                {{#products}}
+                <div class="product-card">
+                    <h3>{{name}}</h3>
+                    <p>{{description}}</p>
+                    <div class="product-info">
+                        <span class="price">${{price}} {{currency}}</span>
+                        {{#category}}
+                        <span class="category">{{category}}</span>
+                        {{/category}}
+                    </div>
+                </div>
+                {{/products}}
+                
+                {{^products}}
+                <div class="no-products">
+                    <p>No products found. Try adjusting your filters.</p>
+                </div>
+                {{/products}}
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2024 Collectibles Store. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <script>
+        function applyFilters() {
+            const query = document.getElementById('searchQuery').value;
+            const category = document.getElementById('categoryFilter').value;
+            const minPrice = document.getElementById('minPrice').value;
+            const maxPrice = document.getElementById('maxPrice').value;
+            
+            let url = '/products';
+            const params = new URLSearchParams();
+            
+            if (query) params.append('q', query);
+            if (category) params.append('category', category);
+            if (minPrice) params.append('min', minPrice);
+            if (maxPrice) params.append('max', maxPrice);
+            
+            if (params.toString()) {
+                url += '?' + params.toString();
+            }
+            
+            window.location.href = url;
+        }
+        
+        function clearFilters() {
+            window.location.href = '/products';
+        }
+        
+        document.getElementById('searchQuery').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
+    </script>
+</body>
+</html>
