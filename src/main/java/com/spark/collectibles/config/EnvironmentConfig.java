@@ -66,6 +66,9 @@ public class EnvironmentConfig {
         setProperty("api.base.path", "API_BASE_PATH", "/api");
         
         logger.info("Configuration loaded successfully");
+        // Log database configuration (without password for security)
+        logger.info("Database configuration - Host: {}, Port: {}, Database: {}, User: {}", 
+            getDbHost(), getDbPort(), getDbName(), getDbUsername());
     }
     
     /**

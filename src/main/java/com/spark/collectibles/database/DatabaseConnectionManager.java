@@ -67,8 +67,19 @@ public class DatabaseConnectionManager {
             HikariConfig config = new HikariConfig();
             
             // Database connection settings
-            config.setJdbcUrl(EnvironmentConfig.getDbUrl());
-            config.setUsername(EnvironmentConfig.getDbUsername());
+            String dbUrl = EnvironmentConfig.getDbUrl();
+            String dbUsername = EnvironmentConfig.getDbUsername();
+            
+            // Log connection details (without password for security)
+            logger.info("Connecting to database: Host={}, Port={}, Database={}, User={}", 
+                EnvironmentConfig.getDbHost(), 
+                EnvironmentConfig.getDbPort(), 
+                EnvironmentConfig.getDbName(), 
+                dbUsername);
+            logger.debug("JDBC URL: {}", dbUrl);
+            
+            config.setJdbcUrl(dbUrl);
+            config.setUsername(dbUsername);
             config.setPassword(EnvironmentConfig.getDbPassword());
             
             // Connection pool settings
@@ -127,6 +138,12 @@ public class DatabaseConnectionManager {
             
         } catch (SQLException e) {
             logger.error("Failed to initialize database connection", e);
+            logger.error("Connection details - Host: {}, Port: {}, Database: {}, User: {}", 
+                EnvironmentConfig.getDbHost(), 
+                EnvironmentConfig.getDbPort(), 
+                EnvironmentConfig.getDbName(), 
+                EnvironmentConfig.getDbUsername());
+            logger.error("Please verify that DB_HOST, DB_PORT, DB_NAME, DB_USERNAME, and DB_PASSWORD are correctly set in environment variables");
             throw new RuntimeException("Database initialization failed", e);
         }
     }
