@@ -162,14 +162,20 @@ public class Application {
         
         // Serve Scalar API documentation
         get("/api/docs", (request, response) -> {
-            response.type("text/html");
+            response.type("text/html; charset=utf-8");
+            response.header("Cache-Control", "no-cache, no-store, must-revalidate");
+            response.header("Pragma", "no-cache");
+            response.header("Expires", "0");
             try {
                 // Read the Scalar HTML from resources
                 java.io.InputStream inputStream = Application.class.getClassLoader()
                     .getResourceAsStream("static/scalar.html");
                 if (inputStream != null) {
-                    return new String(inputStream.readAllBytes());
+                    String html = new String(inputStream.readAllBytes());
+                    logger.info("Serving Scalar API documentation HTML (length: {})", html.length());
+                    return html;
                 } else {
+                    logger.error("Scalar HTML file not found in resources");
                     response.status(404);
                     return "<h1>API Documentation not found</h1>";
                 }
