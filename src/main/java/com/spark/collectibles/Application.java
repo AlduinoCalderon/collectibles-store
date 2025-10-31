@@ -34,6 +34,9 @@ public class Application {
             // Set port from configuration
             port(EnvironmentConfig.getAppPort());
             
+            // Configure static files (MUST be before any route mapping)
+            spark.Spark.staticFiles.location("/static");
+            
             // Enable CORS for all routes
             enableCORS();
             
@@ -41,9 +44,6 @@ public class Application {
             after("/api/*", (request, response) -> {
                 response.type("application/json");
             });
-            
-            // Configure template engine
-            spark.Spark.staticFiles.location("/static");
             
             // Initialize API routes
             ProductRoutes.initialize(productService);
