@@ -56,10 +56,20 @@ public class ViewRoutes {
                     products = productService.searchProducts(query.trim());
                 } else if (category != null && !category.trim().isEmpty()) {
                     products = productService.getProductsByCategory(category.trim());
-                } else if (minPriceStr != null && maxPriceStr != null) {
+                } else if (minPriceStr != null || maxPriceStr != null) {
+                    // Support filtering with only min, only max, or both
                     try {
-                        BigDecimal minPrice = new BigDecimal(minPriceStr);
-                        BigDecimal maxPrice = new BigDecimal(maxPriceStr);
+                        BigDecimal minPrice = null;
+                        BigDecimal maxPrice = null;
+                        
+                        if (minPriceStr != null && !minPriceStr.trim().isEmpty()) {
+                            minPrice = new BigDecimal(minPriceStr.trim());
+                        }
+                        
+                        if (maxPriceStr != null && !maxPriceStr.trim().isEmpty()) {
+                            maxPrice = new BigDecimal(maxPriceStr.trim());
+                        }
+                        
                         products = productService.getProductsByPriceRange(minPrice, maxPrice);
                     } catch (NumberFormatException e) {
                         products = productService.getAllProducts();
