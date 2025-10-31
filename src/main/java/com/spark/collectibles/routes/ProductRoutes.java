@@ -2,6 +2,7 @@ package com.spark.collectibles.routes;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.JsonIOException;
 import com.spark.collectibles.model.Product;
 import com.spark.collectibles.service.ProductService;
 import com.spark.collectibles.util.JsonUtil;
@@ -22,7 +23,8 @@ import static spark.Spark.*;
  */
 public class ProductRoutes {
     private static final Logger logger = LoggerFactory.getLogger(ProductRoutes.class);
-    private static final Gson gson = new Gson();
+    // Use JsonUtil.getGson() to ensure LocalDateTime adapter is configured
+    private static final Gson gson = JsonUtil.getGson();
     
     /**
      * Initialize all product-related routes
@@ -92,7 +94,7 @@ public class ProductRoutes {
                 
                 response.status(201);
                 return createdProduct;
-            } catch (JsonSyntaxException e) {
+            } catch (JsonSyntaxException | JsonIOException e) {
                 logger.error("Invalid JSON in request body", e);
                 response.status(400);
                 return new ErrorResponse("Invalid JSON format");
@@ -127,7 +129,7 @@ public class ProductRoutes {
                 }
                 
                 return updatedProduct;
-            } catch (JsonSyntaxException e) {
+            } catch (JsonSyntaxException | JsonIOException e) {
                 logger.error("Invalid JSON in request body", e);
                 response.status(400);
                 return new ErrorResponse("Invalid JSON format");
@@ -218,6 +220,7 @@ public class ProductRoutes {
         }, JsonUtil::toJson);
         
         // GET /api/products/price-range?min=minPrice&max=maxPrice — Get products by price range
+        // Supports: only min (>=), only max (<=), or both (between)
         get("/api/products/price-range", (request, response) -> {
             String minPriceStr = request.queryParams("min");
             String maxPriceStr = request.queryParams("max");
@@ -225,24 +228,58 @@ public class ProductRoutes {
                        minPriceStr, maxPriceStr);
             
             try {
-                if (minPriceStr == null || maxPriceStr == null) {
+                // At least one parameter is required
+                if ((minPriceStr == null || minPriceStr.trim().isEmpty()) && 
+                    (maxPriceStr == null || maxPriceStr.trim().isEmpty())) {
                     response.status(400);
-                    return new ErrorResponse("Both min and max price parameters are required");
+                    return new ErrorResponse("At least one of min or max price parameters is required");
                 }
                 
-                BigDecimal minPrice = new BigDecimal(minPriceStr);
-                BigDecimal maxPrice = new BigDecimal(maxPriceStr);
+                BigDecimal minPrice = null;
+                BigDecimal maxPrice = null;
                 
-                // Validate price range
-                if (!ValidationUtil.isValidPriceRange(minPrice, maxPrice)) {
-                    response.status(400);
-                    return new ErrorResponse("Invalid price range");
+                // Parse min price if provided
+                if (minPriceStr != null && !minPriceStr.trim().isEmpty()) {
+                    try {
+                        minPrice = new BigDecimal(minPriceStr.trim());
+                        if (!ValidationUtil.isValidPrice(minPrice)) {
+                            response.status(400);
+                            return new ErrorResponse("Invalid min price");
+                        }
+                    } catch (NumberFormatException e) {
+                        response.status(400);
+                        return new ErrorResponse("Invalid min price format");
+                    }
+                }
+                
+                // Parse max price if provided
+                if (maxPriceStr != null && !maxPriceStr.trim().isEmpty()) {
+                    try {
+                        maxPrice = new BigDecimal(maxPriceStr.trim());
+                        if (!ValidationUtil.isValidPrice(maxPrice)) {
+                            response.status(400);
+                            return new ErrorResponse("Invalid max price");
+                        }
+                    } catch (NumberFormatException e) {
+                        response.status(400);
+                        return new ErrorResponse("Invalid max price format");
+                    }
+                }
+                
+                // If both are provided, validate range
+                if (minPrice != null && maxPrice != null) {
+                    if (minPrice.compareTo(maxPrice) > 0) {
+                        response.status(400);
+                        return new ErrorResponse("Min price cannot be greater than max price");
+                    }
+                }
+                
+                // If only max is provided, set min to 0
+                if (minPrice == null && maxPrice != null) {
+                    minPrice = BigDecimal.ZERO;
                 }
                 
                 return productService.getProductsByPriceRange(minPrice, maxPrice);
-            } catch (NumberFormatException e) {
-                response.status(400);
-                return new ErrorResponse("Invalid price format");
             } catch (Exception e) {
                 logger.error("Error getting products by price range", e);
                 response.status(500);
