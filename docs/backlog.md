@@ -18,19 +18,19 @@
 **So that** I can easily find items of interest
 
 **Acceptance Criteria:**
-- [ ] Website shows a list of collectible items
-- [ ] Visitors can filter items by category or price
-- [ ] Filtering updates the displayed items without reloading the page
+- [x] Website shows a list of collectible items (✅ Completed Sprint 2)
+- [x] Visitors can filter items by category or price (✅ Completed Sprint 2 - Basic filtering implemented)
+- [ ] Filtering updates the displayed items without reloading the page (⏳ Advanced filtering planned for Sprint 3)
 
 ### User Story 3
 **As a** store administrator  
 **I want to** add, edit, and remove item offers through a web form  
-**So that** I can keep the store’s inventory up to date
+**So that** I can keep the store's inventory up to date
 
 **Acceptance Criteria:**
-- [ ] Admin panel with item management form is present
-- [ ] Item changes are reflected in the item list
-- [ ] Input validation and error handling are implemented
+- [x] Admin panel with item management form is present (✅ Completed Sprint 2)
+- [x] Item changes are reflected in the item list (✅ Completed Sprint 2)
+- [x] Input validation and error handling are implemented (✅ Completed Sprint 2)
 
 ### User Story 4
 **As a** store visitor  
@@ -53,16 +53,16 @@
 
 ## Requirements Tracking Table 2: Prioritized Requirements
 
-| Requirements | Stages | Time Estimation (hours) | Deliverables |
-|-------------|--------|------------------------|--------------|
-| Requirement 1.1: API endpoints for user CRUD | Sprint 1 | 5 | User API implemented |
-| Requirement 1.2: Input validation | Sprint 1 | 3 | User API validation |
-| Requirement 1.3: Error handling and status codes | Sprint 1 | 3 | User API error handling |
-| Requirement 2.1: Item browsing view | Sprint 2 | 4 | Item list page |
-| Requirement 2.2: Filtering logic | Sprint 2 | 3 | Filtering functionality |
-| Requirement 2.3: Dynamic client updates | Sprint 2 | 3 | Live item update mechanism |
-| Requirement 3.1: Admin item management form | Sprint 2 | 5 | Admin form for item management |
-| Requirement 3.2: Inventory update logic | Sprint 2 | 3 | Inventory update |
-| Requirement 3.3: Validation and feedback | Sprint 2 | 2 | Form validation and feedback |
-| Requirement 4.1: Real-time price update via WebSockets | Sprint 3 | 6 | WebSocket price update |
-| Requirement 4.2: Resilience to connection issues | Sprint 3 | 2 | Robust real-time system |
+| Requirements | Stages | Time Estimation (hours) | Deliverables | Status |
+|-------------|--------|------------------------|--------------|--------|
+| Requirement 1.1: API endpoints for user CRUD | Sprint 1 | 5 | User API implemented | ✅ |
+| Requirement 1.2: Input validation | Sprint 1 | 3 | User API validation | ✅ |
+| Requirement 1.3: Error handling and status codes | Sprint 1 | 3 | User API error handling | ✅ |
+| Requirement 2.1: Item browsing view | Sprint 2 | 4 | Item list page | ✅ |
+| Requirement 2.2: Filtering logic | Sprint 2 | 3 | Filtering functionality | ✅ (Basic) |
+| Requirement 2.3: Dynamic client updates | Sprint 2 | 3 | Live item update mechanism | ⏳ Sprint 3 |
+| Requirement 3.1: Admin item management form | Sprint 2 | 5 | Admin form for item management | ✅ |
+| Requirement 3.2: Inventory update logic | Sprint 2 | 3 | Inventory update | ✅ |
+| Requirement 3.3: Validation and feedback | Sprint 2 | 2 | Form validation and feedback | ✅ |
+| Requirement 4.1: Real-time price update via WebSockets | Sprint 3 | 6 | WebSocket price update | ⏳ |
+| Requirement 4.2: Resilience to connection issues | Sprint 3 | 2 | Robust real-time system | ⏳ |

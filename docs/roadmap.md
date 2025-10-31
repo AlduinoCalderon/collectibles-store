@@ -21,13 +21,14 @@ Develop a fully functional web application for selling collectible items using J
   - Project scaffolding and initial commit.
   - API endpoints for user CRUD operations tested.
 
-### Sprint 2 (Oct 28 to Oct 30)
-- Develop Mustache templates and frontend views for the website.
-- Implement exception handling for user interactions.
-- Create and connect a form to manage item offers.
+### Sprint 2 (Oct 28 to Oct 30) ✅ COMPLETED
+- ✅ Develop Mustache templates and frontend views for the website.
+- ✅ Implement exception handling for user interactions.
+- ✅ Create and connect a form to manage item offers.
 - **Milestones:**
-  - User-facing forms and views functional.
-  - Exception handling and feedback implemented.
+  - ✅ User-facing forms and views functional.
+  - ✅ Exception handling and feedback implemented.
+- **Status**: All deliverables completed. Branch: `feature/sprint-2-exception-handling-views-templates`
 
 ### Sprint 3 (Oct 31 to Nov 3)
 - Implement item filtering features.
@@ -52,10 +53,19 @@ Develop a fully functional web application for selling collectible items using J
 - Configured Maven project
 - Route definitions and testing
 
-### Sprint 2
-- Dynamic Mustache templates and website views
-- Error and exception handling infrastructure
-- Item management form
+### Sprint 2 ✅ COMPLETED
+- ✅ Dynamic Mustache templates and website views
+  - Product browsing page with filtering (`/products`)
+  - Admin product management form (`/admin/products`)
+  - Error page templates
+- ✅ Error and exception handling infrastructure
+  - Custom exception hierarchy (CollectiblesException, ProductNotFoundException, etc.)
+  - Centralized ExceptionHandler module
+  - Integration with existing ErrorHandler utility
+- ✅ Item management form
+  - Create, edit, and delete product functionality
+  - Client-side and server-side validation
+  - Real-time form submission via REST API
 
 ### Sprint 3
 - Item filtering functionality
