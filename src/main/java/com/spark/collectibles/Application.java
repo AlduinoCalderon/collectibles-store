@@ -40,9 +40,12 @@ public class Application {
             // Enable CORS for all routes
             enableCORS();
             
-            // Set up JSON response type only for API routes
+            // Set up JSON response type only for API routes (exclude /api/docs which serves HTML)
             after("/api/*", (request, response) -> {
-                response.type("application/json");
+                // Don't override Content-Type for /api/docs (it serves HTML)
+                if (!request.pathInfo().equals("/api/docs")) {
+                    response.type("application/json");
+                }
             });
             
             // Initialize API routes
