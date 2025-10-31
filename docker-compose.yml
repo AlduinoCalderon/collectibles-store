@@ -35,8 +35,9 @@ services:
       APP_PORT: 4567
       APP_ENV: production
       LOG_LEVEL: INFO
-      DB_MAX_CONNECTIONS: 10
-      DB_MIN_CONNECTIONS: 2
+      # Reduced for free MySQL instances (max 5 connections total)
+      DB_MAX_CONNECTIONS: 3
+      DB_MIN_CONNECTIONS: 1
       DB_CONNECTION_TIMEOUT: 30000
       API_BASE_PATH: /api
     depends_on:

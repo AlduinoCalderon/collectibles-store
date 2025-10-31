@@ -57,8 +57,9 @@ public class EnvironmentConfig {
         setProperty("app.log.level", "LOG_LEVEL", "INFO");
         
         // Database connection pool
-        setProperty("db.max.connections", "DB_MAX_CONNECTIONS", "10");
-        setProperty("db.min.connections", "DB_MIN_CONNECTIONS", "2");
+        // Reduced defaults for free MySQL instances (max 5 connections total)
+        setProperty("db.max.connections", "DB_MAX_CONNECTIONS", "3");
+        setProperty("db.min.connections", "DB_MIN_CONNECTIONS", "1");
         setProperty("db.connection.timeout", "DB_CONNECTION_TIMEOUT", "30000");
         
         // API configuration
