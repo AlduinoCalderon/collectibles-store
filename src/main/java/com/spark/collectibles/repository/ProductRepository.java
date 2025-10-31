@@ -89,6 +89,20 @@ public interface ProductRepository {
     List<Product> findByPriceRange(java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice);
     
     /**
+     * Find products with price greater than or equal to minPrice
+     * @param minPrice Minimum price
+     * @return List of products with price >= minPrice
+     */
+    List<Product> findByMinPrice(java.math.BigDecimal minPrice);
+    
+    /**
+     * Find products with price less than or equal to maxPrice
+     * @param maxPrice Maximum price
+     * @return List of products with price <= maxPrice
+     */
+    List<Product> findByMaxPrice(java.math.BigDecimal maxPrice);
+    
+    /**
      * Search products by name or description
      * @param query Search query
      * @return List of matching products

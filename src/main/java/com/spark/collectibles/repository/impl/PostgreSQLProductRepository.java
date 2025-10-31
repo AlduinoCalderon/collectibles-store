@@ -184,6 +184,18 @@ public class PostgreSQLProductRepository implements ProductRepository {
     }
     
     @Override
+    public List<Product> findByMinPrice(BigDecimal minPrice) {
+        String sql = "SELECT * FROM products WHERE price >= ? AND is_deleted = false ORDER BY price ASC";
+        return executeQuery(sql, minPrice);
+    }
+    
+    @Override
+    public List<Product> findByMaxPrice(BigDecimal maxPrice) {
+        String sql = "SELECT * FROM products WHERE price <= ? AND is_deleted = false ORDER BY price ASC";
+        return executeQuery(sql, maxPrice);
+    }
+    
+    @Override
     public List<Product> search(String query) {
         String sql =
             "SELECT * FROM products " +
