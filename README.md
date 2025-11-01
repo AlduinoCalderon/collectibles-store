@@ -25,7 +25,7 @@ This project is part of the Digital NAO Backend Development pathway, focusing on
 - **Maven Build**: Standard Maven project structure with dependency management
 - **Docker Support**: Containerized deployment ready
 - **API Documentation**: Interactive API docs with Scalar
-- **CI/CD Pipeline**: GitHub Actions workflow for automated testing and deployment
+- **CI/CD Pipeline**: GitHub Actions workflow for automated deployment
 
 ## 📋 API Endpoints
 
