@@ -3,10 +3,17 @@
   "info": {
     "title": "Collectibles Store API",
     "version": "1.0.0",
-    "description": "A RESTful API for managing collectible items."
+    "description": "A RESTful API for managing collectible items. Note: HTML views are available at / (home), /products (browsing), and /admin/products (management). See Sprint 2 deliverables for view routes."
   },
   "servers": [
-    { "url": "http://localhost:4567/api" }
+    { 
+      "url": "https://collectibles-store-09ew.onrender.com/api",
+      "description": "Production Demo Server"
+    },
+    { 
+      "url": "http://localhost:4567/api",
+      "description": "Local Development Server"
+    }
   ],
   "paths": {
     "/products": {
