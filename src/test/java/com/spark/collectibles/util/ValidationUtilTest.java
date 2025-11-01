@@ -259,6 +259,3 @@ class ValidationUtilTest {
         assertNull(ValidationUtil.validateAndSanitizeSearchQuery(null));
     }
 }
-
-
-
