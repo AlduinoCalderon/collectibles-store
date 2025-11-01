@@ -145,6 +145,36 @@
             color: #28a745;
         }
         
+        .price-updated {
+            animation: priceFlash 1.5s ease-in-out;
+        }
+        
+        @keyframes priceFlash {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(76, 175, 80, 0.3); }
+        }
+        
+        .connection-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        
+        .connection-indicator.connected {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .connection-indicator.disconnected {
+            background-color: #dc3545;
+            color: white;
+        }
+        
         .category {
             background: #667eea;
             color: white;
@@ -169,6 +199,10 @@
     </style>
 </head>
 <body>
+    <div class="connection-indicator disconnected" id="connectionIndicator">
+        🔴 Disconnected
+    </div>
+    
     <div class="container">
         <header>
             <h1>🏺 Collectibles Store</h1>
@@ -199,11 +233,11 @@
             
             <div id="productsContainer">
                 {{#products}}
-                <div class="product-card">
+                <div class="product-card" data-product-id="{{id}}">
                     <h3>{{name}}</h3>
                     <p>{{description}}</p>
                     <div class="product-info">
-                        <span class="price">${{price}} {{currency}}</span>
+                        <span class="price" data-product-price="{{id}}">${{price}} {{currency}}</span>
                         {{#category}}
                         <span class="category">{{category}}</span>
                         {{/category}}
@@ -253,6 +287,88 @@
         document.getElementById('searchQuery').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 applyFilters();
+            }
+        });
+        
+        // WebSocket connection for real-time price updates
+        let ws = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 10;
+        const reconnectDelay = 3000;
+        
+        function connectWebSocket() {
+            try {
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${protocol}//${window.location.host}/ws/prices`;
+                console.log('Connecting to WebSocket:', wsUrl);
+                
+                ws = new WebSocket(wsUrl);
+                
+                ws.onopen = function() {
+                    console.log('WebSocket connected');
+                    reconnectAttempts = 0;
+                    document.getElementById('connectionIndicator').textContent = '🟢 Connected';
+                    document.getElementById('connectionIndicator').className = 'connection-indicator connected';
+                };
+                
+                ws.onmessage = function(event) {
+                    try {
+                        const message = JSON.parse(event.data);
+                        console.log('Received price update:', message);
+                        
+                        if (message.type === 'price_update') {
+                            const priceElement = document.querySelector(`span[data-product-price="${message.productId}"]`);
+                            if (priceElement) {
+                                const oldText = priceElement.textContent;
+                                priceElement.textContent = `$${message.newPrice} ${message.currency}`;
+                                priceElement.classList.add('price-updated');
+                                
+                                setTimeout(() => {
+                                    priceElement.classList.remove('price-updated');
+                                }, 1500);
+                                
+                                console.log(`Price updated for product ${message.productId}: ${oldText} -> $${message.newPrice} ${message.currency}`);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error parsing WebSocket message:', error);
+                    }
+                };
+                
+                ws.onerror = function(error) {
+                    console.error('WebSocket error:', error);
+                    document.getElementById('connectionIndicator').textContent = '🔴 Error';
+                    document.getElementById('connectionIndicator').className = 'connection-indicator disconnected';
+                };
+                
+                ws.onclose = function() {
+                    console.log('WebSocket disconnected');
+                    document.getElementById('connectionIndicator').textContent = '🔴 Disconnected';
+                    document.getElementById('connectionIndicator').className = 'connection-indicator disconnected';
+                    
+                    if (reconnectAttempts < maxReconnectAttempts) {
+                        reconnectAttempts++;
+                        console.log(`Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`);
+                        setTimeout(connectWebSocket, reconnectDelay);
+                    } else {
+                        console.error('Max reconnection attempts reached');
+                        document.getElementById('connectionIndicator').textContent = '🔴 Offline';
+                    }
+                };
+            } catch (error) {
+                console.error('Failed to establish WebSocket connection:', error);
+                document.getElementById('connectionIndicator').textContent = '🔴 Not Available';
+                document.getElementById('connectionIndicator').className = 'connection-indicator disconnected';
+            }
+        }
+        
+        // Initialize WebSocket connection on page load
+        connectWebSocket();
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (ws) {
+                ws.close();
             }
         });
     </script>
