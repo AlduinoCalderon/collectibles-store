@@ -6,6 +6,7 @@ import com.spark.collectibles.database.DatabaseMigrationManager;
 import com.spark.collectibles.routes.ProductRoutes;
 import com.spark.collectibles.routes.ViewRoutes;
 import com.spark.collectibles.service.ProductService;
+import com.spark.collectibles.websocket.PriceWebSocketHandler;
 import com.spark.collectibles.util.JsonUtil;
 import com.spark.collectibles.util.ErrorHandler;
 import com.spark.collectibles.exception.ExceptionHandler;
@@ -33,6 +34,9 @@ public class Application {
             
             // Set port from configuration
             port(EnvironmentConfig.getAppPort());
+            
+            // Configure WebSocket endpoint for real-time price updates
+            webSocket("/ws/prices", PriceWebSocketHandler.class);
             
             // Configure static files (MUST be before any route mapping)
             spark.Spark.staticFiles.location("/static");
@@ -92,9 +96,13 @@ public class Application {
                 }
             });
             
+            // Initialize Spark (required for WebSocket to work)
+            init();
+            
             logger.info("Collectibles Store API started on port {}", EnvironmentConfig.getAppPort());
             logger.info("API Base Path: {}", EnvironmentConfig.getApiBasePath());
             logger.info("Environment: {}", EnvironmentConfig.getAppEnv());
+            logger.info("WebSocket endpoint available at /ws/prices");
             
         } catch (Exception e) {
             logger.error("Failed to start application", e);
