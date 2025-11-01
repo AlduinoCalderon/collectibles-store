@@ -1,6 +1,6 @@
 # Collectibles Store API
 
-A RESTful e-commerce API for managing collectible items using Java and the Spark framework with PostgreSQL database integration. This project implements a modern web service architecture following SOLID principles with proper error handling, validation, and comprehensive documentation.
+A RESTful e-commerce API for managing collectible items using Java and the Spark framework with MySQL database integration. This project implements a modern web service architecture following SOLID principles with proper error handling, validation, and comprehensive documentation.
 
 ## 🚀 Project Overview
 
@@ -10,10 +10,13 @@ This project is part of the Digital NAO Backend Development pathway, focusing on
 
 - **RESTful API Design**: Clean, intuitive endpoints following REST principles
 - **Product Management**: Complete CRUD operations for collectible items with soft delete functionality
+- **Real-Time Updates**: WebSocket support for live price updates across all connected clients
+- **Web Interface**: Modern Mustache templates with admin panel and product browsing
 - **MySQL Integration**: Robust database layer with connection pooling and migrations
+- **Exception Handling**: Custom exception hierarchy with centralized error management
 - **Environment Configuration**: Flexible configuration management with .env support
 - **SOLID Principles**: Clean architecture following SOLID design principles
-- **Input Validation**: Comprehensive data validation and error handling
+- **Input Validation**: Comprehensive data validation and error handling (SQL injection protection)
 - **JSON API**: Full JSON support with proper serialization/deserialization
 - **CORS Support**: Cross-origin resource sharing enabled for web clients
 - **Database Migrations**: Automated schema management with Flyway
@@ -49,6 +52,21 @@ This project is part of the Digital NAO Backend Development pathway, focusing on
 | `POST` | `/api/products/:id/restore` | Restore soft-deleted product |
 | `DELETE` | `/api/products/:id/hard` | Permanently delete a product |
 
+### Web Interfaces
+
+| Page | Endpoint | Description |
+|------|----------|-------------|
+| `GET` | `/` | Home page |
+| `GET` | `/products` | Browse products with filtering |
+| `GET` | `/admin/products` | Admin product management (create mode) |
+| `GET` | `/admin/products/:id` | Admin product management (edit mode) |
+
+### WebSocket Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `/ws/prices` | Real-time price updates (WebSocket connection) |
+
 ### API Documentation
 
 - **Interactive API Docs**: Available at `/api/docs` (Scalar UI)
@@ -64,7 +82,10 @@ This project is part of the Digital NAO Backend Development pathway, focusing on
 - **Maven**: Dependency management and build automation
 - **Gson 2.10.1**: JSON serialization/deserialization
 - **Logback 1.4.14**: Logging framework
+- **Mustache**: Server-side templating engine for views
+- **Jetty WebSocket**: Real-time communication (included in Spark)
 - **JUnit 5**: Testing framework
+- **Mockito**: Mocking framework for tests
 - **Docker**: Containerization
 - **Scalar**: Interactive API documentation
 
@@ -93,13 +114,31 @@ collectibles-store/
 │   │   │               ├── service/
 │   │   │               │   └── ProductService.java            # Business logic
 │   │   │               ├── routes/
-│   │   │               │   └── ProductRoutes.java             # API routes
+│   │   │               │   ├── ProductRoutes.java             # API routes
+│   │   │               │   └── ViewRoutes.java                # View routes
+│   │   │               ├── exception/
+│   │   │               │   ├── CollectiblesException.java     # Base exception
+│   │   │               │   ├── ProductNotFoundException.java  # Product not found
+│   │   │               │   ├── ProductValidationException.java # Validation errors
+│   │   │               │   ├── DuplicateProductException.java # Duplicate products
+│   │   │               │   ├── DatabaseException.java         # Database errors
+│   │   │               │   └── ExceptionHandler.java          # Exception handling
+│   │   │               ├── websocket/
+│   │   │               │   ├── PriceWebSocketHandler.java     # WebSocket handler
+│   │   │               │   └── PriceUpdateMessage.java        # WebSocket messages
 │   │   │               └── util/
 │   │   │                   ├── JsonUtil.java                  # JSON utilities
+│   │   │                   ├── ErrorHandler.java              # Error utilities
+│   │   │                   ├── ValidationUtil.java            # Validation utilities
 │   │   │                   └── LocalDateTimeAdapter.java      # Date/time serialization
 │   │   └── resources/
 │   │       ├── application.properties                         # Application configuration
 │   │       ├── logback.xml                                   # Logging configuration
+│   │       ├── templates/                                    # Mustache templates
+│   │       │   ├── products.mustache                         # Product browsing page
+│   │       │   ├── admin/
+│   │       │   │   └── product-form.mustache                # Admin form
+│   │       │   └── error.mustache                            # Error pages
 │   │       └── db/
 │   │           └── migration/                                # Database migration scripts
 │   │               ├── V1__Create_products_table.sql
@@ -110,6 +149,7 @@ collectibles-store/
 │   ├── openapi.json                                         # OpenAPI specification
 │   ├── backlog.md                                           # Project backlog
 │   └── roadmap.md                                           # Development roadmap
+│   └── project_gantt.html                                   # Project Gantt chart
 ├── .github/
 │   └── workflows/
 │       └── ci-cd.yml                                        # GitHub Actions workflow
@@ -174,9 +214,11 @@ collectibles-store/
    java -jar target/collectibles-store-1.0.0.jar
    ```
 
-6. **Access the API**
-   - API: `http://localhost:4567`
-   - Interactive Docs: `http://localhost:4567/api/docs`
+6. **Access the application**
+   - Home Page: `http://localhost:4567`
+   - Products Browser: `http://localhost:4567/products`
+   - Admin Panel: `http://localhost:4567/admin/products`
+   - Interactive API Docs: `http://localhost:4567/api/docs`
    - OpenAPI Spec: `http://localhost:4567/api/openapi.json`
 
 ### Docker Deployment
@@ -396,6 +438,62 @@ The project is configured for easy deployment on Render:
 - [Project Backlog](docs/backlog.md) - User stories and requirements
 - [Project Roadmap](docs/roadmap.md) - Development timeline and milestones
 - [OpenAPI Specification](docs/openapi.json) - Complete API specification
+
+## 🎯 Development Sprints
+
+### Sprint 2: Exception Handling, Views & Templates ✅
+
+**Completed Features:**
+- **Exception Handling Module**: Custom exception hierarchy with centralized handling
+  - `CollectiblesException` base class
+  - `ProductNotFoundException`, `ProductValidationException`, `DuplicateProductException`
+  - `DatabaseException` for database errors
+  - `ExceptionHandler` for unified error management
+  
+- **Views and Templates**: Modern web interface using Mustache templates
+  - Product browsing page with filtering (search, category, price range)
+  - Admin form for product management (create/edit/delete)
+  - Error pages with proper status code handling
+  - Responsive, modern UI design
+  
+- **Web Form**: Full-featured admin interface
+  - Real-time form submission using Fetch API
+  - Client-side and server-side validation
+  - Product list with inline edit/delete actions
+  - Form auto-population for edit mode
+
+**Technical Implementation:**
+- Added Mustache template engine integration
+- Implemented `ViewRoutes.java` for view handling
+- Separate exception handling for API (JSON) vs Views (HTML)
+- REST API integration with web forms
+
+### Sprint 3: WebSocket Real-Time Updates ✅
+
+**Completed Features:**
+- **WebSocket Implementation**: Real-time bidirectional communication
+  - `PriceWebSocketHandler` using Jetty WebSocket API
+  - `PriceUpdateMessage` POJO for price notifications
+  - WebSocket endpoint at `/ws/prices`
+  - Broadcast updates to all connected clients
+  
+- **Real-Time Price Updates**: Automatic UI updates
+  - Connection indicator (🟢 Connected / 🔴 Disconnected)
+  - Price change animation with visual feedback
+  - Automatic reconnection logic (10 attempts)
+  - WebSocket integration in `ProductService.updateProduct()`
+
+- **Admin UI Enhancements**:
+  - Auto-generated product IDs (removed manual input)
+  - Read-only ID display in edit mode
+  - Advanced table filtering (search by name/ID, filter by category)
+  - Improved user experience with instant filtering
+
+**Technical Implementation:**
+- Jetty WebSocket API (included in Spark framework)
+- Static broadcast method for price updates
+- Client-side JavaScript for WebSocket connection management
+- Integration with existing product update workflow
 
 ## 🤝 Contributing
 
