@@ -4,6 +4,8 @@
 
 This report provides a comprehensive technical analysis of the Collectibles Store web application, a full-stack e-commerce solution for selling collectible items. The project successfully demonstrates modern backend development practices using Java and the Spark framework, delivering a robust, scalable, and user-friendly platform for both administrators and customers.
 
+**🌐 Live Demo**: [https://collectibles-store-09ew.onrender.com](https://collectibles-store-09ew.onrender.com) - The application is currently deployed and fully operational in production.
+
 ### Problem Statement
 
 Collectible item stores require an efficient, real-time system to manage inventory and provide customers with up-to-date information. Traditional approaches face challenges with:
@@ -207,7 +209,7 @@ if (priceChanged) {
 
 **Client-Side Connection**:
 ```javascript
-const ws = new WebSocket('ws://localhost:4567/ws/prices');
+const ws = new WebSocket('wss://collectibles-store-09ew.onrender.com/ws/prices');
 ws.onmessage = (event) => {
     const update = JSON.parse(event.data);
     updatePriceOnPage(update.productId, update.newPrice);
@@ -471,5 +473,18 @@ The solution is ready for production deployment and can scale to handle growing 
 
 **Project Repository**: https://github.com/alduinocalderon/collectibles-store  
 **Technology Stack**: Java 17, Spark Framework, MySQL, WebSockets  
-**Status**: ✅ Production Ready
+**Status**: ✅ **Production Ready & Live**
+
+### 🌐 Live Demo Available
+
+This application is currently deployed and running in production:
+
+- **🌍 Live Website**: [https://collectibles-store-09ew.onrender.com](https://collectibles-store-09ew.onrender.com)
+- **📊 Interactive API Docs**: [https://collectibles-store-09ew.onrender.com/api/docs](https://collectibles-store-09ew.onrender.com/api/docs)
+- **📄 OpenAPI Spec**: [https://collectibles-store-09ew.onrender.com/api/openapi.json](https://collectibles-store-09ew.onrender.com/api/openapi.json)
+- **🔌 WebSocket Endpoint**: `wss://collectibles-store-09ew.onrender.com/ws/prices`
+
+**Deployment Platform**: Render.com  
+**Deployment Status**: ✅ Active  
+**Demo Features**: All functionality available including real-time WebSocket updates
 

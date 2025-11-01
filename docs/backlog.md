@@ -8,9 +8,9 @@
 **So that** I can control who has access to the system
 
 **Acceptance Criteria:**
-- [ ] API exposes endpoints for user CRUD operations
-- [ ] Requests return appropriate status codes and error messages
-- [ ] User data is validated and persisted
+- [x] API exposes endpoints for user CRUD operations
+- [x] Requests return appropriate status codes and error messages
+- [x] User data is validated and persisted
 
 ### User Story 2
 **As a** store visitor  

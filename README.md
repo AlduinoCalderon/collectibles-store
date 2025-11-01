@@ -2,6 +2,8 @@
 
 A RESTful e-commerce API for managing collectible items using Java and the Spark framework with MySQL database integration. This project implements a modern web service architecture following SOLID principles with proper error handling, validation, and comprehensive documentation.
 
+**🌐 Live Demo**: [https://collectibles-store-09ew.onrender.com](https://collectibles-store-09ew.onrender.com)
+
 ## 🚀 Project Overview
 
 This project is part of the Digital NAO Backend Development pathway, focusing on implementing a web application for selling collectible items using Java and the Spark framework. The API provides comprehensive product management functionality with a clean, RESTful interface and proper route grouping for better organization.
@@ -25,7 +27,7 @@ This project is part of the Digital NAO Backend Development pathway, focusing on
 - **Maven Build**: Standard Maven project structure with dependency management
 - **Docker Support**: Containerized deployment ready
 - **API Documentation**: Interactive API docs with Scalar
-- **CI/CD Pipeline**: GitHub Actions workflow for automated testing and deployment
+- **CI/CD Pipeline**: GitHub Actions workflow for automated deployment
 
 ## 📋 API Endpoints
 
@@ -174,7 +176,7 @@ collectibles-store/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/collectibles-store.git
+   git clone https://github.com/alduinocalderon/collectibles-store.git
    cd collectibles-store
    ```
 
@@ -214,12 +216,17 @@ collectibles-store/
    java -jar target/collectibles-store-1.0.0.jar
    ```
 
-6. **Access the application**
+6. **Access the application locally**
    - Home Page: `http://localhost:4567`
    - Products Browser: `http://localhost:4567/products`
    - Admin Panel: `http://localhost:4567/admin/products`
    - Interactive API Docs: `http://localhost:4567/api/docs`
    - OpenAPI Spec: `http://localhost:4567/api/openapi.json`
+
+**Or access the live deployed version**:
+   - 🌐 **Demo Site**: [https://collectibles-store-09ew.onrender.com](https://collectibles-store-09ew.onrender.com)
+   - 📊 **API Docs**: [https://collectibles-store-09ew.onrender.com/api/docs](https://collectibles-store-09ew.onrender.com/api/docs)
+   - 📄 **API Spec**: [https://collectibles-store-09ew.onrender.com/api/openapi.json](https://collectibles-store-09ew.onrender.com/api/openapi.json)
 
 ### Docker Deployment
 
@@ -253,10 +260,12 @@ mvn test jacoco:report
 
 ## 📖 API Usage Examples
 
+All examples use the production demo URL. For local testing, replace `https://collectibles-store-09ew.onrender.com` with `http://localhost:4567`.
+
 ### Create a Product
 
 ```bash
-curl -X POST http://localhost:4567/api/products \
+curl -X POST https://collectibles-store-09ew.onrender.com/api/products \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Guitarra autografiada por Coldplay",
@@ -270,19 +279,19 @@ curl -X POST http://localhost:4567/api/products \
 ### Get All Products
 
 ```bash
-curl -X GET http://localhost:4567/api/products
+curl -X GET https://collectibles-store-09ew.onrender.com/api/products
 ```
 
 ### Get Product by ID
 
 ```bash
-curl -X GET http://localhost:4567/api/products/item1
+curl -X GET https://collectibles-store-09ew.onrender.com/api/products/item1
 ```
 
 ### Update a Product
 
 ```bash
-curl -X PUT http://localhost:4567/api/products/item1 \
+curl -X PUT https://collectibles-store-09ew.onrender.com/api/products/item1 \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Gorra autografiada por Peso Pluma - Limited Edition",
@@ -296,19 +305,19 @@ curl -X PUT http://localhost:4567/api/products/item1 \
 ### Search Products
 
 ```bash
-curl -X GET "http://localhost:4567/api/products/search?q=guitarra"
+curl -X GET "https://collectibles-store-09ew.onrender.com/api/products/search?q=guitarra"
 ```
 
 ### Get Products by Category
 
 ```bash
-curl -X GET http://localhost:4567/api/products/category/Autographed%20Items
+curl -X GET https://collectibles-store-09ew.onrender.com/api/products/category/Autographed%20Items
 ```
 
 ### Get Products by Price Range
 
 ```bash
-curl -X GET "http://localhost:4567/api/products/price-range?min=500&max=800"
+curl -X GET "https://collectibles-store-09ew.onrender.com/api/products/price-range?min=500&max=800"
 ```
 
 ## 🔧 Configuration
@@ -433,6 +442,8 @@ The project is configured for easy deployment on Render:
 2. Set environment variables in Render dashboard
 3. Deploy automatically via GitHub Actions
 
+**Current Status**: ✅ Successfully deployed and running at [https://collectibles-store-09ew.onrender.com](https://collectibles-store-09ew.onrender.com)
+
 ## 📚 Documentation
 
 - [Project Backlog](docs/backlog.md) - User stories and requirements
@@ -516,9 +527,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 For support and questions, please contact:
-- Email: support@collectibles-store.com
-- GitHub Issues: [Create an issue](https://github.com/yourusername/collectibles-store/issues)
+- GitHub Issues: [Create an issue](https://github.com/alduinocalderon/collectibles-store/issues)
 
----
-
-**Note**: This project is part of the Digital NAO Backend Development pathway and follows the requirements specified in the project documentation.
