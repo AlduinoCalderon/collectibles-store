@@ -198,13 +198,13 @@
             <h2>{{#product}}Edit Product{{/product}}{{^product}}Create New Product{{/product}}</h2>
             
             <form id="productForm" style="max-width: 600px; margin-top: 20px;">
+                {{#product}}
                 <div class="form-group">
-                    <label for="id">Product ID *</label>
-                    <input type="text" id="id" name="id" value="{{#product}}{{product.id}}{{/product}}" 
-                           {{#product}}readonly style="background: #f0f0f0;"{{/product}}
-                           {{^product}}required{{/product}}>
-                    <small>{{#product}}ID cannot be changed{{/product}}{{^product}}Unique identifier for the product{{/product}}</small>
+                    <label>Product ID</label>
+                    <input type="text" value="{{product.id}}" readonly style="background: #f0f0f0; color: #6c757d;">
+                    <small>ID is automatically generated and cannot be changed</small>
                 </div>
+                {{/product}}
                 
                 <div class="form-group">
                     <label for="name">Product Name *</label>
@@ -252,6 +252,20 @@
             
             <div style="margin-top: 40px;">
                 <h3>All Products</h3>
+                <div style="margin-bottom: 15px;">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+                        <input type="text" id="tableSearch" placeholder="Search by name or ID..." 
+                               style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                        <select id="tableCategoryFilter" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="">All Categories</option>
+                            {{#allProducts}}
+                            {{#category}}
+                            <option value="{{category}}">{{category}}</option>
+                            {{/category}}
+                            {{/allProducts}}
+                        </select>
+                    </div>
+                </div>
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
@@ -263,9 +277,9 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="productsTableBody">
                             {{#allProducts}}
-                            <tr>
+                            <tr data-name="{{name}}" data-id="{{id}}" data-category="{{category}}">
                                 <td>{{id}}</td>
                                 <td>{{name}}</td>
                                 <td>${{price}} {{currency}}</td>
@@ -276,7 +290,7 @@
                             </tr>
                             {{/allProducts}}
                             {{^allProducts}}
-                            <tr>
+                            <tr id="noProductsRow">
                                 <td colspan="5" style="text-align: center; padding: 20px; color: #6c757d;">No products found</td>
                             </tr>
                             {{/allProducts}}
@@ -294,6 +308,68 @@
     <script>
         const productId = '{{#product}}{{product.id}}{{/product}}';
         const isEdit = productId !== '';
+        
+        // Table filtering functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('tableSearch');
+            const categoryFilter = document.getElementById('tableCategoryFilter');
+            
+            if (searchInput && categoryFilter) {
+                searchInput.addEventListener('input', filterTable);
+                categoryFilter.addEventListener('change', filterTable);
+            }
+        });
+        
+        function filterTable() {
+            const searchInput = document.getElementById('tableSearch');
+            const categoryFilter = document.getElementById('tableCategoryFilter');
+            const tableBody = document.getElementById('productsTableBody');
+            const noProductsRow = document.getElementById('noProductsRow');
+            
+            if (!searchInput || !categoryFilter || !tableBody) return;
+            
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedCategory = categoryFilter.value;
+            const rows = tableBody.querySelectorAll('tr');
+            
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                // Skip the "No products" row
+                if (row.id === 'noProductsRow') {
+                    return;
+                }
+                
+                const name = row.getAttribute('data-name') || '';
+                const id = row.getAttribute('data-id') || '';
+                const category = row.getAttribute('data-category') || '';
+                
+                const matchesSearch = name.toLowerCase().includes(searchTerm) || 
+                                    id.toLowerCase().includes(searchTerm);
+                const matchesCategory = !selectedCategory || category === selectedCategory;
+                
+                if (matchesSearch && matchesCategory) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Show/hide "No products" message
+            if (visibleCount === 0 && rows.length > 0) {
+                if (!noProductsRow) {
+                    const tr = document.createElement('tr');
+                    tr.id = 'noProductsRow';
+                    tr.innerHTML = '<td colspan="5" style="text-align: center; padding: 20px; color: #6c757d;">No products found matching filters</td>';
+                    tableBody.appendChild(tr);
+                } else {
+                    noProductsRow.style.display = '';
+                }
+            } else if (noProductsRow) {
+                noProductsRow.style.display = 'none';
+            }
+        }
         
         function deleteProduct(id) {
             if (confirm('Are you sure you want to delete this product?')) {
@@ -319,13 +395,17 @@
             e.preventDefault();
             
             const formData = {
-                id: document.getElementById('id').value,
                 name: document.getElementById('name').value,
                 description: document.getElementById('description').value,
                 price: parseFloat(document.getElementById('price').value),
                 currency: document.getElementById('currency').value,
                 category: document.getElementById('category').value || null
             };
+            
+            // Only add ID if editing
+            if (isEdit && productId) {
+                formData.id = productId;
+            }
             
             const url = isEdit ? '/api/products/' + productId : '/api/products';
             const method = isEdit ? 'PUT' : 'POST';
