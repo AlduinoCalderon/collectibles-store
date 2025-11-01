@@ -214,9 +214,11 @@ collectibles-store/
    java -jar target/collectibles-store-1.0.0.jar
    ```
 
-6. **Access the API**
-   - API: `http://localhost:4567`
-   - Interactive Docs: `http://localhost:4567/api/docs`
+6. **Access the application**
+   - Home Page: `http://localhost:4567`
+   - Products Browser: `http://localhost:4567/products`
+   - Admin Panel: `http://localhost:4567/admin/products`
+   - Interactive API Docs: `http://localhost:4567/api/docs`
    - OpenAPI Spec: `http://localhost:4567/api/openapi.json`
 
 ### Docker Deployment
