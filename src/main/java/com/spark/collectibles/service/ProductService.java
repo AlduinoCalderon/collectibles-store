@@ -3,6 +3,8 @@ package com.spark.collectibles.service;
 import com.spark.collectibles.model.Product;
 import com.spark.collectibles.repository.ProductRepository;
 import com.spark.collectibles.repository.impl.PostgreSQLProductRepository;
+import com.spark.collectibles.websocket.PriceUpdateMessage;
+import com.spark.collectibles.websocket.PriceWebSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -199,6 +201,21 @@ public class ProductService {
         Product updatedProduct = productRepository.update(product);
         if (updatedProduct != null) {
             logger.info("Product updated successfully with ID: {}", id);
+            
+            // Broadcast price update via WebSocket if price changed
+            if (existingProduct.getPrice() != null && updatedProduct.getPrice() != null &&
+                !existingProduct.getPrice().equals(updatedProduct.getPrice())) {
+                
+                PriceUpdateMessage message = new PriceUpdateMessage(
+                    "price_update",
+                    id,
+                    existingProduct.getPrice().doubleValue(),
+                    updatedProduct.getPrice().doubleValue(),
+                    updatedProduct.getCurrency()
+                );
+                
+                PriceWebSocketHandler.broadcastPriceUpdate(message);
+            }
         }
         return updatedProduct;
     }
