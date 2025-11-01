@@ -70,4 +70,7 @@ logs/
 # Temporary files
 *.tmp
 *.temp
-*.tex 
+*.tex
+
+# Local work log (should not be committed)
+LOCAL-WORKLOG.md 

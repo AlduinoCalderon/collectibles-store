@@ -37,5 +37,9 @@ docker-compose.yml
 *.tmp
 *.temp
 
+# Local work log (should not be included in Docker builds)
+LOCAL-WORKLOG.md
+
+
 
 

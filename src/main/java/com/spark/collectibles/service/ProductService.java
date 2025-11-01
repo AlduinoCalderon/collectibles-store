@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service class for managing product operations
@@ -82,7 +81,20 @@ public class ProductService {
      * @return Created product if successful, null if product already exists or invalid
      */
     public Product createProduct(Product product) {
-        if (product == null || !product.isValid()) {
+        if (product == null) {
+            logger.warn("Null product provided for creation");
+            return null;
+        }
+        
+        // Generate ID automatically if not provided or empty
+        if (product.getId() == null || product.getId().trim().isEmpty()) {
+            String generatedId = generateProductId();
+            product.setId(generatedId);
+            logger.info("Generated product ID: {}", generatedId);
+        }
+        
+        // Validate product data (excluding ID check since we just generated it)
+        if (!isProductDataValid(product)) {
             logger.warn("Invalid product data provided for creation");
             return null;
         }
@@ -107,6 +119,49 @@ public class ProductService {
             logger.info("Product created successfully with ID: {}", product.getId());
         }
         return createdProduct;
+    }
+    
+    /**
+     * Generate a unique product ID
+     * @return Generated product ID
+     */
+    private String generateProductId() {
+        // Get the highest numeric ID from existing products
+        long maxId = 0;
+        try {
+            List<Product> allProducts = productRepository.findAllIncludingDeleted();
+            for (Product p : allProducts) {
+                String id = p.getId();
+                if (id != null && id.startsWith("item")) {
+                    try {
+                        String numPart = id.substring(4); // Skip "item"
+                        long num = Long.parseLong(numPart);
+                        if (num > maxId) {
+                            maxId = num;
+                        }
+                    } catch (NumberFormatException e) {
+                        // Ignore IDs that don't match the pattern
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Error generating product ID, using timestamp fallback", e);
+            return "item" + System.currentTimeMillis();
+        }
+        
+        return "item" + (maxId + 1);
+    }
+    
+    /**
+     * Validate product data (excluding ID check)
+     * @param product Product to validate
+     * @return true if valid, false otherwise
+     */
+    private boolean isProductDataValid(Product product) {
+        return product.getName() != null && !product.getName().trim().isEmpty() &&
+               product.getDescription() != null && !product.getDescription().trim().isEmpty() &&
+               product.getPrice() != null && product.getPrice().compareTo(BigDecimal.ZERO) > 0 &&
+               product.getCurrency() != null && !product.getCurrency().trim().isEmpty();
     }
     
     /**
@@ -223,18 +278,40 @@ public class ProductService {
     
     /**
      * Get products by price range
-     * @param minPrice Minimum price
-     * @param maxPrice Maximum price
+     * Supports filtering with only min (>=), only max (<=), or both (between)
+     * @param minPrice Minimum price (can be null if only max is provided)
+     * @param maxPrice Maximum price (can be null if only min is provided)
      * @return List of products in the price range
      */
     public List<Product> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
-        if (minPrice == null || maxPrice == null || minPrice.compareTo(maxPrice) > 0) {
-            logger.warn("Invalid price range provided: {} - {}", minPrice, maxPrice);
-            return List.of();
+        // If both are null, return all products
+        if (minPrice == null && maxPrice == null) {
+            return getAllProducts();
         }
         
-        logger.info("Getting products by price range: {} - {}", minPrice, maxPrice);
-        return productRepository.findByPriceRange(minPrice, maxPrice);
+        // If both are provided, validate range
+        if (minPrice != null && maxPrice != null) {
+            if (minPrice.compareTo(maxPrice) > 0) {
+                logger.warn("Invalid price range provided: {} > {}", minPrice, maxPrice);
+                return List.of();
+            }
+            logger.info("Getting products by price range: {} - {}", minPrice, maxPrice);
+            return productRepository.findByPriceRange(minPrice, maxPrice);
+        }
+        
+        // If only min is provided (>= minPrice)
+        if (minPrice != null && maxPrice == null) {
+            logger.info("Getting products with price >= {}", minPrice);
+            return productRepository.findByMinPrice(minPrice);
+        }
+        
+        // If only max is provided (<= maxPrice)
+        if (minPrice == null && maxPrice != null) {
+            logger.info("Getting products with price <= {}", maxPrice);
+            return productRepository.findByMaxPrice(maxPrice);
+        }
+        
+        return List.of();
     }
     
     /**

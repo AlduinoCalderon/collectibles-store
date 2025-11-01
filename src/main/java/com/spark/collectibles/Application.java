@@ -4,9 +4,11 @@ import com.spark.collectibles.config.EnvironmentConfig;
 import com.spark.collectibles.database.DatabaseConnectionManager;
 import com.spark.collectibles.database.DatabaseMigrationManager;
 import com.spark.collectibles.routes.ProductRoutes;
+import com.spark.collectibles.routes.ViewRoutes;
 import com.spark.collectibles.service.ProductService;
 import com.spark.collectibles.util.JsonUtil;
 import com.spark.collectibles.util.ErrorHandler;
+import com.spark.collectibles.exception.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,16 +34,25 @@ public class Application {
             // Set port from configuration
             port(EnvironmentConfig.getAppPort());
             
+            // Configure static files (MUST be before any route mapping)
+            spark.Spark.staticFiles.location("/static");
+            
             // Enable CORS for all routes
             enableCORS();
             
-            // Set up JSON response type
-            after((request, response) -> {
-                response.type("application/json");
+            // Set up JSON response type only for API routes (exclude /api/docs which serves HTML)
+            after("/api/*", (request, response) -> {
+                // Don't override Content-Type for /api/docs (it serves HTML)
+                if (!request.pathInfo().equals("/api/docs")) {
+                    response.type("application/json");
+                }
             });
             
-            // Initialize routes
+            // Initialize API routes
             ProductRoutes.initialize(productService);
+            
+            // Initialize view routes (must come after API routes)
+            ViewRoutes.initialize(productService);
             
             // API Documentation routes
             setupApiDocumentation();
@@ -51,16 +62,34 @@ public class Application {
             
             // Global exception handler
             exception(Exception.class, (exception, request, response) -> {
-                ErrorHandler.ErrorResponse errorResponse = ErrorHandler.handleException(exception, request, response);
-                response.status(errorResponse.getStatusCode());
-                response.body(JsonUtil.toJson(errorResponse));
+                // Check if it's an API route
+                if (request.pathInfo().startsWith("/api")) {
+                    ErrorHandler.ErrorResponse errorResponse = ExceptionHandler.handleGeneric(exception, request, response);
+                    response.status(errorResponse.getStatusCode());
+                    response.type("application/json");
+                    response.body(JsonUtil.toJson(errorResponse));
+                } else {
+                    // For view routes, redirect to error page
+                    ErrorHandler.ErrorResponse errorResponse = ExceptionHandler.handleGeneric(exception, request, response);
+                    response.status(errorResponse.getStatusCode());
+                    response.redirect("/error/" + errorResponse.getStatusCode());
+                }
             });
             
             // 404 handler
             notFound((request, response) -> {
-                ErrorHandler.ErrorResponse errorResponse = ErrorHandler.createNotFoundError("Endpoint");
-                response.status(errorResponse.getStatusCode());
-                return JsonUtil.toJson(errorResponse);
+                if (request.pathInfo().startsWith("/api")) {
+                    // API route - return JSON
+                    ErrorHandler.ErrorResponse errorResponse = ErrorHandler.createNotFoundError("Endpoint");
+                    response.status(errorResponse.getStatusCode());
+                    response.type("application/json");
+                    return JsonUtil.toJson(errorResponse);
+                } else {
+                    // View route - redirect to error page
+                    response.status(404);
+                    response.redirect("/error/404");
+                    return null;
+                }
             });
             
             logger.info("Collectibles Store API started on port {}", EnvironmentConfig.getAppPort());
@@ -133,14 +162,20 @@ public class Application {
         
         // Serve Scalar API documentation
         get("/api/docs", (request, response) -> {
-            response.type("text/html");
+            response.type("text/html; charset=utf-8");
+            response.header("Cache-Control", "no-cache, no-store, must-revalidate");
+            response.header("Pragma", "no-cache");
+            response.header("Expires", "0");
             try {
                 // Read the Scalar HTML from resources
                 java.io.InputStream inputStream = Application.class.getClassLoader()
                     .getResourceAsStream("static/scalar.html");
                 if (inputStream != null) {
-                    return new String(inputStream.readAllBytes());
+                    String html = new String(inputStream.readAllBytes());
+                    logger.info("Serving Scalar API documentation HTML (length: {})", html.length());
+                    return html;
                 } else {
+                    logger.error("Scalar HTML file not found in resources");
                     response.status(404);
                     return "<h1>API Documentation not found</h1>";
                 }

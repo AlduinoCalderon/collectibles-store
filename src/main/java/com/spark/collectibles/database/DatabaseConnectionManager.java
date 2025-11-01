@@ -31,7 +31,30 @@ public class DatabaseConnectionManager {
      */
     public static synchronized DatabaseConnectionManager getInstance() {
         if (instance == null) {
+            logger.info("Creating new DatabaseConnectionManager instance");
             instance = new DatabaseConnectionManager();
+        } else {
+            // Check if dataSource is still valid
+            if (instance.dataSource == null || instance.dataSource.isClosed()) {
+                logger.warn("Existing instance found but dataSource is closed. Cleaning up and creating new instance.");
+                // Clean up the old instance first (if not already closed)
+                if (instance.dataSource != null) {
+                    try {
+                        if (!instance.dataSource.isClosed()) {
+                            instance.dataSource.close();
+                        }
+                    } catch (Exception e) {
+                        logger.error("Error closing old dataSource", e);
+                    }
+                }
+                instance = new DatabaseConnectionManager();
+            } else {
+                // Verify only one pool exists
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Returning existing DatabaseConnectionManager instance. Pool: {}", 
+                        instance.dataSource.getPoolName());
+                }
+            }
         }
         return instance;
     }
@@ -44,19 +67,53 @@ public class DatabaseConnectionManager {
             HikariConfig config = new HikariConfig();
             
             // Database connection settings
-            config.setJdbcUrl(EnvironmentConfig.getDbUrl());
-            config.setUsername(EnvironmentConfig.getDbUsername());
+            String dbUrl = EnvironmentConfig.getDbUrl();
+            String dbUsername = EnvironmentConfig.getDbUsername();
+            
+            // Log connection details (without password for security)
+            logger.info("Connecting to database: Host={}, Port={}, Database={}, User={}", 
+                EnvironmentConfig.getDbHost(), 
+                EnvironmentConfig.getDbPort(), 
+                EnvironmentConfig.getDbName(), 
+                dbUsername);
+            logger.debug("JDBC URL: {}", dbUrl);
+            
+            config.setJdbcUrl(dbUrl);
+            config.setUsername(dbUsername);
             config.setPassword(EnvironmentConfig.getDbPassword());
             
             // Connection pool settings
-            config.setMaximumPoolSize(EnvironmentConfig.getDbMaxConnections());
-            config.setMinimumIdle(EnvironmentConfig.getDbMinConnections());
+            int maxPoolSize = EnvironmentConfig.getDbMaxConnections();
+            int minIdle = EnvironmentConfig.getDbMinConnections();
+            
+            // Ensure max pool size doesn't exceed 3 for free MySQL instances
+            if (maxPoolSize > 3) {
+                logger.warn("Max pool size {} exceeds recommended limit of 3 for free MySQL. Reducing to 3.", maxPoolSize);
+                maxPoolSize = 3;
+            }
+            // Ensure min idle doesn't exceed max pool size
+            if (minIdle > maxPoolSize) {
+                logger.warn("Min idle {} exceeds max pool size {}. Reducing min idle to {}.", minIdle, maxPoolSize, maxPoolSize);
+                minIdle = maxPoolSize;
+            }
+            
+            config.setMaximumPoolSize(maxPoolSize);
+            config.setMinimumIdle(minIdle);
             config.setConnectionTimeout(EnvironmentConfig.getDbConnectionTimeout());
             
-            // Connection pool properties
+            // Connection pool properties - aggressive cleanup for limited connections
             config.setPoolName("CollectiblesStorePool");
             config.setConnectionTestQuery("SELECT 1");
-            config.setLeakDetectionThreshold(60000); // 60 seconds
+            config.setLeakDetectionThreshold(30000); // 30 seconds - reduced for faster leak detection
+            
+            // Close connections that are idle for more than 10 minutes
+            config.setIdleTimeout(600000); // 10 minutes in milliseconds
+            // Close connections that have been open for more than 30 minutes
+            config.setMaxLifetime(1800000); // 30 minutes in milliseconds
+            
+            // Validate connections before use
+            config.setValidationTimeout(5000); // 5 seconds
+            config.setKeepaliveTime(300000); // 5 minutes - send keepalive packets
             
             // MySQL specific settings for performance optimization
             config.addDataSourceProperty("cachePrepStmts", "true");
@@ -75,10 +132,18 @@ public class DatabaseConnectionManager {
             // Test connection
             try (Connection connection = dataSource.getConnection()) {
                 logger.info("Database connection established successfully");
+                logger.info("Connection pool configured: Max={}, MinIdle={}, IdleTimeout={}ms, MaxLifetime={}ms", 
+                    maxPoolSize, minIdle, config.getIdleTimeout(), config.getMaxLifetime());
             }
             
         } catch (SQLException e) {
             logger.error("Failed to initialize database connection", e);
+            logger.error("Connection details - Host: {}, Port: {}, Database: {}, User: {}", 
+                EnvironmentConfig.getDbHost(), 
+                EnvironmentConfig.getDbPort(), 
+                EnvironmentConfig.getDbName(), 
+                EnvironmentConfig.getDbUsername());
+            logger.error("Please verify that DB_HOST, DB_PORT, DB_NAME, DB_USERNAME, and DB_PASSWORD are correctly set in environment variables");
             throw new RuntimeException("Database initialization failed", e);
         }
     }
@@ -92,6 +157,12 @@ public class DatabaseConnectionManager {
         if (dataSource == null || dataSource.isClosed()) {
             throw new SQLException("DataSource is not available");
         }
+        
+        // Log pool stats periodically for debugging
+        if (logger.isDebugEnabled()) {
+            logger.debug("Getting connection. Pool stats: {}", getPoolStats());
+        }
+        
         return dataSource.getConnection();
     }
     
