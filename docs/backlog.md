@@ -19,8 +19,8 @@
 
 **Acceptance Criteria:**
 - [x] Website shows a list of collectible items (✅ Completed Sprint 2)
-- [x] Visitors can filter items by category or price (✅ Completed Sprint 2 - Basic filtering implemented)
-- [ ] Filtering updates the displayed items without reloading the page (⏳ Advanced filtering planned for Sprint 3)
+- [x] Visitors can filter items by category or price (✅ Completed Sprint 2)
+- [x] Filtering updates the displayed items without reloading the page (✅ Completed Sprint 2 - Client-side filtering)
 
 ### User Story 3
 **As a** store administrator  
@@ -38,9 +38,9 @@
 **So that** I can make informed purchasing decisions based on current prices
 
 **Acceptance Criteria:**
-- [ ] Price changes are pushed instantly to the website via WebSockets
-- [ ] No manual refresh is required to view updates
-- [ ] Real-time system is robust against failures
+- [x] Price changes are pushed instantly to the website via WebSockets (✅ Completed Sprint 3)
+- [x] No manual refresh is required to view updates (✅ Completed Sprint 3)
+- [x] Real-time system is robust against failures (✅ Completed Sprint 3 - Auto-reconnect implemented)
 
 ## Requirements Tracking Table 1: User Stories and Requirements
 
@@ -59,10 +59,10 @@
 | Requirement 1.2: Input validation | Sprint 1 | 3 | User API validation | ✅ |
 | Requirement 1.3: Error handling and status codes | Sprint 1 | 3 | User API error handling | ✅ |
 | Requirement 2.1: Item browsing view | Sprint 2 | 4 | Item list page | ✅ |
-| Requirement 2.2: Filtering logic | Sprint 2 | 3 | Filtering functionality | ✅ (Basic) |
-| Requirement 2.3: Dynamic client updates | Sprint 2 | 3 | Live item update mechanism | ⏳ Sprint 3 |
+| Requirement 2.2: Filtering logic | Sprint 2 | 3 | Filtering functionality | ✅ |
+| Requirement 2.3: Dynamic client updates | Sprint 2 | 3 | Live item update mechanism | ✅ (Client-side filtering) |
 | Requirement 3.1: Admin item management form | Sprint 2 | 5 | Admin form for item management | ✅ |
 | Requirement 3.2: Inventory update logic | Sprint 2 | 3 | Inventory update | ✅ |
 | Requirement 3.3: Validation and feedback | Sprint 2 | 2 | Form validation and feedback | ✅ |
-| Requirement 4.1: Real-time price update via WebSockets | Sprint 3 | 6 | WebSocket price update | ⏳ |
-| Requirement 4.2: Resilience to connection issues | Sprint 3 | 2 | Robust real-time system | ⏳ |
+| Requirement 4.1: Real-time price update via WebSockets | Sprint 3 | 6 | WebSocket price update | ✅ |
+| Requirement 4.2: Resilience to connection issues | Sprint 3 | 2 | Robust real-time system | ✅ |

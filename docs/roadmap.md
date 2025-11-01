@@ -30,13 +30,14 @@ Develop a fully functional web application for selling collectible items using J
   - ✅ Exception handling and feedback implemented.
 - **Status**: All deliverables completed. Branch: `feature/sprint-2-exception-handling-views-templates`
 
-### Sprint 3 (Oct 31 to Nov 3)
-- Implement item filtering features.
-- Add real-time price updates for items using WebSockets.
-- Finalize all features and ensure system integration.
+### Sprint 3 (Oct 31 to Nov 3) ✅ COMPLETED
+- ✅ Implement advanced item filtering features (admin panel).
+- ✅ Add real-time price updates for items using WebSockets.
+- ✅ Enhance admin UI with auto-generated IDs and table filtering.
 - **Milestones:**
-  - Item filter and WebSocket updates integrated.
-  - System passes integration tests.
+  - ✅ Item filter and WebSocket updates integrated.
+  - ✅ System fully functional with all features.
+- **Status**: All deliverables completed. Branch: `feature/websocket-realtime-price-updates-new`
 
 ### Final Delivery (Nov 4-5)
 - Integrate all sprints into a cohesive web application.
@@ -67,9 +68,10 @@ Develop a fully functional web application for selling collectible items using J
   - Client-side and server-side validation
   - Real-time form submission via REST API
 
-### Sprint 3
-- Item filtering functionality
-- Real-time price update with WebSockets
+### Sprint 3 ✅ COMPLETED
+- ✅ Advanced item filtering functionality (admin table filters)
+- ✅ Real-time price update with WebSockets
+- ✅ Admin UI enhancements (auto-generated IDs, improved filtering)
 
 ### Final Delivery
 - Integrated project with all features
