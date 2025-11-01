@@ -1,6 +1,6 @@
 # Collectibles Store API
 
-A RESTful e-commerce API for managing collectible items using Java and the Spark framework with PostgreSQL database integration. This project implements a modern web service architecture following SOLID principles with proper error handling, validation, and comprehensive documentation.
+A RESTful e-commerce API for managing collectible items using Java and the Spark framework with MySQL database integration. This project implements a modern web service architecture following SOLID principles with proper error handling, validation, and comprehensive documentation.
 
 ## 🚀 Project Overview
 
@@ -10,10 +10,13 @@ This project is part of the Digital NAO Backend Development pathway, focusing on
 
 - **RESTful API Design**: Clean, intuitive endpoints following REST principles
 - **Product Management**: Complete CRUD operations for collectible items with soft delete functionality
+- **Real-Time Updates**: WebSocket support for live price updates across all connected clients
+- **Web Interface**: Modern Mustache templates with admin panel and product browsing
 - **MySQL Integration**: Robust database layer with connection pooling and migrations
+- **Exception Handling**: Custom exception hierarchy with centralized error management
 - **Environment Configuration**: Flexible configuration management with .env support
 - **SOLID Principles**: Clean architecture following SOLID design principles
-- **Input Validation**: Comprehensive data validation and error handling
+- **Input Validation**: Comprehensive data validation and error handling (SQL injection protection)
 - **JSON API**: Full JSON support with proper serialization/deserialization
 - **CORS Support**: Cross-origin resource sharing enabled for web clients
 - **Database Migrations**: Automated schema management with Flyway
