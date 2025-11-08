@@ -24,6 +24,8 @@
     <!-- Database version is managed externally via environment variables -->
         <hikaricp.version>5.1.0</hikaricp.version>
         <flyway.version>10.8.1</flyway.version>
+        <jwt.version>4.4.0</jwt.version>
+        <bcrypt.version>0.4</bcrypt.version>
     </properties>
 
     <dependencies>
@@ -105,6 +107,20 @@
             <groupId>com.sparkjava</groupId>
             <artifactId>spark-template-mustache</artifactId>
             <version>2.7.1</version>
+        </dependency>
+
+        <!-- JWT for authentication -->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>${jwt.version}</version>
+        </dependency>
+
+        <!-- BCrypt for password hashing -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>${bcrypt.version}</version>
         </dependency>
 
     </dependencies>

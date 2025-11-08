@@ -3,13 +3,19 @@ package com.spark.collectibles;
 import com.spark.collectibles.config.EnvironmentConfig;
 import com.spark.collectibles.database.DatabaseConnectionManager;
 import com.spark.collectibles.database.DatabaseMigrationManager;
+import com.spark.collectibles.routes.AuthRoutes;
 import com.spark.collectibles.routes.ProductRoutes;
+import com.spark.collectibles.routes.UserRoutes;
 import com.spark.collectibles.routes.ViewRoutes;
+import com.spark.collectibles.service.AuthService;
 import com.spark.collectibles.service.ProductService;
-import com.spark.collectibles.websocket.PriceWebSocketHandler;
+import com.spark.collectibles.service.UserService;
+import com.spark.collectibles.util.AuthFilter;
 import com.spark.collectibles.util.JsonUtil;
 import com.spark.collectibles.util.ErrorHandler;
 import com.spark.collectibles.exception.ExceptionHandler;
+import com.spark.collectibles.model.User;
+import com.spark.collectibles.websocket.PriceWebSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +37,9 @@ public class Application {
             
             // Initialize services
             ProductService productService = new ProductService();
+            UserService userService = new UserService();
+            AuthService authService = new AuthService();
+            AuthFilter authFilter = new AuthFilter(authService);
             
             // Set port from configuration
             port(EnvironmentConfig.getAppPort());
@@ -52,8 +61,17 @@ public class Application {
                 }
             });
             
+            // Initialize authentication routes (public)
+            AuthRoutes.initialize(authService);
+            
             // Initialize API routes
             ProductRoutes.initialize(productService);
+            
+            // Initialize user management routes (protected - admin only)
+            setupUserRoutes(userService, authFilter);
+            
+            // Protect admin product management routes (POST, PUT, DELETE require ADMIN role)
+            setupProtectedProductRoutes(authFilter);
             
             // Initialize view routes (must come after API routes)
             ViewRoutes.initialize(productService);
@@ -103,6 +121,8 @@ public class Application {
             logger.info("API Base Path: {}", EnvironmentConfig.getApiBasePath());
             logger.info("Environment: {}", EnvironmentConfig.getAppEnv());
             logger.info("WebSocket endpoint available at /ws/prices");
+            logger.info("Authentication enabled - JWT-based authentication");
+            logger.info("Protected routes require authentication with ADMIN role");
             
         } catch (Exception e) {
             logger.error("Failed to start application", e);
@@ -232,6 +252,47 @@ public class Application {
         });
         
         logger.info("Health check endpoint available at /api/health");
+    }
+    
+    /**
+     * Setup user management routes with authentication
+     */
+    private static void setupUserRoutes(UserService userService, AuthFilter authFilter) {
+        // Protect all user management routes with ADMIN role requirement
+        before("/api/users/*", authFilter.requireRole(User.UserRole.ADMIN));
+        before("/api/users", authFilter.requireRole(User.UserRole.ADMIN));
+        
+        // Initialize user routes
+        UserRoutes.initialize(userService);
+        
+        logger.info("User management routes initialized (ADMIN access required)");
+    }
+    
+    /**
+     * Setup protected product management routes
+     * Public routes (GET) remain accessible, but admin routes (POST, PUT, DELETE) require authentication
+     */
+    private static void setupProtectedProductRoutes(AuthFilter authFilter) {
+        // Protect product creation, update, and deletion with ADMIN role
+        before("/api/products", (request, response) -> {
+            // Only require auth for POST, PUT, DELETE methods
+            if ("POST".equals(request.requestMethod())) {
+                authFilter.requireRole(User.UserRole.ADMIN).handle(request, response);
+            }
+        });
+        
+        before("/api/products/:id", (request, response) -> {
+            // Only require auth for PUT, DELETE methods (GET is public)
+            if ("PUT".equals(request.requestMethod()) || "DELETE".equals(request.requestMethod())) {
+                authFilter.requireRole(User.UserRole.ADMIN).handle(request, response);
+            }
+        });
+        
+        // Protect restore and hard delete routes
+        before("/api/products/:id/restore", authFilter.requireRole(User.UserRole.ADMIN));
+        before("/api/products/:id/hard", authFilter.requireRole(User.UserRole.ADMIN));
+        
+        logger.info("Product management routes protected (ADMIN access required for modifications)");
     }
     
     /**
