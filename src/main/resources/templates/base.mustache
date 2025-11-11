@@ -303,21 +303,22 @@
         
         // Update navigation based on authentication status
         async function updateNavigation() {
-            console.log('[AUTH] updateNavigation() called');
+            console.log('[AUTH] updateNavigation() called at:', new Date().toISOString());
             const authNav = document.getElementById('authNav');
             const userNav = document.getElementById('userNav');
             const userInfo = document.getElementById('userInfo');
             const userBadge = document.getElementById('userBadge');
             
             if (!authNav || !userNav) {
-                console.warn('[AUTH] Navigation elements not found');
+                console.warn('[AUTH] Navigation elements not found - authNav:', !!authNav, 'userNav:', !!userNav);
                 return;
             }
             
+            // Always check localStorage directly first
             const token = localStorage.getItem('authToken');
             const userStr = localStorage.getItem('currentUser');
             
-            console.log('[AUTH] Navigation check - Token:', token ? 'EXISTS' : 'MISSING');
+            console.log('[AUTH] Navigation check - Token:', token ? 'EXISTS (' + token.length + ' chars)' : 'MISSING');
             console.log('[AUTH] Navigation check - User:', userStr ? 'EXISTS' : 'MISSING');
             
             if (token) {
@@ -325,15 +326,38 @@
                 if (userStr) {
                     try {
                         user = JSON.parse(userStr);
-                        console.log('[AUTH] Parsed user from localStorage:', user.username);
+                        console.log('[AUTH] Parsed user from localStorage:', user ? user.username : 'null');
                     } catch (e) {
                         console.error('[AUTH] Error parsing user from localStorage:', e);
                     }
                 }
                 
-                // If no user data, try to validate token and get user info
+                // If we have token but no user, try to get user info
+                if (!user && token) {
+                    console.log('[AUTH] Token exists but no user data, fetching user info...');
+                    try {
+                        const response = await fetch('/api/auth/me', {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            user = await response.json();
+                            console.log('[AUTH] User info fetched from server:', user.username);
+                            localStorage.setItem('currentUser', JSON.stringify(user));
+                        } else {
+                            console.warn('[AUTH] Failed to fetch user info, status:', response.status);
+                            // Don't clear token yet, might be temporary
+                        }
+                    } catch (error) {
+                        console.error('[AUTH] Error fetching user info:', error);
+                    }
+                }
+                
+                // If no user data, try to validate token and get user info using Auth object
                 if (!user) {
-                    console.log('[AUTH] No user data found, validating token with server...');
+                    console.log('[AUTH] No user data found, validating token with server using Auth object...');
                     if (typeof Auth !== 'undefined' && Auth.validateToken) {
                         const isValid = await Auth.validateToken();
                         console.log('[AUTH] Token validation result:', isValid);
@@ -341,17 +365,26 @@
                             user = Auth.getCurrentUser();
                             console.log('[AUTH] User retrieved after validation:', user ? user.username : 'null');
                         }
+                    } else {
+                        console.warn('[AUTH] Auth object not available for token validation');
                     }
                 }
                 
                 if (user) {
-                    console.log('[AUTH] Showing user menu for:', user.username);
+                    console.log('[AUTH] Showing user menu for:', user.username, 'Role:', user.role);
                     authNav.style.display = 'none';
                     userNav.style.display = 'inline-block';
-                    if (userInfo) userInfo.textContent = user.username;
-                    if (userBadge) userBadge.textContent = user.role === 'ADMIN' ? 'Admin' : 'User';
+                    if (userInfo) {
+                        userInfo.textContent = user.username;
+                        console.log('[AUTH] User info text set to:', user.username);
+                    }
+                    if (userBadge) {
+                        userBadge.textContent = user.role === 'ADMIN' ? 'Admin' : 'User';
+                        console.log('[AUTH] User badge set to:', userBadge.textContent);
+                    }
+                    console.log('[AUTH] Navigation updated successfully - user menu visible');
                 } else {
-                    console.log('[AUTH] No valid user found, showing login/register');
+                    console.log('[AUTH] No valid user found despite token, showing login/register');
                     authNav.style.display = 'inline';
                     userNav.style.display = 'none';
                 }
@@ -365,7 +398,14 @@
         // Update navigation on page load
         document.addEventListener('DOMContentLoaded', function() {
             console.log('[AUTH] DOMContentLoaded - Initializing navigation');
+            console.log('[AUTH] Current URL:', window.location.href);
             console.log('[AUTH] Checking if Auth object exists:', typeof Auth !== 'undefined');
+            
+            // Always check localStorage first, regardless of Auth object
+            const token = localStorage.getItem('authToken');
+            const user = localStorage.getItem('currentUser');
+            console.log('[AUTH] Direct localStorage check - Token:', token ? 'EXISTS (' + token.length + ' chars)' : 'MISSING');
+            console.log('[AUTH] Direct localStorage check - User:', user ? 'EXISTS' : 'MISSING');
             
             // Check if auth.js loaded
             if (typeof Auth === 'undefined') {
@@ -374,17 +414,34 @@
                 const script = document.createElement('script');
                 script.src = '/static/auth.js';
                 script.onload = function() {
-                    console.log('[AUTH] auth.js loaded successfully');
-                    setTimeout(updateNavigation, 100);
+                    console.log('[AUTH] auth.js loaded successfully, waiting for initialization...');
+                    // Wait a bit more for Auth object to be fully initialized
+                    setTimeout(function() {
+                        console.log('[AUTH] Auth object after load:', typeof Auth !== 'undefined' ? 'EXISTS' : 'STILL MISSING');
+                        updateNavigation();
+                    }, 200);
                 };
                 script.onerror = function() {
                     console.error('[AUTH] ERROR: Failed to load auth.js from /static/auth.js');
                     console.error('[AUTH] This will cause authentication issues!');
+                    // Even without Auth object, try to update navigation with direct localStorage access
+                    setTimeout(updateNavigation, 100);
                 };
                 document.head.appendChild(script);
             } else {
+                console.log('[AUTH] Auth object exists, updating navigation...');
                 // Wait a bit for everything to initialize
                 setTimeout(updateNavigation, 100);
+            }
+        });
+        
+        // Also check on window load (after all resources loaded)
+        window.addEventListener('load', function() {
+            console.log('[AUTH] Window loaded - Final navigation check');
+            const token = localStorage.getItem('authToken');
+            console.log('[AUTH] Final check - Token in localStorage:', token ? 'EXISTS' : 'MISSING');
+            if (token) {
+                setTimeout(updateNavigation, 200);
             }
         });
         
