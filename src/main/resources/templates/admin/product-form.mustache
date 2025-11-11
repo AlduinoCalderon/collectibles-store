@@ -563,6 +563,53 @@
                 alert('Error saving product');
             });
         });
+        
+        // User menu functionality
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            if (dropdown) dropdown.classList.toggle('show');
+        }
+        
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('userNav');
+            const dropdown = document.getElementById('userMenuDropdown');
+            if (userMenu && !userMenu.contains(event.target) && dropdown && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        });
+        
+        // Update navigation
+        async function updateNavigation() {
+            const authNav = document.getElementById('authNav');
+            const userNav = document.getElementById('userNav');
+            const userInfo = document.getElementById('userInfo');
+            const userBadge = document.getElementById('userBadge');
+            
+            if (typeof Auth !== 'undefined' && Auth.isAuthenticated()) {
+                let user = Auth.getCurrentUser();
+                if (!user) {
+                    const isValid = await Auth.validateToken();
+                    if (isValid) user = Auth.getCurrentUser();
+                }
+                if (user) {
+                    if (authNav) authNav.style.display = 'none';
+                    if (userNav) userNav.style.display = 'inline-block';
+                    if (userInfo) userInfo.textContent = user.username;
+                    if (userBadge) userBadge.textContent = user.role === 'ADMIN' ? 'Admin' : 'User';
+                } else {
+                    if (authNav) authNav.style.display = 'inline';
+                    if (userNav) userNav.style.display = 'none';
+                }
+            } else {
+                if (authNav) authNav.style.display = 'inline';
+                if (userNav) userNav.style.display = 'none';
+            }
+        }
+        
+        // Update navigation after auth check
+        if (typeof Auth !== 'undefined') {
+            updateNavigation();
+        }
     </script>
 </body>
 </html>
