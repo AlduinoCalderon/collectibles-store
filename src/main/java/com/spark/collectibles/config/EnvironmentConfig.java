@@ -94,58 +94,99 @@ public class EnvironmentConfig {
     
     // Database configuration getters
     public static String getDbHost() {
+        if (properties == null) {
+            return "localhost";
+        }
         return properties.getProperty("db.host");
     }
     
     public static int getDbPort() {
-        return Integer.parseInt(properties.getProperty("db.port"));
+        if (properties == null) {
+            return 3306;
+        }
+        String port = properties.getProperty("db.port");
+        return port != null ? Integer.parseInt(port) : 3306;
     }
     
     public static String getDbName() {
-        return properties.getProperty("db.name");
+        if (properties == null) {
+            return "collectibles_store";
+        }
+        return properties.getProperty("db.name", "collectibles_store");
     }
     
     public static String getDbUsername() {
-        return properties.getProperty("db.username");
+        if (properties == null) {
+            return "root";
+        }
+        return properties.getProperty("db.username", "root");
     }
     
     public static String getDbPassword() {
-        return properties.getProperty("db.password");
+        if (properties == null) {
+            return "password";
+        }
+        return properties.getProperty("db.password", "password");
     }
     
     public static String getDbUrl() {
-    return String.format("jdbc:mysql://%s:%d/%s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true", getDbHost(), getDbPort(), getDbName());
+        return String.format("jdbc:mysql://%s:%d/%s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true", getDbHost(), getDbPort(), getDbName());
     }
     
     // Application configuration getters
     public static int getAppPort() {
-        return Integer.parseInt(properties.getProperty("app.port"));
+        if (properties == null) {
+            return 4567;
+        }
+        String port = properties.getProperty("app.port");
+        return port != null ? Integer.parseInt(port) : 4567;
     }
     
     public static String getAppEnv() {
-        return properties.getProperty("app.env");
+        if (properties == null) {
+            return "development";
+        }
+        return properties.getProperty("app.env", "development");
     }
     
     public static String getLogLevel() {
-        return properties.getProperty("app.log.level");
+        if (properties == null) {
+            return "INFO";
+        }
+        return properties.getProperty("app.log.level", "INFO");
     }
     
     // Database connection pool getters
     public static int getDbMaxConnections() {
-        return Integer.parseInt(properties.getProperty("db.max.connections"));
+        if (properties == null) {
+            return 3;
+        }
+        String max = properties.getProperty("db.max.connections");
+        return max != null ? Integer.parseInt(max) : 3;
     }
     
     public static int getDbMinConnections() {
-        return Integer.parseInt(properties.getProperty("db.min.connections"));
+        if (properties == null) {
+            return 1;
+        }
+        String min = properties.getProperty("db.min.connections");
+        return min != null ? Integer.parseInt(min) : 1;
     }
     
     public static int getDbConnectionTimeout() {
-        return Integer.parseInt(properties.getProperty("db.connection.timeout"));
+        if (properties == null) {
+            return 30000;
+        }
+        String timeout = properties.getProperty("db.connection.timeout");
+        return timeout != null ? Integer.parseInt(timeout) : 30000;
     }
     
     // API configuration getters
     public static String getApiBasePath() {
-        return properties.getProperty("api.base.path");
+        if (properties == null) {
+            return "/api";
+        }
+        return properties.getProperty("api.base.path", "/api");
     }
     
     /**
@@ -166,11 +207,17 @@ public class EnvironmentConfig {
      * Get all configuration as properties
      */
     public static Properties getAllProperties() {
+        if (properties == null) {
+            properties = new Properties();
+        }
         return new Properties(properties);
     }
     
     // JWT configuration getters
     public static String getJwtSecret() {
+        if (properties == null) {
+            properties = new Properties();
+        }
         String secret = properties.getProperty("jwt.secret");
         if (secret == null || secret.trim().isEmpty()) {
             if (isProduction()) {
