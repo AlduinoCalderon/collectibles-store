@@ -50,9 +50,32 @@ public class Application {
             webSocket("/ws/prices", PriceWebSocketHandler.class);
             
             // Configure static files (MUST be before any route mapping)
-            // Use externalStaticFileLocation for files in resources/static
+            // Spark serves files from resources/static when using location("/static")
             spark.Spark.staticFiles.location("/static");
             logger.info("Static files configured at /static");
+            
+            // Explicitly serve auth.js to ensure it's accessible
+            get("/static/auth.js", (request, response) -> {
+                response.type("application/javascript");
+                response.header("Cache-Control", "no-cache, no-store, must-revalidate");
+                try {
+                    java.io.InputStream inputStream = Application.class.getClassLoader()
+                        .getResourceAsStream("static/auth.js");
+                    if (inputStream != null) {
+                        String js = new String(inputStream.readAllBytes());
+                        logger.debug("Serving auth.js (length: {})", js.length());
+                        return js;
+                    } else {
+                        logger.error("auth.js file not found in resources/static");
+                        response.status(404);
+                        return "console.error('auth.js not found');";
+                    }
+                } catch (Exception e) {
+                    logger.error("Error serving auth.js", e);
+                    response.status(500);
+                    return "console.error('Error loading auth.js');";
+                }
+            });
             
             // Add logging for static file requests
             before("/static/*", (request, response) -> {
