@@ -15,9 +15,10 @@ import java.util.Properties;
  */
 public class EnvironmentConfig {
     private static final Logger logger = LoggerFactory.getLogger(EnvironmentConfig.class);
-    private static final Properties properties = new Properties();
+    private static Properties properties;
     
     static {
+        properties = new Properties();
         loadConfiguration();
     }
     
@@ -80,10 +81,13 @@ public class EnvironmentConfig {
      * Set property from environment variable with fallback to default value
      */
     private static void setProperty(String key, String envVar, String defaultValue) {
+        if (properties == null) {
+            properties = new Properties();
+        }
         String value = System.getenv(envVar);
         if (value != null && !value.trim().isEmpty()) {
             properties.setProperty(key, value);
-        } else {
+        } else if (defaultValue != null) {
             properties.setProperty(key, defaultValue);
         }
     }
