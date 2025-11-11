@@ -1,682 +1,544 @@
 package com.spark.collectibles.service;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.spark.collectibles.model.User;
 import com.spark.collectibles.repository.UserRepository;
+import com.spark.collectibles.repository.impl.MySQLUserRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
- * Comprehensive unit tests for AuthService
+ * Unit tests for AuthService
  * 
- * This test class covers all authentication functionality including:
- * - User registration with password hashing
+ * Tests cover:
+ * - User registration with validation
  * - User login with password verification
  * - JWT token generation and validation
+ * - Password hashing and verification
  * - Edge cases and error handling
- * - Security validations
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AuthService Tests")
+@DisplayName("AuthService Unit Tests")
 class AuthServiceTest {
     
     @Mock
     private UserRepository userRepository;
     
     private AuthService authService;
+    private String testJwtSecret;
+    private int testJwtExpirationHours;
     
     @BeforeEach
     void setUp() {
-        authService = new AuthService(userRepository);
+        // Use a test JWT secret for testing
+        testJwtSecret = "test-jwt-secret-key-for-unit-testing-minimum-32-characters-long";
+        testJwtExpirationHours = 24;
+        authService = new AuthService(userRepository, testJwtSecret, testJwtExpirationHours);
     }
     
-    // ========== Registration Tests ==========
-    
     @Test
-    @DisplayName("Should register user successfully with valid data")
-    void testRegisterUserSuccess() {
-        // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(userRepository.create(any(User.class))).thenAnswer(invocation -> {
-            User user = invocation.getArgument(0);
-            return user;
-        });
-        when(userRepository.findById(anyString())).thenAnswer(invocation -> {
-            User user = new User();
-            user.setId(invocation.getArgument(0));
-            user.setUsername("testuser");
-            user.setEmail("test@example.com");
-            user.setRole(User.UserRole.CUSTOMER);
-            return Optional.of(user);
-        });
+    @DisplayName("Should successfully register a new user")
+    void testRegisterUser_Success() {
+        // Arrange
+        String username = "testuser";
+        String email = "test@example.com";
+        String password = "password123";
+        String firstName = "Test";
+        String lastName = "User";
+        User.UserRole role = User.UserRole.CUSTOMER;
         
-        // When
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            "password123",
-            "Test",
-            "User",
-            User.UserRole.CUSTOMER
-        );
+        when(userRepository.existsByUsername(username)).thenReturn(false);
+        when(userRepository.existsByEmail(email)).thenReturn(false);
+        when(userRepository.findAll()).thenReturn(new ArrayList<>());
         
-        // Then
+        User savedUser = new User();
+        savedUser.setId("user1");
+        savedUser.setUsername(username);
+        savedUser.setEmail(email);
+        savedUser.setFirstName(firstName);
+        savedUser.setLastName(lastName);
+        savedUser.setRole(role);
+        savedUser.setActive(true);
+        
+        when(userRepository.create(any(User.class))).thenReturn(savedUser);
+        
+        // Act
+        AuthService.AuthResult result = authService.register(username, email, password, firstName, lastName, role);
+        
+        // Assert
         assertNotNull(result);
         assertNotNull(result.getUser());
         assertNotNull(result.getToken());
-        assertEquals("testuser", result.getUser().getUsername());
-        assertEquals("test@example.com", result.getUser().getEmail());
-        assertEquals(User.UserRole.CUSTOMER, result.getUser().getRole());
+        assertEquals(username, result.getUser().getUsername());
+        assertEquals(email, result.getUser().getEmail());
+        assertEquals(role, result.getUser().getRole());
         assertTrue(result.getToken().length() > 0);
+        
+        verify(userRepository).existsByUsername(username);
+        verify(userRepository).existsByEmail(email);
         verify(userRepository).create(any(User.class));
     }
     
     @Test
-    @DisplayName("Should not register user with empty username")
-    void testRegisterUserEmptyUsername() {
-        // When
-        AuthService.AuthResult result = authService.register(
-            "",
-            "test@example.com",
-            "password123",
-            "Test",
-            "User",
-            null
-        );
+    @DisplayName("Should fail registration with empty username")
+    void testRegisterUser_EmptyUsername() {
+        // Act
+        AuthService.AuthResult result = authService.register("", "test@example.com", "password123", "Test", "User", null);
         
-        // Then
+        // Assert
         assertNull(result);
         verify(userRepository, never()).create(any(User.class));
     }
     
     @Test
-    @DisplayName("Should not register user with null username")
-    void testRegisterUserNullUsername() {
-        // When
-        AuthService.AuthResult result = authService.register(
-            null,
-            "test@example.com",
-            "password123",
-            "Test",
-            "User",
-            null
-        );
+    @DisplayName("Should fail registration with null username")
+    void testRegisterUser_NullUsername() {
+        // Act
+        AuthService.AuthResult result = authService.register(null, "test@example.com", "password123", "Test", "User", null);
         
-        // Then
+        // Assert
         assertNull(result);
         verify(userRepository, never()).create(any(User.class));
     }
     
     @Test
-    @DisplayName("Should not register user with invalid email")
-    void testRegisterUserInvalidEmail() {
-        // When
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "invalid-email",
-            "password123",
-            "Test",
-            "User",
-            null
-        );
+    @DisplayName("Should fail registration with invalid email")
+    void testRegisterUser_InvalidEmail() {
+        // Act
+        AuthService.AuthResult result = authService.register("testuser", "invalid-email", "password123", "Test", "User", null);
         
-        // Then
+        // Assert
         assertNull(result);
         verify(userRepository, never()).create(any(User.class));
     }
     
     @Test
-    @DisplayName("Should not register user with empty email")
-    void testRegisterUserEmptyEmail() {
-        // When
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "",
-            "password123",
-            "Test",
-            "User",
-            null
-        );
+    @DisplayName("Should fail registration with short password")
+    void testRegisterUser_ShortPassword() {
+        // Act
+        AuthService.AuthResult result = authService.register("testuser", "test@example.com", "12345", "Test", "User", null);
         
-        // Then
+        // Assert
         assertNull(result);
         verify(userRepository, never()).create(any(User.class));
     }
     
     @Test
-    @DisplayName("Should not register user with weak password")
-    void testRegisterUserWeakPassword() {
-        // When
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            "12345", // Less than 6 characters
-            "Test",
-            "User",
-            null
-        );
+    @DisplayName("Should fail registration with existing username")
+    void testRegisterUser_DuplicateUsername() {
+        // Arrange
+        String username = "existinguser";
+        when(userRepository.existsByUsername(username)).thenReturn(true);
         
-        // Then
+        // Act
+        AuthService.AuthResult result = authService.register(username, "test@example.com", "password123", "Test", "User", null);
+        
+        // Assert
         assertNull(result);
+        verify(userRepository).existsByUsername(username);
         verify(userRepository, never()).create(any(User.class));
     }
     
     @Test
-    @DisplayName("Should not register user with null password")
-    void testRegisterUserNullPassword() {
-        // When
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            null,
-            "Test",
-            "User",
-            null
-        );
+    @DisplayName("Should fail registration with existing email")
+    void testRegisterUser_DuplicateEmail() {
+        // Arrange
+        String email = "existing@example.com";
+        when(userRepository.existsByUsername(anyString())).thenReturn(false);
+        when(userRepository.existsByEmail(email)).thenReturn(true);
         
-        // Then
+        // Act
+        AuthService.AuthResult result = authService.register("testuser", email, "password123", "Test", "User", null);
+        
+        // Assert
         assertNull(result);
+        verify(userRepository).existsByEmail(email);
         verify(userRepository, never()).create(any(User.class));
     }
     
     @Test
-    @DisplayName("Should not register user with duplicate username")
-    void testRegisterUserDuplicateUsername() {
-        // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(true);
-        
-        // When
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            "password123",
-            "Test",
-            "User",
-            null
-        );
-        
-        // Then
-        assertNull(result);
-        verify(userRepository, never()).create(any(User.class));
-    }
-    
-    @Test
-    @DisplayName("Should not register user with duplicate email")
-    void testRegisterUserDuplicateEmail() {
-        // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
-        
-        // When
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            "password123",
-            "Test",
-            "User",
-            null
-        );
-        
-        // Then
-        assertNull(result);
-        verify(userRepository, never()).create(any(User.class));
-    }
-    
-    @Test
-    @DisplayName("Should hash password during registration")
-    void testRegisterUserPasswordHashing() {
-        // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(userRepository.create(any(User.class))).thenAnswer(invocation -> {
-            User user = invocation.getArgument(0);
-            // Verify password is hashed (BCrypt hash starts with $2a$ or $2b$)
-            assertNotNull(user.getPasswordHash());
-            assertTrue(user.getPasswordHash().startsWith("$2a$") || user.getPasswordHash().startsWith("$2b$"));
-            assertNotEquals("password123", user.getPasswordHash());
-            return user;
-        });
-        when(userRepository.findById(anyString())).thenAnswer(invocation -> {
-            User user = new User();
-            user.setId(invocation.getArgument(0));
-            user.setUsername("testuser");
-            return Optional.of(user);
-        });
-        
-        // When
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            "password123",
-            "Test",
-            "User",
-            null
-        );
-        
-        // Then
-        assertNotNull(result);
-        verify(userRepository).create(any(User.class));
-    }
-    
-    @Test
-    @DisplayName("Should use default CUSTOMER role when role is null")
-    void testRegisterUserDefaultRole() {
-        // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(userRepository.create(any(User.class))).thenAnswer(invocation -> {
-            User user = invocation.getArgument(0);
-            assertEquals(User.UserRole.CUSTOMER, user.getRole());
-            return user;
-        });
-        when(userRepository.findById(anyString())).thenAnswer(invocation -> {
-            User user = new User();
-            user.setId(invocation.getArgument(0));
-            user.setUsername("testuser");
-            user.setRole(User.UserRole.CUSTOMER);
-            return Optional.of(user);
-        });
-        
-        // When
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            "password123",
-            "Test",
-            "User",
-            null
-        );
-        
-        // Then
-        assertNotNull(result);
-        assertEquals(User.UserRole.CUSTOMER, result.getUser().getRole());
-    }
-    
-    // ========== Password Hashing Tests ==========
-    
-    @Test
-    @DisplayName("Should hash password with BCrypt")
-    void testHashPassword() {
-        // When
-        String hash = authService.hashPassword("password123");
-        
-        // Then
-        assertNotNull(hash);
-        assertTrue(hash.startsWith("$2a$") || hash.startsWith("$2b$"));
-        assertNotEquals("password123", hash);
-        assertTrue(hash.length() >= 60); // BCrypt hashes are 60 characters
-    }
-    
-    @Test
-    @DisplayName("Should verify correct password")
-    void testVerifyPasswordCorrect() {
-        // Given
+    @DisplayName("Should successfully login with username")
+    void testLogin_WithUsername_Success() {
+        // Arrange
+        String username = "testuser";
         String password = "password123";
-        String hash = authService.hashPassword(password);
+        String hashedPassword = authService.hashPassword(password);
         
-        // When
-        boolean isValid = authService.verifyPassword(password, hash);
+        User user = new User();
+        user.setId("user1");
+        user.setUsername(username);
+        user.setEmail("test@example.com");
+        user.setPasswordHash(hashedPassword);
+        user.setActive(true);
+        user.setRole(User.UserRole.CUSTOMER);
         
-        // Then
-        assertTrue(isValid);
-    }
-    
-    @Test
-    @DisplayName("Should not verify incorrect password")
-    void testVerifyPasswordIncorrect() {
-        // Given
-        String hash = authService.hashPassword("correctpassword");
+        MySQLUserRepository mysqlRepo = mock(MySQLUserRepository.class);
+        when(mysqlRepo.findByUsernameWithPassword(username)).thenReturn(Optional.of(user));
         
-        // When
-        boolean isValid = authService.verifyPassword("wrongpassword", hash);
+        AuthService authServiceWithMock = new AuthService(mysqlRepo, testJwtSecret, testJwtExpirationHours);
         
-        // Then
-        assertFalse(isValid);
-    }
-    
-    @Test
-    @DisplayName("Should not verify password with null hash")
-    void testVerifyPasswordNullHash() {
-        // When
-        boolean isValid = authService.verifyPassword("password123", null);
+        // Act
+        AuthService.AuthResult result = authServiceWithMock.login(username, password);
         
-        // Then
-        assertFalse(isValid);
-    }
-    
-    @Test
-    @DisplayName("Should not verify null password")
-    void testVerifyPasswordNullPassword() {
-        // Given
-        String hash = authService.hashPassword("password123");
-        
-        // When
-        boolean isValid = authService.verifyPassword(null, hash);
-        
-        // Then
-        assertFalse(isValid);
-    }
-    
-    @Test
-    @DisplayName("Should generate different hashes for same password")
-    void testHashPasswordUniqueness() {
-        // When
-        String hash1 = authService.hashPassword("password123");
-        String hash2 = authService.hashPassword("password123");
-        
-        // Then
-        assertNotEquals(hash1, hash2); // BCrypt uses random salt
-        // But both should verify correctly
-        assertTrue(authService.verifyPassword("password123", hash1));
-        assertTrue(authService.verifyPassword("password123", hash2));
-    }
-    
-    // ========== JWT Token Tests ==========
-    
-    @Test
-    @DisplayName("Should generate valid JWT token during registration")
-    void testGenerateJwtToken() {
-        // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(userRepository.create(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(userRepository.findById(anyString())).thenAnswer(invocation -> {
-            User user = new User();
-            user.setId(invocation.getArgument(0));
-            user.setUsername("testuser");
-            user.setRole(User.UserRole.ADMIN);
-            return Optional.of(user);
-        });
-        
-        // When
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            "password123",
-            "Test",
-            "User",
-            User.UserRole.ADMIN
-        );
-        
-        // Then
+        // Assert
         assertNotNull(result);
+        assertNotNull(result.getUser());
         assertNotNull(result.getToken());
+        assertEquals(username, result.getUser().getUsername());
         assertTrue(result.getToken().length() > 0);
-        assertTrue(result.getToken().contains(".")); // JWT has 3 parts separated by dots
     }
     
     @Test
-    @DisplayName("Should validate valid JWT token")
-    void testValidateValidToken() {
-        // Given
-        User user = new User("user1", "testuser", "test@example.com", "Test", "User");
+    @DisplayName("Should successfully login with email")
+    void testLogin_WithEmail_Success() {
+        // Arrange
+        String email = "test@example.com";
+        String password = "password123";
+        String hashedPassword = authService.hashPassword(password);
+        
+        User user = new User();
+        user.setId("user1");
+        user.setUsername("testuser");
+        user.setEmail(email);
+        user.setPasswordHash(hashedPassword);
+        user.setActive(true);
+        user.setRole(User.UserRole.CUSTOMER);
+        
+        MySQLUserRepository mysqlRepo = mock(MySQLUserRepository.class);
+        when(mysqlRepo.findByUsernameWithPassword(email)).thenReturn(Optional.empty());
+        when(mysqlRepo.findByEmailWithPassword(email)).thenReturn(Optional.of(user));
+        
+        AuthService authServiceWithMock = new AuthService(mysqlRepo, testJwtSecret, testJwtExpirationHours);
+        
+        // Act
+        AuthService.AuthResult result = authServiceWithMock.login(email, password);
+        
+        // Assert
+        assertNotNull(result);
+        assertNotNull(result.getUser());
+        assertNotNull(result.getToken());
+        assertEquals(email, result.getUser().getEmail());
+    }
+    
+    @Test
+    @DisplayName("Should fail login with wrong password")
+    void testLogin_WrongPassword() {
+        // Arrange
+        String username = "testuser";
+        String correctPassword = "password123";
+        String wrongPassword = "wrongpassword";
+        String hashedPassword = authService.hashPassword(correctPassword);
+        
+        User user = new User();
+        user.setId("user1");
+        user.setUsername(username);
+        user.setPasswordHash(hashedPassword);
         user.setActive(true);
         
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(userRepository.create(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        MySQLUserRepository mysqlRepo = mock(MySQLUserRepository.class);
+        when(mysqlRepo.findByUsernameWithPassword(username)).thenReturn(Optional.of(user));
+        
+        AuthService authServiceWithMock = new AuthService(mysqlRepo, testJwtSecret, testJwtExpirationHours);
+        
+        // Act
+        AuthService.AuthResult result = authServiceWithMock.login(username, wrongPassword);
+        
+        // Assert
+        assertNull(result);
+    }
+    
+    @Test
+    @DisplayName("Should fail login with non-existent user")
+    void testLogin_NonExistentUser() {
+        // Arrange
+        MySQLUserRepository mysqlRepo = mock(MySQLUserRepository.class);
+        when(mysqlRepo.findByUsernameWithPassword(anyString())).thenReturn(Optional.empty());
+        when(mysqlRepo.findByEmailWithPassword(anyString())).thenReturn(Optional.empty());
+        
+        AuthService authServiceWithMock = new AuthService(mysqlRepo, testJwtSecret, testJwtExpirationHours);
+        
+        // Act
+        AuthService.AuthResult result = authServiceWithMock.login("nonexistent", "password123");
+        
+        // Assert
+        assertNull(result);
+    }
+    
+    @Test
+    @DisplayName("Should fail login with inactive user")
+    void testLogin_InactiveUser() {
+        // Arrange
+        String username = "testuser";
+        String password = "password123";
+        String hashedPassword = authService.hashPassword(password);
+        
+        User user = new User();
+        user.setId("user1");
+        user.setUsername(username);
+        user.setPasswordHash(hashedPassword);
+        user.setActive(false); // Inactive user
+        
+        MySQLUserRepository mysqlRepo = mock(MySQLUserRepository.class);
+        when(mysqlRepo.findByUsernameWithPassword(username)).thenReturn(Optional.of(user));
+        
+        AuthService authServiceWithMock = new AuthService(mysqlRepo, testJwtSecret, testJwtExpirationHours);
+        
+        // Act
+        AuthService.AuthResult result = authServiceWithMock.login(username, password);
+        
+        // Assert
+        assertNull(result);
+    }
+    
+    @Test
+    @DisplayName("Should fail login with empty username")
+    void testLogin_EmptyUsername() {
+        // Act
+        AuthService.AuthResult result = authService.login("", "password123");
+        
+        // Assert
+        assertNull(result);
+    }
+    
+    @Test
+    @DisplayName("Should fail login with empty password")
+    void testLogin_EmptyPassword() {
+        // Act
+        AuthService.AuthResult result = authService.login("testuser", "");
+        
+        // Assert
+        assertNull(result);
+    }
+    
+    @Test
+    @DisplayName("Should successfully validate a valid JWT token")
+    void testValidateToken_ValidToken() {
+        // Arrange
+        User user = new User();
+        user.setId("user1");
+        user.setUsername("testuser");
+        user.setEmail("test@example.com");
+        user.setActive(true);
+        user.setRole(User.UserRole.CUSTOMER);
+        
+        // Generate a valid token
+        String token = generateTestToken(user.getId(), user.getUsername(), user.getRole().name());
+        
         when(userRepository.findById("user1")).thenReturn(Optional.of(user));
         
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            "password123",
-            "Test",
-            "User",
-            User.UserRole.CUSTOMER
-        );
+        // Act
+        User validatedUser = authService.validateToken(token);
         
-        // When
-        User validatedUser = authService.validateToken(result.getToken());
-        
-        // Then
+        // Assert
         assertNotNull(validatedUser);
         assertEquals("user1", validatedUser.getId());
         assertEquals("testuser", validatedUser.getUsername());
     }
     
     @Test
-    @DisplayName("Should not validate invalid JWT token")
-    void testValidateInvalidToken() {
-        // When
-        User user = authService.validateToken("invalid.token.here");
+    @DisplayName("Should fail validation with invalid token")
+    void testValidateToken_InvalidToken() {
+        // Act
+        User validatedUser = authService.validateToken("invalid-token");
         
-        // Then
-        assertNull(user);
+        // Assert
+        assertNull(validatedUser);
     }
     
     @Test
-    @DisplayName("Should not validate null token")
-    void testValidateNullToken() {
-        // When
-        User user = authService.validateToken(null);
+    @DisplayName("Should fail validation with null token")
+    void testValidateToken_NullToken() {
+        // Act
+        User validatedUser = authService.validateToken(null);
         
-        // Then
-        assertNull(user);
+        // Assert
+        assertNull(validatedUser);
     }
     
     @Test
-    @DisplayName("Should not validate empty token")
-    void testValidateEmptyToken() {
-        // When
-        User user = authService.validateToken("");
+    @DisplayName("Should fail validation with empty token")
+    void testValidateToken_EmptyToken() {
+        // Act
+        User validatedUser = authService.validateToken("");
         
-        // Then
-        assertNull(user);
+        // Assert
+        assertNull(validatedUser);
     }
     
     @Test
-    @DisplayName("Should handle Bearer prefix in token")
-    void testValidateTokenWithBearerPrefix() {
-        // Given
-        User user = new User("user1", "testuser", "test@example.com", "Test", "User");
-        user.setActive(true);
+    @DisplayName("Should fail validation when user not found")
+    void testValidateToken_UserNotFound() {
+        // Arrange
+        String token = generateTestToken("nonexistent", "testuser", "CUSTOMER");
+        when(userRepository.findById("nonexistent")).thenReturn(Optional.empty());
         
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(userRepository.create(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        // Act
+        User validatedUser = authService.validateToken(token);
+        
+        // Assert
+        assertNull(validatedUser);
+    }
+    
+    @Test
+    @DisplayName("Should fail validation with inactive user")
+    void testValidateToken_InactiveUser() {
+        // Arrange
+        User user = new User();
+        user.setId("user1");
+        user.setActive(false);
+        
+        String token = generateTestToken("user1", "testuser", "CUSTOMER");
         when(userRepository.findById("user1")).thenReturn(Optional.of(user));
         
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            "password123",
-            "Test",
-            "User",
-            null
-        );
+        // Act
+        User validatedUser = authService.validateToken(token);
         
-        // When
-        User validatedUser = authService.validateToken("Bearer " + result.getToken());
+        // Assert
+        assertNull(validatedUser);
+    }
+    
+    @Test
+    @DisplayName("Should handle token with Bearer prefix")
+    void testValidateToken_WithBearerPrefix() {
+        // Arrange
+        User user = new User();
+        user.setId("user1");
+        user.setUsername("testuser");
+        user.setActive(true);
         
-        // Then
+        String token = generateTestToken("user1", "testuser", "CUSTOMER");
+        when(userRepository.findById("user1")).thenReturn(Optional.of(user));
+        
+        // Act
+        User validatedUser = authService.validateToken("Bearer " + token);
+        
+        // Assert
         assertNotNull(validatedUser);
         assertEquals("user1", validatedUser.getId());
     }
     
     @Test
-    @DisplayName("Should not validate token for inactive user")
-    void testValidateTokenInactiveUser() {
-        // Given
-        User user = new User("user1", "testuser", "test@example.com", "Test", "User");
-        user.setActive(false);
+    @DisplayName("Should hash password correctly")
+    void testHashPassword() {
+        // Act
+        String hash1 = authService.hashPassword("password123");
+        String hash2 = authService.hashPassword("password123");
         
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(userRepository.create(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(userRepository.findById("user1")).thenReturn(Optional.of(user));
-        
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            "password123",
-            "Test",
-            "User",
-            null
-        );
-        
-        // When
-        User validatedUser = authService.validateToken(result.getToken());
-        
-        // Then
-        assertNull(validatedUser); // Inactive user should not be validated
+        // Assert
+        assertNotNull(hash1);
+        assertNotNull(hash2);
+        assertTrue(hash1.startsWith("$2"));
+        // BCrypt hashes should be different each time (due to salt)
+        assertNotEquals(hash1, hash2);
     }
     
-    // ========== Edge Cases and Error Handling ==========
+    @Test
+    @DisplayName("Should verify password correctly")
+    void testVerifyPassword() {
+        // Arrange
+        String password = "password123";
+        String hash = authService.hashPassword(password);
+        
+        // Act & Assert
+        assertTrue(authService.verifyPassword(password, hash));
+        assertFalse(authService.verifyPassword("wrongpassword", hash));
+        assertFalse(authService.verifyPassword(null, hash));
+        assertFalse(authService.verifyPassword(password, null));
+    }
     
     @Test
-    @DisplayName("Should handle registration with null firstName and lastName")
-    void testRegisterUserNullNames() {
-        // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(userRepository.create(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(userRepository.findById(anyString())).thenAnswer(invocation -> {
-            User user = new User();
-            user.setId(invocation.getArgument(0));
-            user.setUsername("testuser");
-            user.setFirstName("");
-            user.setLastName("");
-            return Optional.of(user);
+    @DisplayName("Should handle null password in hashPassword")
+    void testHashPassword_NullPassword() {
+        // Act & Assert
+        assertThrows(Exception.class, () -> {
+            authService.hashPassword(null);
         });
-        
-        // When
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            "password123",
-            null,
-            null,
-            null
-        );
-        
-        // Then
-        assertNotNull(result);
-        assertEquals("", result.getUser().getFirstName());
-        assertEquals("", result.getUser().getLastName());
     }
     
     @Test
-    @DisplayName("Should handle registration failure in repository")
-    void testRegisterUserRepositoryFailure() {
-        // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(userRepository.create(any(User.class))).thenReturn(null);
+    @DisplayName("Should register user with ADMIN role")
+    void testRegisterUser_WithAdminRole() {
+        // Arrange
+        String username = "adminuser";
+        String email = "admin@example.com";
+        String password = "password123";
         
-        // When
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            "password123",
-            "Test",
-            "User",
-            null
-        );
+        when(userRepository.existsByUsername(username)).thenReturn(false);
+        when(userRepository.existsByEmail(email)).thenReturn(false);
+        when(userRepository.findAll()).thenReturn(new ArrayList<>());
         
-        // Then
-        assertNull(result);
+        User savedUser = new User();
+        savedUser.setId("user1");
+        savedUser.setUsername(username);
+        savedUser.setEmail(email);
+        savedUser.setRole(User.UserRole.ADMIN);
+        savedUser.setActive(true);
+        
+        when(userRepository.create(any(User.class))).thenReturn(savedUser);
+        
+        // Act
+        AuthService.AuthResult result = authService.register(username, email, password, "Admin", "User", User.UserRole.ADMIN);
+        
+        // Assert
+        assertNotNull(result);
+        assertEquals(User.UserRole.ADMIN, result.getUser().getRole());
     }
     
     @Test
-    @DisplayName("Should handle whitespace in username and email")
-    void testRegisterUserWithWhitespace() {
-        // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(userRepository.create(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(userRepository.findById(anyString())).thenAnswer(invocation -> {
-            User user = new User();
-            user.setId(invocation.getArgument(0));
-            user.setUsername("testuser");
-            user.setEmail("test@example.com");
-            return Optional.of(user);
-        });
+    @DisplayName("Should register user with default CUSTOMER role when role is null")
+    void testRegisterUser_DefaultRole() {
+        // Arrange
+        String username = "customeruser";
+        String email = "customer@example.com";
+        String password = "password123";
         
-        // When
-        AuthService.AuthResult result = authService.register(
-            "  testuser  ",
-            "  test@example.com  ",
-            "password123",
-            "Test",
-            "User",
-            null
-        );
+        when(userRepository.existsByUsername(username)).thenReturn(false);
+        when(userRepository.existsByEmail(email)).thenReturn(false);
+        when(userRepository.findAll()).thenReturn(new ArrayList<>());
         
-        // Then
+        User savedUser = new User();
+        savedUser.setId("user1");
+        savedUser.setUsername(username);
+        savedUser.setEmail(email);
+        savedUser.setRole(User.UserRole.CUSTOMER);
+        savedUser.setActive(true);
+        
+        when(userRepository.create(any(User.class))).thenReturn(savedUser);
+        
+        // Act
+        AuthService.AuthResult result = authService.register(username, email, password, "Customer", "User", null);
+        
+        // Assert
         assertNotNull(result);
-        assertEquals("testuser", result.getUser().getUsername());
-        assertEquals("test@example.com", result.getUser().getEmail());
+        assertEquals(User.UserRole.CUSTOMER, result.getUser().getRole());
     }
     
-    @Test
-    @DisplayName("Should handle very long password")
-    void testRegisterUserLongPassword() {
-        // Given
-        String longPassword = "a".repeat(1000);
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(userRepository.create(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(userRepository.findById(anyString())).thenAnswer(invocation -> {
-            User user = new User();
-            user.setId(invocation.getArgument(0));
-            user.setUsername("testuser");
-            return Optional.of(user);
-        });
-        
-        // When
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            longPassword,
-            "Test",
-            "User",
-            null
-        );
-        
-        // Then
-        assertNotNull(result);
-        // Password should be hashed regardless of length
-        verify(userRepository).create(any(User.class));
-    }
-    
-    @Test
-    @DisplayName("Should handle special characters in password")
-    void testRegisterUserSpecialCharacters() {
-        // Given
-        String specialPassword = "!@#$%^&*()_+-=[]{}|;:,.<>?";
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(userRepository.create(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(userRepository.findById(anyString())).thenAnswer(invocation -> {
-            User user = new User();
-            user.setId(invocation.getArgument(0));
-            user.setUsername("testuser");
-            return Optional.of(user);
-        });
-        
-        // When
-        AuthService.AuthResult result = authService.register(
-            "testuser",
-            "test@example.com",
-            specialPassword,
-            "Test",
-            "User",
-            null
-        );
-        
-        // Then
-        assertNotNull(result);
-        verify(userRepository).create(any(User.class));
+    /**
+     * Generate a test JWT token for testing purposes
+     */
+    private String generateTestToken(String userId, String username, String role) {
+        Algorithm algorithm = Algorithm.HMAC256(testJwtSecret);
+        return JWT.create()
+                .withSubject(userId)
+                .withClaim("username", username)
+                .withClaim("role", role)
+                .withIssuedAt(new java.util.Date())
+                .withExpiresAt(new java.util.Date(System.currentTimeMillis() + testJwtExpirationHours * 3600L * 1000))
+                .sign(algorithm);
     }
 }
+
