@@ -34,16 +34,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
         
         header h1 {
             font-size: 24px;
             font-weight: 600;
+            margin: 0;
+            flex-shrink: 0;
         }
         
         nav {
             display: flex;
-            gap: 20px;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
         }
         
         nav a {
@@ -52,10 +58,92 @@
             padding: 8px 16px;
             border-radius: 5px;
             transition: background-color 0.3s;
+            white-space: nowrap;
         }
         
         nav a:hover {
             background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-menu {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .user-menu-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+        }
+        
+        .user-menu-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-menu-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            min-width: 200px;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .user-menu-dropdown.show {
+            display: block;
+        }
+        
+        .user-menu-item {
+            display: block;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .user-menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-menu-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .user-menu-item.logout {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .user-menu-item.logout:hover {
+            background-color: #f8d7da;
+        }
+        
+        .user-info-text {
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .user-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
         }
         
         main {
@@ -149,6 +237,21 @@
                 <a href="/products">Browse Products</a>
                 <a href="/admin/products">Manage Products</a>
                 <a href="/api/docs">API Docs</a>
+                <span id="authNav">
+                    <a href="/login" id="loginLink">Login</a>
+                    <a href="/register" id="registerLink">Register</a>
+                </span>
+                <span id="userNav" style="display: none;" class="user-menu">
+                    <a href="#" class="user-menu-button" id="userMenuButton" onclick="event.preventDefault(); toggleUserMenu();">
+                        <span id="userInfo" class="user-info-text"></span>
+                        <span id="userBadge" class="user-badge"></span>
+                        <span>▼</span>
+                    </a>
+                    <div class="user-menu-dropdown" id="userMenuDropdown">
+                        <a href="/profile" class="user-menu-item">Edit Profile</a>
+                        <a href="#" class="user-menu-item logout" onclick="event.preventDefault(); Auth.logout();">Logout</a>
+                    </div>
+                </span>
             </nav>
         </header>
         
@@ -179,6 +282,187 @@
         </footer>
     </div>
     
+    <script src="/static/auth.js"></script>
+    <script>
+        // Toggle user menu dropdown
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            dropdown.classList.toggle('show');
+        }
+        
+        // Close user menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('userNav');
+            const userMenuButton = document.getElementById('userMenuButton');
+            const dropdown = document.getElementById('userMenuDropdown');
+            
+            if (userMenu && !userMenu.contains(event.target) && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        });
+        
+        // Update navigation based on authentication status
+        async function updateNavigation() {
+            console.log('[AUTH] updateNavigation() called at:', new Date().toISOString());
+            const authNav = document.getElementById('authNav');
+            const userNav = document.getElementById('userNav');
+            const userInfo = document.getElementById('userInfo');
+            const userBadge = document.getElementById('userBadge');
+            
+            if (!authNav || !userNav) {
+                console.warn('[AUTH] Navigation elements not found - authNav:', !!authNav, 'userNav:', !!userNav);
+                return;
+            }
+            
+            // Always check localStorage directly first
+            const token = localStorage.getItem('authToken');
+            const userStr = localStorage.getItem('currentUser');
+            
+            console.log('[AUTH] Navigation check - Token:', token ? 'EXISTS (' + token.length + ' chars)' : 'MISSING');
+            console.log('[AUTH] Navigation check - User:', userStr ? 'EXISTS' : 'MISSING');
+            
+            if (token) {
+                let user = null;
+                if (userStr) {
+                    try {
+                        user = JSON.parse(userStr);
+                        console.log('[AUTH] Parsed user from localStorage:', user ? user.username : 'null');
+                    } catch (e) {
+                        console.error('[AUTH] Error parsing user from localStorage:', e);
+                    }
+                }
+                
+                // If we have token but no user, try to get user info
+                if (!user && token) {
+                    console.log('[AUTH] Token exists but no user data, fetching user info...');
+                    try {
+                        const response = await fetch('/api/auth/me', {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            user = await response.json();
+                            console.log('[AUTH] User info fetched from server:', user.username);
+                            localStorage.setItem('currentUser', JSON.stringify(user));
+                        } else {
+                            console.warn('[AUTH] Failed to fetch user info, status:', response.status);
+                            // Don't clear token yet, might be temporary
+                        }
+                    } catch (error) {
+                        console.error('[AUTH] Error fetching user info:', error);
+                    }
+                }
+                
+                // If no user data, try to validate token and get user info using Auth object
+                if (!user) {
+                    console.log('[AUTH] No user data found, validating token with server using Auth object...');
+                    if (typeof Auth !== 'undefined' && Auth.validateToken) {
+                        const isValid = await Auth.validateToken();
+                        console.log('[AUTH] Token validation result:', isValid);
+                        if (isValid) {
+                            user = Auth.getCurrentUser();
+                            console.log('[AUTH] User retrieved after validation:', user ? user.username : 'null');
+                        }
+                    } else {
+                        console.warn('[AUTH] Auth object not available for token validation');
+                    }
+                }
+                
+                if (user) {
+                    console.log('[AUTH] Showing user menu for:', user.username, 'Role:', user.role);
+                    authNav.style.display = 'none';
+                    userNav.style.display = 'inline-block';
+                    if (userInfo) {
+                        userInfo.textContent = user.username;
+                        console.log('[AUTH] User info text set to:', user.username);
+                    }
+                    if (userBadge) {
+                        userBadge.textContent = user.role === 'ADMIN' ? 'Admin' : 'User';
+                        console.log('[AUTH] User badge set to:', userBadge.textContent);
+                    }
+                    console.log('[AUTH] Navigation updated successfully - user menu visible');
+                } else {
+                    console.log('[AUTH] No valid user found despite token, showing login/register');
+                    authNav.style.display = 'inline';
+                    userNav.style.display = 'none';
+                }
+            } else {
+                console.log('[AUTH] No token found, showing login/register');
+                authNav.style.display = 'inline';
+                userNav.style.display = 'none';
+            }
+        }
+        
+        // Update navigation on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[AUTH] DOMContentLoaded - Initializing navigation');
+            console.log('[AUTH] Current URL:', window.location.href);
+            console.log('[AUTH] Checking if Auth object exists:', typeof Auth !== 'undefined');
+            
+            // Always check localStorage first, regardless of Auth object
+            const token = localStorage.getItem('authToken');
+            const user = localStorage.getItem('currentUser');
+            console.log('[AUTH] Direct localStorage check - Token:', token ? 'EXISTS (' + token.length + ' chars)' : 'MISSING');
+            console.log('[AUTH] Direct localStorage check - User:', user ? 'EXISTS' : 'MISSING');
+            
+            // Check if auth.js loaded
+            if (typeof Auth === 'undefined') {
+                console.warn('[AUTH] Auth object not found, auth.js may not have loaded');
+                console.log('[AUTH] Attempting to load auth.js manually...');
+                const script = document.createElement('script');
+                script.src = '/static/auth.js';
+                script.onload = function() {
+                    console.log('[AUTH] auth.js loaded successfully, waiting for initialization...');
+                    // Wait a bit more for Auth object to be fully initialized
+                    setTimeout(function() {
+                        console.log('[AUTH] Auth object after load:', typeof Auth !== 'undefined' ? 'EXISTS' : 'STILL MISSING');
+                        updateNavigation();
+                    }, 200);
+                };
+                script.onerror = function() {
+                    console.error('[AUTH] ERROR: Failed to load auth.js from /static/auth.js');
+                    console.error('[AUTH] This will cause authentication issues!');
+                    // Even without Auth object, try to update navigation with direct localStorage access
+                    setTimeout(updateNavigation, 100);
+                };
+                document.head.appendChild(script);
+            } else {
+                console.log('[AUTH] Auth object exists, updating navigation...');
+                // Wait a bit for everything to initialize
+                setTimeout(updateNavigation, 100);
+            }
+        });
+        
+        // Also check on window load (after all resources loaded)
+        window.addEventListener('load', function() {
+            console.log('[AUTH] Window loaded - Final navigation check');
+            const token = localStorage.getItem('authToken');
+            console.log('[AUTH] Final check - Token in localStorage:', token ? 'EXISTS' : 'MISSING');
+            if (token) {
+                setTimeout(updateNavigation, 200);
+            }
+        });
+        
+        // Periodically validate token to keep session alive
+        if (typeof Auth !== 'undefined' && Auth.isAuthenticated()) {
+            console.log('[AUTH] Setting up periodic token validation');
+            setInterval(async () => {
+                const token = localStorage.getItem('authToken');
+                if (token && typeof Auth !== 'undefined' && Auth.validateToken) {
+                    console.log('[AUTH] Periodic token validation check');
+                    const isValid = await Auth.validateToken();
+                    if (!isValid) {
+                        console.warn('[AUTH] Periodic check: Token validation failed, updating navigation');
+                        updateNavigation();
+                    } else {
+                        console.log('[AUTH] Periodic check: Token is still valid');
+                    }
+                }
+            }, 5 * 60 * 1000); // Check every 5 minutes
+        }
+    </script>
     {{#additionalScripts}}
     <script>
         {{{additionalScripts}}}

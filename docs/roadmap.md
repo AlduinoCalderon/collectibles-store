@@ -1,106 +1,85 @@
-# Project Roadmap: Spark in Java Web Application Development
+# Project Roadmap: Collectibles Store - Authentication Feature
 
 ## Objectives
 
 ### General Objective
-Develop a fully functional web application for selling collectible items using Java and the Spark framework, demonstrating modern backend development practices and delivering a seamless user experience.
+To enhance the Collectibles Store API by designing, implementing, and testing a secure user authentication system using stored procedures, while following best practices for development on a separate branch to ensure production stability.
 
 ### Specific Objectives
-1. Design and implement a RESTful API for user and item management using Java Spark.
-2. Develop dynamic web views and templates for the online store, ensuring usability and proper error handling.
-3. Integrate advanced features such as item filtering and real-time price updates using WebSockets.
-4. Deliver a complete, robust, and well-documented system, including a technical analysis and video presentation.
+1.  **Design and Implement Database Schema:** Create the necessary database tables (e.g., `users`, `roles`) and stored procedures for managing user authentication and metadata.
+2.  **Develop Authentication API:** Build the backend logic and RESTful API endpoints in Java for user registration, login, and session management using the Spark framework.
+3.  **Ensure Code Quality with Unit Tests:** Implement a comprehensive suite of unit tests with JUnit for the new authentication module, aiming for at least 90% code coverage to guarantee reliability.
+4.  **Produce Comprehensive Documentation:** Create detailed documentation for the new feature, including API endpoints, database schema, setup instructions, and maintain a clean, well-organized GitHub repository.
 
 ## Timeline and Milestones
 
-### Sprint 1 (Oct 24 to Oct 27)
-- Set up project repository and Maven configuration.
-- Implement Spark-based API with basic user operations (GET, POST, PUT, DELETE).
-- Define API routes and handle requests for user management.
-- **Milestones:**
-  - Project scaffolding and initial commit.
-  - API endpoints for user CRUD operations tested.
+### Sprint 1: Database and Core Logic (Nov 6, 2025 - Nov 7, 2025)
+-   Finalize the database schema design for user authentication.
+-   Implement tables (`users`, etc.) and relationships in the MySQL database.
+-   Develop and test all required stored procedures for user management (e.g., `sp_createUser`, `sp_findUserByEmail`).
+-   Create Java data models and initial Data Access Objects (DAO) for the new tables.
+-   Work will be done in a new feature branch (e.g., `feature/authentication`).
 
-### Sprint 2 (Oct 28 to Oct 30) ✅ COMPLETED
-- ✅ Develop Mustache templates and frontend views for the website.
-- ✅ Implement exception handling for user interactions.
-- ✅ Create and connect a form to manage item offers.
-- **Milestones:**
-  - ✅ User-facing forms and views functional.
-  - ✅ Exception handling and feedback implemented.
-- **Status**: All deliverables completed. Branch: `feature/sprint-2-exception-handling-views-templates`
+### Sprint 2: API Development and Testing (Nov 8, 2025 - Nov 10, 2025)
+-   Develop the RESTful API endpoints for registration, login, and token validation.
+-   Integrate the authentication logic with the existing Spark framework application.
+-   Write comprehensive unit tests for all services, DAOs, and utility classes using JUnit.
+-   Verify code coverage for the new Java module, ensuring it meets the 90% target.
+-   Ensure all JUnit tests pass successfully.
 
-### Sprint 3 (Oct 31 to Nov 3) ✅ COMPLETED
-- ✅ Implement advanced item filtering features (admin panel).
-- ✅ Add real-time price updates for items using WebSockets.
-- ✅ Enhance admin UI with auto-generated IDs and table filtering.
-- **Milestones:**
-  - ✅ Item filter and WebSocket updates integrated.
-  - ✅ System fully functional with all features.
-- **Status**: All deliverables completed. Branch: `feature/websocket-realtime-price-updates-new`
+### Sprint 3: Documentation and Refinement (Nov 11, 2025 - Nov 12, 2025)
+-   Draft complete project documentation for the new authentication feature.
+-   Document the API endpoints using a tool like Swagger or in Markdown.
+-   Add detailed comments within the Java code and stored procedures.
+-   Update the main `README.md` to include instructions on the new feature.
+-   Prepare the feature branch for merging into the main branch.
 
-### Final Delivery (Nov 4-5)
-- Integrate all sprints into a cohesive web application.
-- Prepare technical analysis and results PDF.
-- Record demonstration and results video (MP4).
-- **Milestones:**
-  - Final system delivered and deployed.
-  - Documentation and video submitted.
+### Final Delivery (Nov 13-16, 2025)
+-   Complete final integration testing.
+-   Finalize all project documentation and peer-review for clarity.
+-   Submit the final project, including a Pull Request from the feature branch to the main branch.
 
 ## Deliverables
 
 ### Sprint 1
-- API service for user management with Spark (Java)
-- Configured Maven project
-- Route definitions and testing
+-   **SQL Scripts**: Scripts for creating new tables and stored procedures.
+-   **Feature Branch**: A new branch in the GitHub repository for development.
+-   **Java Models/DAOs**: Core Java classes for the database interaction.
 
-### Sprint 2 ✅ COMPLETED
-- ✅ Dynamic Mustache templates and website views
-  - Product browsing page with filtering (`/products`)
-  - Admin product management form (`/admin/products`)
-  - Error page templates
-- ✅ Error and exception handling infrastructure
-  - Custom exception hierarchy (CollectiblesException, ProductNotFoundException, etc.)
-  - Centralized ExceptionHandler module
-  - Integration with existing ErrorHandler utility
-- ✅ Item management form
-  - Create, edit, and delete product functionality
-  - Client-side and server-side validation
-  - Real-time form submission via REST API
+### Sprint 2
+-   **Authentication API Endpoints**: Functional endpoints for user management.
+-   **JUnit Test Suite**: A suite of unit tests for the authentication module.
+-   **Code Coverage Report**: A report showing at least 90% test coverage for the new code.
 
-### Sprint 3 ✅ COMPLETED
-- ✅ Advanced item filtering functionality (admin table filters)
-- ✅ Real-time price update with WebSockets
-- ✅ Admin UI enhancements (auto-generated IDs, improved filtering)
+### Sprint 3
+-   **API Documentation**: Detailed documentation of all new endpoints.
+-   **Updated GitHub Repository**: A clean repository with the new feature branch ready for review.
 
 ### Final Delivery
-- Integrated project with all features
-- Analysis and results PDF
-- Video presentation (MP4)
+-   **Pull Request**: A well-documented Pull Request to merge the feature into the main branch.
+-   **Final Project**: The complete, tested, and documented authentication feature integrated into the API.
 
 ## Project Gantt Chart
-
-![Project Gantt Chart](./images/GanttChart.png)
+![Project Gantt Chart](project_gantt.png)
 
 ## Technologies and Tools
-- Java & Spark: Backend service, routing, and API
-- Maven: Dependency management and build automation
-- Mustache: Templating engine for web views
-- WebSockets: Real-time communication for price updates
-- HTML/CSS/JS: Frontend interface and interactivity
-- GitHub: Version control and collaboration
+-   **Java**: Core language for the API.
+-   **Spark Framework**: Web framework for building the RESTful API.
+-   **MySQL**: Database for storing user and collectibles data.
+-   **Stored Procedures**: For all database interactions related to authentication.
+-   **JUnit**: Framework for unit testing the Java module.
+-   **Git & GitHub**: For version control and repository management in a feature branch.
+-   **Render**: Platform where the production environment is hosted.
 
 ## Stakeholders
-- Rafael: Lead Developer (implements solution)
-- Ramón: Client and collectibles expert (domain requirements)
-- Sofía: Technical advisor (provides expert programming guidance)
-- Digital NAO Evaluators: Assess final deliverables and presentations
+-   **Aldo Calderon**: Lead Developer.
+-   **API Consumers**: Users or frontend applications that will use the authentication service.
 
 ## Risk Management
 
-| Risk | Impact | Probability | Mitigation Strategy |
-|------|--------|------------|---------------------|
-| Delays in API or WebSocket integration | High | Medium | Allocate buffer days, perform early integration tests |
-| Maven or dependency issues | Medium | Medium | Use stable dependencies, maintain backup configuration |
-| User interface bugs or usability issues | Medium | Medium | Conduct usability testing after each sprint |
-| Incomplete final deliverables | High | Low | Track progress via Gantt, prioritize documentation and video early |
+| Risk                                     | Impact | Probability | Mitigation Strategy                                                                                             |
+| ---------------------------------------- | ------ | ----------- | --------------------------------------------------------------------------------------------------------------- |
+| Stored procedures are difficult to debug | Medium | Medium      | Develop procedures incrementally. Ensure comprehensive unit testing of the Java code that calls the procedures. |
+| Security vulnerabilities in auth logic   | High   | Medium      | Follow security best practices (e.g., password hashing with bcrypt, secure token generation). Conduct peer reviews. |
+| Breaking changes to the existing API     | High   | Low         | Develop entirely on a separate feature branch. Perform thorough integration testing before merging to main.      |
+| Delays in API development                | Medium | Medium      | Define a clear contract for the API endpoints and database schema early in Sprint 1. Prioritize core functionality. |

@@ -1,6 +1,7 @@
 package com.spark.collectibles.websocket;
 
 import com.google.gson.Gson;
+import com.spark.collectibles.service.AuthService;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.slf4j.Logger;
@@ -13,22 +14,52 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * WebSocket handler for real-time price updates
  * Uses Jetty WebSocket API (included with Spark)
+ * Requires authentication token in query parameter
  */
 @WebSocket
 public class PriceWebSocketHandler {
     private static final Logger logger = LoggerFactory.getLogger(PriceWebSocketHandler.class);
     private static final Gson gson = new Gson();
+    private static AuthService authService;
     
     // Store all active WebSocket sessions
     private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
+    
+    /**
+     * Set the AuthService instance for token validation
+     * This should be called during application initialization
+     */
+    public static void setAuthService(AuthService authService) {
+        PriceWebSocketHandler.authService = authService;
+    }
     
     /**
      * Called when a WebSocket client connects
      */
     @OnWebSocketConnect
     public void connected(Session session) {
+        // Validate authentication token from query parameters
+        String token = session.getUpgradeRequest().getParameterMap().get("token") != null 
+            ? session.getUpgradeRequest().getParameterMap().get("token").get(0) 
+            : null;
+        
+        if (token == null || token.trim().isEmpty()) {
+            logger.warn("WebSocket connection rejected: No token provided");
+            session.close(1008, "Authentication required");
+            return;
+        }
+        
+        // Validate token if AuthService is available
+        if (authService != null) {
+            if (authService.validateToken(token) == null) {
+                logger.warn("WebSocket connection rejected: Invalid token");
+                session.close(1008, "Invalid or expired token");
+                return;
+            }
+        }
+        
         sessions.add(session);
-        logger.info("WebSocket client connected. Total connections: {}", sessions.size());
+        logger.info("WebSocket client connected (authenticated). Total connections: {}", sessions.size());
     }
     
     /**
