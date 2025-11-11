@@ -34,16 +34,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
         
         header h1 {
             font-size: 24px;
             font-weight: 600;
+            margin: 0;
+            flex-shrink: 0;
         }
         
         nav {
             display: flex;
-            gap: 20px;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
         }
         
         nav a {
@@ -52,10 +58,92 @@
             padding: 8px 16px;
             border-radius: 5px;
             transition: background-color 0.3s;
+            white-space: nowrap;
         }
         
         nav a:hover {
             background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-menu {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .user-menu-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+        }
+        
+        .user-menu-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-menu-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            min-width: 200px;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .user-menu-dropdown.show {
+            display: block;
+        }
+        
+        .user-menu-item {
+            display: block;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .user-menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-menu-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .user-menu-item.logout {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .user-menu-item.logout:hover {
+            background-color: #f8d7da;
+        }
+        
+        .user-info-text {
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .user-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
         }
         
         main {
@@ -183,6 +271,21 @@
                 <a href="/products">Browse Products</a>
                 <a href="/admin/products">Manage Products</a>
                 <a href="/api/docs">API Docs</a>
+                <span id="authNav">
+                    <a href="/login" id="loginLink">Login</a>
+                    <a href="/register" id="registerLink">Register</a>
+                </span>
+                <span id="userNav" style="display: none;" class="user-menu">
+                    <a href="#" class="user-menu-button" id="userMenuButton" onclick="event.preventDefault(); toggleUserMenu();">
+                        <span id="userInfo" class="user-info-text"></span>
+                        <span id="userBadge" class="user-badge"></span>
+                        <span>▼</span>
+                    </a>
+                    <div class="user-menu-dropdown" id="userMenuDropdown">
+                        <a href="/profile" class="user-menu-item">Edit Profile</a>
+                        <a href="#" class="user-menu-item logout" onclick="event.preventDefault(); Auth.logout();">Logout</a>
+                    </div>
+                </span>
             </nav>
         </header>
         
