@@ -299,7 +299,16 @@
         function connectWebSocket() {
             try {
                 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                const wsUrl = `${protocol}//${window.location.host}/ws/prices`;
+                let wsUrl = `${protocol}//${window.location.host}/ws/prices`;
+                
+                // Add authentication token if available
+                if (typeof Auth !== 'undefined' && Auth.isAuthenticated()) {
+                    const token = Auth.getToken();
+                    if (token) {
+                        wsUrl += '?token=' + encodeURIComponent(token);
+                    }
+                }
+                
                 console.log('Connecting to WebSocket:', wsUrl);
                 
                 ws = new WebSocket(wsUrl);
@@ -362,8 +371,19 @@
             }
         }
         
-        // Initialize WebSocket connection on page load
-        connectWebSocket();
+        // Load auth.js if not already loaded
+        if (typeof Auth === 'undefined') {
+            const script = document.createElement('script');
+            script.src = '/static/auth.js';
+            script.onload = function() {
+                // Initialize WebSocket connection after auth.js loads
+                connectWebSocket();
+            };
+            document.head.appendChild(script);
+        } else {
+            // Initialize WebSocket connection on page load
+            connectWebSocket();
+        }
         
         // Cleanup on page unload
         window.addEventListener('beforeunload', function() {
