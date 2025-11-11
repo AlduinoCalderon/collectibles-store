@@ -124,13 +124,15 @@ public class AuthService {
      * @return AuthResult containing user and JWT token, or null if login fails
      */
     public AuthResult login(String usernameOrEmail, String password) {
+        logger.debug("AuthService.login() called for: {}", usernameOrEmail);
+        
         if (usernameOrEmail == null || usernameOrEmail.trim().isEmpty()) {
-            logger.warn("Login attempted with empty username/email");
+            logger.warn("AuthService.login() - Empty username/email provided");
             return null;
         }
         
         if (password == null || password.isEmpty()) {
-            logger.warn("Login attempted with empty password");
+            logger.warn("AuthService.login() - Empty password provided for user: {}", usernameOrEmail);
             return null;
         }
         
@@ -138,38 +140,48 @@ public class AuthService {
         MySQLUserRepository mysqlRepo = (MySQLUserRepository) userRepository;
         User user = null;
         
+        logger.debug("AuthService.login() - Searching for user by username: {}", usernameOrEmail);
         // Try username first
         user = mysqlRepo.findByUsernameWithPassword(usernameOrEmail.trim()).orElse(null);
         
         // If not found, try email
         if (user == null) {
+            logger.debug("AuthService.login() - User not found by username, trying email: {}", usernameOrEmail);
             user = mysqlRepo.findByEmailWithPassword(usernameOrEmail.trim().toLowerCase()).orElse(null);
         }
         
         if (user == null) {
-            logger.warn("Login attempted with non-existent user: {}", usernameOrEmail);
+            logger.warn("AuthService.login() - User not found: {}", usernameOrEmail);
             return null;
         }
+        
+        logger.debug("AuthService.login() - User found: {} (ID: {}), checking if active", 
+                    user.getUsername(), user.getId());
         
         // Check if user is active
         if (!user.isActive()) {
-            logger.warn("Login attempted with inactive user: {}", usernameOrEmail);
+            logger.warn("AuthService.login() - User is inactive: {} (ID: {})", 
+                     user.getUsername(), user.getId());
             return null;
         }
         
+        logger.debug("AuthService.login() - Verifying password for user: {}", user.getUsername());
         // Verify password
         if (!verifyPassword(password, user.getPasswordHash())) {
-            logger.warn("Login attempted with incorrect password for user: {}", usernameOrEmail);
+            logger.warn("AuthService.login() - Password verification failed for user: {} (ID: {})", 
+                      user.getUsername(), user.getId());
             return null;
         }
         
+        logger.debug("AuthService.login() - Password verified, generating token for user: {}", user.getUsername());
         // Generate JWT token
         String token = generateToken(user);
         
         // Return user without password hash
         user.setPasswordHash(null);
         
-        logger.info("User logged in successfully: {}", usernameOrEmail);
+        logger.info("AuthService.login() - Login successful for user: {} (ID: {}), token generated", 
+                   usernameOrEmail, user.getId());
         return new AuthResult(user, token);
     }
     
@@ -179,7 +191,10 @@ public class AuthService {
      * @return User if token is valid, null otherwise
      */
     public User validateToken(String token) {
+        logger.debug("AuthService.validateToken() called");
+        
         if (token == null || token.trim().isEmpty()) {
+            logger.warn("AuthService.validateToken() - Token is null or empty");
             return null;
         }
         
@@ -187,28 +202,45 @@ public class AuthService {
             // Remove "Bearer " prefix if present
             if (token.startsWith("Bearer ")) {
                 token = token.substring(7);
+                logger.debug("AuthService.validateToken() - Removed 'Bearer ' prefix");
             }
             
+            logger.debug("AuthService.validateToken() - Verifying JWT token signature");
             JWTVerifier verifier = JWT.require(jwtAlgorithm).build();
             DecodedJWT decodedJWT = verifier.verify(token);
             
             // Extract user ID from token
             String userId = decodedJWT.getSubject();
             if (userId == null) {
+                logger.warn("AuthService.validateToken() - Token has no subject (user ID)");
                 return null;
             }
+            
+            logger.debug("AuthService.validateToken() - Token signature valid, user ID: {}", userId);
             
             // Get user from database
             User user = userRepository.findById(userId).orElse(null);
-            if (user == null || !user.isActive()) {
-                logger.warn("Token validated but user not found or inactive: {}", userId);
+            if (user == null) {
+                logger.warn("AuthService.validateToken() - User not found in database: {}", userId);
                 return null;
             }
             
+            if (!user.isActive()) {
+                logger.warn("AuthService.validateToken() - User is inactive: {} (ID: {})", 
+                           user.getUsername(), userId);
+                return null;
+            }
+            
+            logger.debug("AuthService.validateToken() - Token validation successful for user: {} (ID: {})", 
+                        user.getUsername(), userId);
             return user;
             
         } catch (JWTVerificationException e) {
-            logger.warn("JWT token verification failed: {}", e.getMessage());
+            logger.warn("AuthService.validateToken() - JWT verification failed: {}", e.getMessage());
+            logger.debug("AuthService.validateToken() - JWT verification exception details", e);
+            return null;
+        } catch (Exception e) {
+            logger.error("AuthService.validateToken() - Unexpected error during token validation", e);
             return null;
         }
     }
