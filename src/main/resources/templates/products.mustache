@@ -287,9 +287,7 @@
     </style>
 </head>
 <body>
-    <div class="connection-indicator disconnected" id="connectionIndicator">
-        🔴 Disconnected
-    </div>
+    <div class="connection-indicator disconnected" id="connectionIndicator">🔴 Connecting...</div>
     
     <div class="container">
         <header>
@@ -440,6 +438,15 @@
                                 }, 1500);
                                 
                                 console.log(`Price updated for product ${message.productId}: ${oldText} -> $${message.newPrice} ${message.currency}`);
+                            } else {
+                                console.warn(`Price element not found for product ID: ${message.productId}`);
+                                // Try alternative selector
+                                const altElement = document.querySelector(`[data-product-id="${message.productId}"] .price`);
+                                if (altElement) {
+                                    altElement.textContent = `$${message.newPrice} ${message.currency}`;
+                                    altElement.classList.add('price-updated');
+                                    setTimeout(() => altElement.classList.remove('price-updated'), 1500);
+                                }
                             }
                         }
                     } catch (error) {
