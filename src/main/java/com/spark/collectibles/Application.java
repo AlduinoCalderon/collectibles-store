@@ -45,6 +45,8 @@ public class Application {
             port(EnvironmentConfig.getAppPort());
             
             // Configure WebSocket endpoint for real-time price updates
+            // Set AuthService for WebSocket authentication
+            PriceWebSocketHandler.setAuthService(authService);
             webSocket("/ws/prices", PriceWebSocketHandler.class);
             
             // Configure static files (MUST be before any route mapping)
