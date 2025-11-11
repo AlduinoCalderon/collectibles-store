@@ -216,6 +216,7 @@
             const password = document.getElementById('password').value;
             
             try {
+                console.log('[AUTH] Sending login request for:', usernameOrEmail);
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: {
@@ -227,20 +228,69 @@
                     })
                 });
                 
-                const data = await response.json();
+                console.log('[AUTH] Login response status:', response.status);
+                console.log('[AUTH] Login response headers:', {
+                    'content-type': response.headers.get('content-type'),
+                    'status': response.status,
+                    'statusText': response.statusText
+                });
+                
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                let data;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                    console.log('[AUTH] Login response data received');
+                } else {
+                    // Server returned HTML or other format (likely an error page)
+                    const text = await response.text();
+                    console.error('[AUTH] Server returned non-JSON response:', text.substring(0, 200));
+                    throw new Error(`Server error (${response.status}): Expected JSON but got ${contentType || 'unknown'}`);
+                }
                 
                 if (response.ok) {
                     // Save token to localStorage
                     if (data.token) {
+                        console.log('[AUTH] Login successful, saving token to localStorage');
+                        console.log('[AUTH] Token length:', data.token.length);
+                        console.log('[AUTH] User:', data.user ? data.user.username : 'null');
+                        
                         localStorage.setItem('authToken', data.token);
                         localStorage.setItem('currentUser', JSON.stringify(data.user));
+                        
+                        // Verify token was saved
+                        const savedToken = localStorage.getItem('authToken');
+                        const savedUser = localStorage.getItem('currentUser');
+                        console.log('[AUTH] Token saved verification - Token exists:', !!savedToken);
+                        console.log('[AUTH] User saved verification - User exists:', !!savedUser);
+                        
+                        if (!savedToken) {
+                            console.error('[AUTH] ERROR: Token was not saved to localStorage!');
+                            errorDiv.textContent = 'Error: Failed to save authentication token. Please try again.';
+                            errorDiv.style.display = 'block';
+                            loginBtn.disabled = false;
+                            loginBtn.textContent = 'Sign In';
+                            return;
+                        }
+                    } else {
+                        console.error('[AUTH] ERROR: No token in response!');
+                        errorDiv.textContent = 'Error: No authentication token received from server.';
+                        errorDiv.style.display = 'block';
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'Sign In';
+                        return;
                     }
                     
                     successDiv.textContent = 'Login successful! Redirecting...';
                     successDiv.style.display = 'block';
                     
                     // Redirect to home page
+                    console.log('[AUTH] Redirecting to home page in 1 second...');
                     setTimeout(() => {
+                        console.log('[AUTH] Executing redirect now...');
+                        const tokenBeforeRedirect = localStorage.getItem('authToken');
+                        console.log('[AUTH] Token before redirect:', tokenBeforeRedirect ? 'EXISTS' : 'MISSING');
                         window.location.href = '/';
                     }, 1000);
                 } else {
@@ -250,8 +300,21 @@
                     loginBtn.textContent = 'Sign In';
                 }
             } catch (error) {
-                console.error('Login error:', error);
-                errorDiv.textContent = 'An error occurred. Please try again.';
+                console.error('[AUTH] Login error:', error);
+                console.error('[AUTH] Error details:', {
+                    name: error.name,
+                    message: error.message,
+                    stack: error.stack
+                });
+                
+                // Try to get response text if available
+                if (error.response) {
+                    error.response.text().then(text => {
+                        console.error('[AUTH] Response text:', text);
+                    }).catch(e => console.error('[AUTH] Could not read response text:', e));
+                }
+                
+                errorDiv.textContent = 'An error occurred. Please try again. Error: ' + error.message;
                 errorDiv.style.display = 'block';
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'Sign In';
@@ -260,9 +323,15 @@
         
         // Check if already logged in - validate token first
         (async function() {
+            console.log('[AUTH] Checking authentication status on login page load...');
             const token = localStorage.getItem('authToken');
+            const user = localStorage.getItem('currentUser');
+            
+            console.log('[AUTH] Token in localStorage:', token ? 'EXISTS (' + token.length + ' chars)' : 'MISSING');
+            console.log('[AUTH] User in localStorage:', user ? 'EXISTS' : 'MISSING');
+            
             if (token) {
-                console.log('[AUTH] Token found in localStorage, validating...');
+                console.log('[AUTH] Token found, validating with server...');
                 try {
                     const response = await fetch('/api/auth/me', {
                         headers: {
@@ -270,24 +339,34 @@
                         }
                     });
                     
+                    console.log('[AUTH] Token validation response status:', response.status);
+                    
                     if (response.ok) {
-                        const user = await response.json();
-                        console.log('[AUTH] Token is valid, user:', user.username);
-                        localStorage.setItem('currentUser', JSON.stringify(user));
+                        const userData = await response.json();
+                        console.log('[AUTH] Token is valid, user:', userData.username);
+                        localStorage.setItem('currentUser', JSON.stringify(userData));
+                        console.log('[AUTH] Redirecting to home page (user already authenticated)');
                         window.location.href = '/';
                     } else {
-                        console.log('[AUTH] Token validation failed, clearing localStorage');
+                        const errorText = await response.text();
+                        console.warn('[AUTH] Token validation failed, status:', response.status);
+                        console.warn('[AUTH] Error response:', errorText);
+                        console.log('[AUTH] Clearing invalid token from localStorage');
                         localStorage.removeItem('authToken');
                         localStorage.removeItem('currentUser');
-                        // Stay on login page
+                        console.log('[AUTH] Staying on login page');
                     }
                 } catch (error) {
                     console.error('[AUTH] Error validating token:', error);
-                    localStorage.removeItem('authToken');
-                    localStorage.removeItem('currentUser');
+                    console.error('[AUTH] Error details:', {
+                        name: error.name,
+                        message: error.message
+                    });
+                    // Don't clear token on network errors - might be temporary
+                    console.log('[AUTH] Network error - keeping token, staying on login page');
                 }
             } else {
-                console.log('[AUTH] No token found, staying on login page');
+                console.log('[AUTH] No token found, user needs to login');
             }
         })();
     </script>

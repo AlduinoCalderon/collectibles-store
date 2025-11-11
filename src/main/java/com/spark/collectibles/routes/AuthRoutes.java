@@ -126,8 +126,15 @@ public class AuthRoutes {
                 
                 logger.info("POST /api/auth/login - Successful login for user: {} (ID: {}) from IP: {}", 
                           result.getUser().getUsername(), result.getUser().getId(), clientIp);
+                
+                String token = result.getToken();
+                logger.debug("POST /api/auth/login - Token generated, length: {}", token != null ? token.length() : 0);
+                logger.debug("POST /api/auth/login - Token preview: {}", token != null && token.length() > 20 ? token.substring(0, 20) + "..." : "null");
+                
                 response.status(200);
-                return new AuthResponse(result.getUser(), result.getToken());
+                AuthResponse authResponse = new AuthResponse(result.getUser(), token);
+                logger.debug("POST /api/auth/login - AuthResponse created, token in response: {}", authResponse.getToken() != null);
+                return authResponse;
                 
             } catch (JsonSyntaxException e) {
                 logger.error("POST /api/auth/login - Invalid JSON in request body from IP: {}", clientIp, e);
@@ -213,6 +220,11 @@ public class AuthRoutes {
             if (this.user != null) {
                 this.user.setPasswordHash(null);
             }
+            
+            // Log for debugging
+            logger.debug("AuthResponse created - User: {}, Token exists: {}", 
+                        user != null ? user.getUsername() : "null", 
+                        token != null);
         }
         
         public User getUser() {

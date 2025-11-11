@@ -50,7 +50,14 @@ public class Application {
             webSocket("/ws/prices", PriceWebSocketHandler.class);
             
             // Configure static files (MUST be before any route mapping)
+            // Use externalStaticFileLocation for files in resources/static
             spark.Spark.staticFiles.location("/static");
+            logger.info("Static files configured at /static");
+            
+            // Add logging for static file requests
+            before("/static/*", (request, response) -> {
+                logger.debug("Static file request: {}", request.pathInfo());
+            });
             
             // Enable CORS for all routes
             enableCORS();

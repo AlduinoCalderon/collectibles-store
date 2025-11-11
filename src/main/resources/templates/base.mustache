@@ -303,49 +303,105 @@
         
         // Update navigation based on authentication status
         async function updateNavigation() {
+            console.log('[AUTH] updateNavigation() called');
             const authNav = document.getElementById('authNav');
             const userNav = document.getElementById('userNav');
             const userInfo = document.getElementById('userInfo');
             const userBadge = document.getElementById('userBadge');
             
-            if (Auth.isAuthenticated()) {
-                let user = Auth.getCurrentUser();
+            if (!authNav || !userNav) {
+                console.warn('[AUTH] Navigation elements not found');
+                return;
+            }
+            
+            const token = localStorage.getItem('authToken');
+            const userStr = localStorage.getItem('currentUser');
+            
+            console.log('[AUTH] Navigation check - Token:', token ? 'EXISTS' : 'MISSING');
+            console.log('[AUTH] Navigation check - User:', userStr ? 'EXISTS' : 'MISSING');
+            
+            if (token) {
+                let user = null;
+                if (userStr) {
+                    try {
+                        user = JSON.parse(userStr);
+                        console.log('[AUTH] Parsed user from localStorage:', user.username);
+                    } catch (e) {
+                        console.error('[AUTH] Error parsing user from localStorage:', e);
+                    }
+                }
                 
                 // If no user data, try to validate token and get user info
                 if (!user) {
-                    console.log('[AUTH] No user data found, validating token...');
-                    const isValid = await Auth.validateToken();
-                    if (isValid) {
-                        user = Auth.getCurrentUser();
+                    console.log('[AUTH] No user data found, validating token with server...');
+                    if (typeof Auth !== 'undefined' && Auth.validateToken) {
+                        const isValid = await Auth.validateToken();
+                        console.log('[AUTH] Token validation result:', isValid);
+                        if (isValid) {
+                            user = Auth.getCurrentUser();
+                            console.log('[AUTH] User retrieved after validation:', user ? user.username : 'null');
+                        }
                     }
                 }
                 
                 if (user) {
+                    console.log('[AUTH] Showing user menu for:', user.username);
                     authNav.style.display = 'none';
                     userNav.style.display = 'inline-block';
-                    userInfo.textContent = user.username;
-                    userBadge.textContent = user.role === 'ADMIN' ? 'Admin' : 'User';
+                    if (userInfo) userInfo.textContent = user.username;
+                    if (userBadge) userBadge.textContent = user.role === 'ADMIN' ? 'Admin' : 'User';
                 } else {
-                    // Token invalid, show login/register
+                    console.log('[AUTH] No valid user found, showing login/register');
                     authNav.style.display = 'inline';
                     userNav.style.display = 'none';
                 }
             } else {
+                console.log('[AUTH] No token found, showing login/register');
                 authNav.style.display = 'inline';
                 userNav.style.display = 'none';
             }
         }
         
         // Update navigation on page load
-        document.addEventListener('DOMContentLoaded', updateNavigation);
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[AUTH] DOMContentLoaded - Initializing navigation');
+            console.log('[AUTH] Checking if Auth object exists:', typeof Auth !== 'undefined');
+            
+            // Check if auth.js loaded
+            if (typeof Auth === 'undefined') {
+                console.warn('[AUTH] Auth object not found, auth.js may not have loaded');
+                console.log('[AUTH] Attempting to load auth.js manually...');
+                const script = document.createElement('script');
+                script.src = '/static/auth.js';
+                script.onload = function() {
+                    console.log('[AUTH] auth.js loaded successfully');
+                    setTimeout(updateNavigation, 100);
+                };
+                script.onerror = function() {
+                    console.error('[AUTH] ERROR: Failed to load auth.js from /static/auth.js');
+                    console.error('[AUTH] This will cause authentication issues!');
+                };
+                document.head.appendChild(script);
+            } else {
+                // Wait a bit for everything to initialize
+                setTimeout(updateNavigation, 100);
+            }
+        });
         
         // Periodically validate token to keep session alive
-        if (Auth.isAuthenticated()) {
+        if (typeof Auth !== 'undefined' && Auth.isAuthenticated()) {
+            console.log('[AUTH] Setting up periodic token validation');
             setInterval(async () => {
-                const isValid = await Auth.validateToken();
-                if (!isValid && Auth.isAuthenticated()) {
-                    console.warn('[AUTH] Token validation failed, updating navigation');
-                    updateNavigation();
+                const token = localStorage.getItem('authToken');
+                if (token && typeof Auth !== 'undefined' && Auth.validateToken) {
+                    console.log('[AUTH] Periodic token validation check');
+                    const isValid = await Auth.validateToken();
+                    if (!isValid) {
+                        console.warn('[AUTH] Periodic check: Token validation failed, updating navigation');
+                        updateNavigation();
+                    } else {
+                        console.log('[AUTH] Periodic check: Token is still valid');
+                    }
                 }
             }, 5 * 60 * 1000); // Check every 5 minutes
         }
