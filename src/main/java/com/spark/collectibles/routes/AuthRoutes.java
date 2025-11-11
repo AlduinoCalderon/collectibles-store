@@ -27,7 +27,9 @@ public class AuthRoutes {
     public static void initialize(AuthService authService) {
         // POST /api/auth/register — Register a new user
         post("/api/auth/register", (request, response) -> {
-            logger.info("POST /api/auth/register - Registering new user");
+            String clientIp = request.ip();
+            logger.info("POST /api/auth/register - Registration attempt from IP: {}", clientIp);
+            
             try {
                 RegisterRequest registerRequest = gson.fromJson(request.body(), RegisterRequest.class);
                 
@@ -35,12 +37,15 @@ public class AuthRoutes {
                     registerRequest.username == null || registerRequest.username.trim().isEmpty() ||
                     registerRequest.email == null || registerRequest.email.trim().isEmpty() ||
                     registerRequest.password == null || registerRequest.password.isEmpty()) {
+                    logger.warn("POST /api/auth/register - Missing required fields from IP: {}", clientIp);
                     response.status(400);
                     return new ErrorResponse("Username, email, and password are required");
                 }
                 
                 // Validate password strength
                 if (registerRequest.password.length() < 6) {
+                    logger.warn("POST /api/auth/register - Password too short for username: {} from IP: {}", 
+                              registerRequest.username, clientIp);
                     response.status(400);
                     return new ErrorResponse("Password must be at least 6 characters long");
                 }
@@ -48,6 +53,9 @@ public class AuthRoutes {
                 User.UserRole role = registerRequest.role != null ? 
                     User.UserRole.valueOf(registerRequest.role.toUpperCase()) : 
                     User.UserRole.CUSTOMER;
+                
+                logger.debug("POST /api/auth/register - Attempting registration for username: {}, email: {}, role: {} from IP: {}", 
+                           registerRequest.username, registerRequest.email, role, clientIp);
                 
                 AuthService.AuthResult result = authService.register(
                     registerRequest.username,
@@ -59,23 +67,27 @@ public class AuthRoutes {
                 );
                 
                 if (result == null) {
+                    logger.warn("POST /api/auth/register - Registration failed (duplicate username/email): {} from IP: {}", 
+                              registerRequest.username, clientIp);
                     response.status(409);
                     return new ErrorResponse("User registration failed. Username or email may already exist.");
                 }
                 
+                logger.info("POST /api/auth/register - Successful registration for user: {} (ID: {}) from IP: {}", 
+                          result.getUser().getUsername(), result.getUser().getId(), clientIp);
                 response.status(201);
                 return new AuthResponse(result.getUser(), result.getToken());
                 
             } catch (JsonSyntaxException e) {
-                logger.error("Invalid JSON in request body", e);
+                logger.error("POST /api/auth/register - Invalid JSON in request body from IP: {}", clientIp, e);
                 response.status(400);
                 return new ErrorResponse("Invalid JSON format");
             } catch (IllegalArgumentException e) {
-                logger.error("Invalid role in request", e);
+                logger.error("POST /api/auth/register - Invalid role in request from IP: {}", clientIp, e);
                 response.status(400);
                 return new ErrorResponse("Invalid role: " + e.getMessage());
             } catch (Exception e) {
-                logger.error("Error during registration", e);
+                logger.error("POST /api/auth/register - Unexpected error during registration from IP: {}", clientIp, e);
                 response.status(500);
                 return new ErrorResponse("Failed to register user");
             }
@@ -83,16 +95,22 @@ public class AuthRoutes {
         
         // POST /api/auth/login — Login and get JWT token
         post("/api/auth/login", (request, response) -> {
-            logger.info("POST /api/auth/login - User login attempt");
+            String clientIp = request.ip();
+            logger.info("POST /api/auth/login - Login attempt from IP: {}", clientIp);
+            
             try {
                 LoginRequest loginRequest = gson.fromJson(request.body(), LoginRequest.class);
                 
                 if (loginRequest == null || 
                     loginRequest.usernameOrEmail == null || loginRequest.usernameOrEmail.trim().isEmpty() ||
                     loginRequest.password == null || loginRequest.password.isEmpty()) {
+                    logger.warn("POST /api/auth/login - Missing credentials from IP: {}", clientIp);
                     response.status(400);
                     return new ErrorResponse("Username/email and password are required");
                 }
+                
+                logger.debug("POST /api/auth/login - Attempting login for: {} from IP: {}", 
+                           loginRequest.usernameOrEmail, clientIp);
                 
                 AuthService.AuthResult result = authService.login(
                     loginRequest.usernameOrEmail,
@@ -100,19 +118,23 @@ public class AuthRoutes {
                 );
                 
                 if (result == null) {
+                    logger.warn("POST /api/auth/login - Invalid credentials for: {} from IP: {}", 
+                              loginRequest.usernameOrEmail, clientIp);
                     response.status(401);
                     return new ErrorResponse("Invalid username/email or password");
                 }
                 
+                logger.info("POST /api/auth/login - Successful login for user: {} (ID: {}) from IP: {}", 
+                          result.getUser().getUsername(), result.getUser().getId(), clientIp);
                 response.status(200);
                 return new AuthResponse(result.getUser(), result.getToken());
                 
             } catch (JsonSyntaxException e) {
-                logger.error("Invalid JSON in request body", e);
+                logger.error("POST /api/auth/login - Invalid JSON in request body from IP: {}", clientIp, e);
                 response.status(400);
                 return new ErrorResponse("Invalid JSON format");
             } catch (Exception e) {
-                logger.error("Error during login", e);
+                logger.error("POST /api/auth/login - Unexpected error during login from IP: {}", clientIp, e);
                 response.status(500);
                 return new ErrorResponse("Failed to login");
             }
@@ -120,13 +142,26 @@ public class AuthRoutes {
         
         // GET /api/auth/me — Get current user info (requires authentication)
         get("/api/auth/me", (request, response) -> {
-            logger.info("GET /api/auth/me - Getting current user info");
+            String clientIp = request.ip();
+            String authHeader = request.headers("Authorization");
             
-            User currentUser = request.attribute("currentUser");
-            if (currentUser == null) {
+            logger.info("GET /api/auth/me - Token validation request from IP: {}", clientIp);
+            
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                logger.warn("GET /api/auth/me - Missing or invalid Authorization header from IP: {}", clientIp);
                 response.status(401);
                 return new ErrorResponse("Authentication required");
             }
+            
+            User currentUser = request.attribute("currentUser");
+            if (currentUser == null) {
+                logger.warn("GET /api/auth/me - Invalid or expired token from IP: {}", clientIp);
+                response.status(401);
+                return new ErrorResponse("Invalid or expired token");
+            }
+            
+            logger.debug("GET /api/auth/me - Valid token for user: {} (ID: {}) from IP: {}", 
+                       currentUser.getUsername(), currentUser.getId(), clientIp);
             
             // Remove password hash if present
             currentUser.setPasswordHash(null);
