@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.spark.collectibles.config.EnvironmentConfig;
 import com.spark.collectibles.model.User;
 import com.spark.collectibles.repository.UserRepository;
 import com.spark.collectibles.repository.impl.MySQLUserRepository;
@@ -31,15 +32,21 @@ public class AuthService {
     
     public AuthService() {
         this.userRepository = new MySQLUserRepository();
-        this.jwtExpirationHours = getJwtExpirationHours();
-        String jwtSecret = getJwtSecret();
+        this.jwtExpirationHours = EnvironmentConfig.getJwtExpirationHours();
+        String jwtSecret = EnvironmentConfig.getJwtSecret();
         this.jwtAlgorithm = Algorithm.HMAC256(jwtSecret);
     }
     
     public AuthService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.jwtExpirationHours = getJwtExpirationHours();
-        String jwtSecret = getJwtSecret();
+        this.jwtExpirationHours = EnvironmentConfig.getJwtExpirationHours();
+        String jwtSecret = EnvironmentConfig.getJwtSecret();
+        this.jwtAlgorithm = Algorithm.HMAC256(jwtSecret);
+    }
+    
+    public AuthService(UserRepository userRepository, String jwtSecret, int jwtExpirationHours) {
+        this.userRepository = userRepository;
+        this.jwtExpirationHours = jwtExpirationHours;
         this.jwtAlgorithm = Algorithm.HMAC256(jwtSecret);
     }
     
@@ -212,7 +219,7 @@ public class AuthService {
      * @return BCrypt hash
      */
     public String hashPassword(String password) {
-        int rounds = getBcryptRounds();
+        int rounds = EnvironmentConfig.getBcryptRounds();
         return BCrypt.hashpw(password, BCrypt.gensalt(rounds));
     }
     
@@ -289,72 +296,6 @@ public class AuthService {
         return "user" + (maxId + 1);
     }
     
-    /**
-     * Get JWT secret from environment or generate from "Hola mundo"
-     * @return JWT secret
-     */
-    private String getJwtSecret() {
-        String secret = System.getenv("JWT_SECRET");
-        if (secret == null || secret.trim().isEmpty()) {
-            logger.info("JWT_SECRET not set in environment, generating from 'Hola mundo'");
-            // Generate a secure secret from "Hola mundo" using SHA-256
-            try {
-                java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
-                byte[] hash = digest.digest("Hola mundo".getBytes(java.nio.charset.StandardCharsets.UTF_8));
-                // Convert to hex and repeat to ensure minimum 32 characters
-                StringBuilder hexString = new StringBuilder();
-                for (byte b : hash) {
-                    String hex = Integer.toHexString(0xff & b);
-                    if (hex.length() == 1) {
-                        hexString.append('0');
-                    }
-                    hexString.append(hex);
-                }
-                // Repeat to ensure minimum length
-                String baseSecret = hexString.toString();
-                return baseSecret + baseSecret.substring(0, 32); // Ensure at least 64 characters
-            } catch (java.security.NoSuchAlgorithmException e) {
-                logger.error("Error generating JWT secret from 'Hola mundo'", e);
-                return "Hola mundo - JWT Secret Key for Collectibles Store - Change in Production";
-            }
-        }
-        return secret;
-    }
-    
-    /**
-     * Get JWT expiration hours from environment or use default
-     * @return JWT expiration hours
-     */
-    private int getJwtExpirationHours() {
-        String hoursStr = System.getenv("JWT_EXPIRATION_HOURS");
-        if (hoursStr != null && !hoursStr.trim().isEmpty()) {
-            try {
-                return Integer.parseInt(hoursStr.trim());
-            } catch (NumberFormatException e) {
-                logger.warn("Invalid JWT_EXPIRATION_HOURS, using default: 24");
-            }
-        }
-        return 24; // Default: 24 hours
-    }
-    
-    /**
-     * Get BCrypt rounds from environment or use default
-     * @return BCrypt rounds
-     */
-    private int getBcryptRounds() {
-        String roundsStr = System.getenv("BCRYPT_ROUNDS");
-        if (roundsStr != null && !roundsStr.trim().isEmpty()) {
-            try {
-                int rounds = Integer.parseInt(roundsStr.trim());
-                if (rounds >= 4 && rounds <= 31) {
-                    return rounds;
-                }
-            } catch (NumberFormatException e) {
-                logger.warn("Invalid BCRYPT_ROUNDS, using default: 10");
-            }
-        }
-        return 10; // Default: 10 rounds (good balance of security and performance)
-    }
     
     /**
      * Authentication result containing user and JWT token

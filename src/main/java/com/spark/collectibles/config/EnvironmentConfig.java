@@ -65,6 +65,11 @@ public class EnvironmentConfig {
         // API configuration
         setProperty("api.base.path", "API_BASE_PATH", "/api");
         
+        // JWT configuration
+        setProperty("jwt.secret", "JWT_SECRET", null);
+        setProperty("jwt.expiration.hours", "JWT_EXPIRATION_HOURS", "24");
+        setProperty("bcrypt.rounds", "BCRYPT_ROUNDS", "10");
+        
         logger.info("Configuration loaded successfully");
         // Log database configuration (without password for security)
         logger.info("Database configuration - Host: {}, Port: {}, Database: {}, User: {}", 
@@ -158,5 +163,81 @@ public class EnvironmentConfig {
      */
     public static Properties getAllProperties() {
         return new Properties(properties);
+    }
+    
+    // JWT configuration getters
+    public static String getJwtSecret() {
+        String secret = properties.getProperty("jwt.secret");
+        if (secret == null || secret.trim().isEmpty()) {
+            if (isProduction()) {
+                logger.error("JWT_SECRET is not set in environment variables. This is required for production!");
+                throw new RuntimeException("JWT_SECRET environment variable is required but not set");
+            } else {
+                logger.warn("JWT_SECRET not set in environment. Using development default (NOT SECURE FOR PRODUCTION)");
+                // Generate a deterministic secret from "Hello World" for development
+                // In production, this MUST be set via environment variable
+                return generateDevelopmentSecret();
+            }
+        }
+        return secret;
+    }
+    
+    /**
+     * Generate a development secret from "Hello World" phrase
+     * This is only used when JWT_SECRET is not set and not in production
+     * @return Development JWT secret
+     */
+    private static String generateDevelopmentSecret() {
+        String phrase = "Hello World";
+        // Create a deterministic but secure-looking secret from the phrase
+        // Using SHA-256 hash of the phrase repeated to ensure minimum 32 characters
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            String input = phrase + phrase + phrase + phrase; // Ensure enough length
+            byte[] hash = md.digest(input.getBytes("UTF-8"));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            // Repeat to ensure minimum 32 characters
+            String base = hexString.toString();
+            return (base + base).substring(0, 64); // 64 character secret
+        } catch (Exception e) {
+            logger.error("Error generating development secret", e);
+            // Fallback to a simple but long enough secret
+            return "development-secret-key-from-hello-world-phrase-min-32-characters-required";
+        }
+    }
+    
+    public static int getJwtExpirationHours() {
+        String hours = properties.getProperty("jwt.expiration.hours");
+        if (hours != null && !hours.trim().isEmpty()) {
+            try {
+                return Integer.parseInt(hours.trim());
+            } catch (NumberFormatException e) {
+                logger.warn("Invalid JWT_EXPIRATION_HOURS value: {}, using default: 24", hours);
+            }
+        }
+        return 24;
+    }
+    
+    public static int getBcryptRounds() {
+        String rounds = properties.getProperty("bcrypt.rounds");
+        if (rounds != null && !rounds.trim().isEmpty()) {
+            try {
+                int roundsValue = Integer.parseInt(rounds.trim());
+                if (roundsValue >= 4 && roundsValue <= 31) {
+                    return roundsValue;
+                }
+                logger.warn("BCRYPT_ROUNDS value {} is out of range (4-31), using default: 10", roundsValue);
+            } catch (NumberFormatException e) {
+                logger.warn("Invalid BCRYPT_ROUNDS value: {}, using default: 10", rounds);
+            }
+        }
+        return 10;
     }
 }
