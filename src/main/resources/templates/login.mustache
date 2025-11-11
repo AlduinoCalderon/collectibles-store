@@ -258,10 +258,38 @@
             }
         });
         
-        // Check if already logged in
-        if (localStorage.getItem('authToken')) {
-            window.location.href = '/';
-        }
+        // Check if already logged in - validate token first
+        (async function() {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                console.log('[AUTH] Token found in localStorage, validating...');
+                try {
+                    const response = await fetch('/api/auth/me', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const user = await response.json();
+                        console.log('[AUTH] Token is valid, user:', user.username);
+                        localStorage.setItem('currentUser', JSON.stringify(user));
+                        window.location.href = '/';
+                    } else {
+                        console.log('[AUTH] Token validation failed, clearing localStorage');
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('currentUser');
+                        // Stay on login page
+                    }
+                } catch (error) {
+                    console.error('[AUTH] Error validating token:', error);
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('currentUser');
+                }
+            } else {
+                console.log('[AUTH] No token found, staying on login page');
+            }
+        })();
     </script>
 </body>
 </html>
