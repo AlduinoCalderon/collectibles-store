@@ -305,9 +305,21 @@
         </footer>
     </div>
     
+    <script src="/static/auth.js"></script>
     <script>
         const productId = '{{#product}}{{product.id}}{{/product}}';
         const isEdit = productId !== '';
+        
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof Auth !== 'undefined' && !Auth.isAuthenticated()) {
+                alert('You must be logged in to access this page.');
+                window.location.href = '/login';
+            } else if (typeof Auth !== 'undefined' && !Auth.isAdmin()) {
+                alert('Admin access required for this page.');
+                window.location.href = '/';
+            }
+        });
         
         // Table filtering functionality
         document.addEventListener('DOMContentLoaded', function() {
@@ -373,13 +385,21 @@
         
         function deleteProduct(id) {
             if (confirm('Are you sure you want to delete this product?')) {
-                fetch('/api/products/' + id, {
+                // Use Auth.fetch if available, otherwise regular fetch
+                const fetchFn = (typeof Auth !== 'undefined' && Auth.fetch) ? Auth.fetch.bind(Auth) : fetch;
+                
+                fetchFn('/api/products/' + id, {
                     method: 'DELETE'
                 })
                 .then(response => {
                     if (response.ok) {
                         alert('Product deleted successfully');
                         window.location.href = '/admin/products';
+                    } else if (response.status === 401) {
+                        alert('Authentication required. Please login again.');
+                        window.location.href = '/login';
+                    } else if (response.status === 403) {
+                        alert('You do not have permission to delete products.');
                     } else {
                         alert('Error deleting product');
                     }
@@ -410,7 +430,10 @@
             const url = isEdit ? '/api/products/' + productId : '/api/products';
             const method = isEdit ? 'PUT' : 'POST';
             
-            fetch(url, {
+            // Use Auth.fetch if available, otherwise regular fetch
+            const fetchFn = (typeof Auth !== 'undefined' && Auth.fetch) ? Auth.fetch.bind(Auth) : fetch;
+            
+            fetchFn(url, {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json'
@@ -421,6 +444,11 @@
                 if (response.ok) {
                     alert(isEdit ? 'Product updated successfully!' : 'Product created successfully!');
                     window.location.href = '/admin/products';
+                } else if (response.status === 401) {
+                    alert('Authentication required. Please login again.');
+                    window.location.href = '/login';
+                } else if (response.status === 403) {
+                    alert('You do not have permission to perform this action. Admin role required.');
                 } else {
                     return response.json().then(data => {
                         alert('Error: ' + (data.message || 'Failed to save product'));
