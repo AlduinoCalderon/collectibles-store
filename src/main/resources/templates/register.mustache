@@ -189,7 +189,9 @@
                 
                 <div class="form-group">
                     <label for="email">Email *</label>
-                    <input type="email" id="email" name="email" required>
+                    <input type="email" id="email" name="email" required 
+                           pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                           title="Please enter a valid email address (e.g., user@example.com)">
                     <small>We'll never share your email</small>
                 </div>
                 
@@ -237,6 +239,22 @@
     </div>
     
     <script>
+        // Custom validation messages in English
+        document.getElementById('email').addEventListener('invalid', function(e) {
+            const email = e.target.value;
+            if (!email.includes('@')) {
+                e.target.setCustomValidity('Please include an "@" sign in the email address. The address "' + email + '" is missing the "@" sign.');
+            } else if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                e.target.setCustomValidity('Please enter a valid email address (e.g., user@example.com)');
+            } else {
+                e.target.setCustomValidity('');
+            }
+        });
+        
+        document.getElementById('email').addEventListener('input', function(e) {
+            e.target.setCustomValidity('');
+        });
+        
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -247,6 +265,14 @@
             // Hide previous messages
             errorDiv.style.display = 'none';
             successDiv.style.display = 'none';
+            
+            // Validate email format
+            const email = document.getElementById('email').value.trim();
+            if (!email.includes('@') || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                errorDiv.textContent = 'Please enter a valid email address. The email must include an "@" sign and a valid domain.';
+                errorDiv.style.display = 'block';
+                return;
+            }
             
             // Validate passwords match
             const password = document.getElementById('password').value;
