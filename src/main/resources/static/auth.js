@@ -109,15 +109,33 @@ const Auth = {
             if (response.ok) {
                 const user = await response.json();
                 localStorage.setItem('currentUser', JSON.stringify(user));
+                console.log('[AUTH] Token validated successfully, user:', user.username);
                 return true;
             } else {
-                // Token is invalid, clear it
-                this.logout();
+                // Token is invalid, but don't auto-logout (let user decide)
+                console.warn('[AUTH] Token validation failed, status:', response.status);
+                // Only clear if it's a 401 (unauthorized), not for other errors
+                if (response.status === 401) {
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('currentUser');
+                }
                 return false;
             }
         } catch (error) {
-            console.error('Error validating token:', error);
+            console.error('[AUTH] Error validating token:', error);
+            // Don't clear token on network errors, might be temporary
             return false;
+        }
+    },
+    
+    /**
+     * Update current user data in localStorage
+     * @param {object} user - Updated user object
+     */
+    updateUser: function(user) {
+        if (user) {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            console.log('[AUTH] User data updated:', user.username);
         }
     },
     

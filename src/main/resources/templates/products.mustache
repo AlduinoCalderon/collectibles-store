@@ -34,16 +34,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
         
         header h1 {
             font-size: 24px;
             font-weight: 600;
+            margin: 0;
+            flex-shrink: 0;
         }
         
         nav {
             display: flex;
-            gap: 20px;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
         }
         
         nav a {
@@ -52,10 +58,92 @@
             padding: 8px 16px;
             border-radius: 5px;
             transition: background-color 0.3s;
+            white-space: nowrap;
         }
         
         nav a:hover {
             background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-menu {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .user-menu-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+        }
+        
+        .user-menu-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-menu-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            min-width: 200px;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .user-menu-dropdown.show {
+            display: block;
+        }
+        
+        .user-menu-item {
+            display: block;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .user-menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-menu-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .user-menu-item.logout {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .user-menu-item.logout:hover {
+            background-color: #f8d7da;
+        }
+        
+        .user-info-text {
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .user-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
         }
         
         main {
@@ -211,6 +299,21 @@
                 <a href="/products">Browse Products</a>
                 <a href="/admin/products">Manage Products</a>
                 <a href="/api/docs">API Docs</a>
+                <span id="authNav">
+                    <a href="/login" id="loginLink">Login</a>
+                    <a href="/register" id="registerLink">Register</a>
+                </span>
+                <span id="userNav" style="display: none;" class="user-menu">
+                    <a href="#" class="user-menu-button" id="userMenuButton" onclick="event.preventDefault(); toggleUserMenu();">
+                        <span id="userInfo" class="user-info-text"></span>
+                        <span id="userBadge" class="user-badge"></span>
+                        <span>▼</span>
+                    </a>
+                    <div class="user-menu-dropdown" id="userMenuDropdown">
+                        <a href="/profile" class="user-menu-item">Edit Profile</a>
+                        <a href="#" class="user-menu-item logout" onclick="event.preventDefault(); Auth.logout();">Logout</a>
+                    </div>
+                </span>
             </nav>
         </header>
         
@@ -391,6 +494,58 @@
                 ws.close();
             }
         });
+        
+        // User menu functionality
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            if (dropdown) dropdown.classList.toggle('show');
+        }
+        
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('userNav');
+            const dropdown = document.getElementById('userMenuDropdown');
+            if (userMenu && !userMenu.contains(event.target) && dropdown && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        });
+        
+        // Update navigation
+        async function updateNavigation() {
+            const authNav = document.getElementById('authNav');
+            const userNav = document.getElementById('userNav');
+            const userInfo = document.getElementById('userInfo');
+            const userBadge = document.getElementById('userBadge');
+            
+            if (typeof Auth !== 'undefined' && Auth.isAuthenticated()) {
+                let user = Auth.getCurrentUser();
+                if (!user) {
+                    const isValid = await Auth.validateToken();
+                    if (isValid) user = Auth.getCurrentUser();
+                }
+                if (user) {
+                    if (authNav) authNav.style.display = 'none';
+                    if (userNav) userNav.style.display = 'inline-block';
+                    if (userInfo) userInfo.textContent = user.username;
+                    if (userBadge) userBadge.textContent = user.role === 'ADMIN' ? 'Admin' : 'User';
+                } else {
+                    if (authNav) authNav.style.display = 'inline';
+                    if (userNav) userNav.style.display = 'none';
+                }
+            } else {
+                if (authNav) authNav.style.display = 'inline';
+                if (userNav) userNav.style.display = 'none';
+            }
+        }
+        
+        // Load auth.js and update navigation
+        if (typeof Auth === 'undefined') {
+            const script = document.createElement('script');
+            script.src = '/static/auth.js';
+            script.onload = updateNavigation;
+            document.head.appendChild(script);
+        } else {
+            updateNavigation();
+        }
     </script>
 </body>
 </html>

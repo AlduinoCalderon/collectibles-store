@@ -52,6 +52,13 @@ public class ViewRoutes {
             return new ModelAndView(model, "register.mustache");
         }, templateEngine);
         
+        // Profile page
+        get("/profile", (request, response) -> {
+            logger.info("GET /profile - Rendering profile page");
+            Map<String, Object> model = new HashMap<>();
+            return new ModelAndView(model, "profile.mustache");
+        }, templateEngine);
+        
         // Products list page
         get("/products", (request, response) -> {
             logger.info("GET /products - Rendering products list page");
