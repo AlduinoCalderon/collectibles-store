@@ -191,23 +191,34 @@ public class AuthService {
      * @return User if token is valid, null otherwise
      */
     public User validateToken(String token) {
-        logger.debug("AuthService.validateToken() called");
+        logger.info("AuthService.validateToken() called");
         
         if (token == null || token.trim().isEmpty()) {
             logger.warn("AuthService.validateToken() - Token is null or empty");
             return null;
         }
         
+        logger.debug("AuthService.validateToken() - Token length: {}, starts with Bearer: {}", 
+                    token.length(), token.startsWith("Bearer "));
+        
         try {
             // Remove "Bearer " prefix if present
+            String originalToken = token;
             if (token.startsWith("Bearer ")) {
                 token = token.substring(7);
-                logger.debug("AuthService.validateToken() - Removed 'Bearer ' prefix");
+                logger.debug("AuthService.validateToken() - Removed 'Bearer ' prefix, token length now: {}", token.length());
             }
             
             logger.debug("AuthService.validateToken() - Verifying JWT token signature");
+            logger.debug("AuthService.validateToken() - Using JWT secret length: {}", 
+                        EnvironmentConfig.getJwtSecret().length());
+            logger.debug("AuthService.validateToken() - Token preview: {}", 
+                        token.length() > 20 ? token.substring(0, 20) + "..." : token);
+            
             JWTVerifier verifier = JWT.require(jwtAlgorithm).build();
             DecodedJWT decodedJWT = verifier.verify(token);
+            
+            logger.info("AuthService.validateToken() - Token signature verified successfully");
             
             // Extract user ID from token
             String userId = decodedJWT.getSubject();
@@ -216,14 +227,30 @@ public class AuthService {
                 return null;
             }
             
-            logger.debug("AuthService.validateToken() - Token signature valid, user ID: {}", userId);
+            logger.info("AuthService.validateToken() - Token signature valid, user ID: {}", userId);
+            
+            // Get expiration time
+            Date expiresAt = decodedJWT.getExpiresAt();
+            if (expiresAt != null) {
+                long timeUntilExpiry = expiresAt.getTime() - System.currentTimeMillis();
+                logger.debug("AuthService.validateToken() - Token expires at: {}, time until expiry: {} ms", 
+                            expiresAt, timeUntilExpiry);
+                if (timeUntilExpiry <= 0) {
+                    logger.warn("AuthService.validateToken() - Token has expired");
+                    return null;
+                }
+            }
             
             // Get user from database
+            logger.debug("AuthService.validateToken() - Looking up user in database: {}", userId);
             User user = userRepository.findById(userId).orElse(null);
             if (user == null) {
                 logger.warn("AuthService.validateToken() - User not found in database: {}", userId);
                 return null;
             }
+            
+            logger.debug("AuthService.validateToken() - User found: {} (active: {})", 
+                        user.getUsername(), user.isActive());
             
             if (!user.isActive()) {
                 logger.warn("AuthService.validateToken() - User is inactive: {} (ID: {})", 
@@ -231,16 +258,18 @@ public class AuthService {
                 return null;
             }
             
-            logger.debug("AuthService.validateToken() - Token validation successful for user: {} (ID: {})", 
+            logger.info("AuthService.validateToken() - Token validation successful for user: {} (ID: {})", 
                         user.getUsername(), userId);
             return user;
             
         } catch (JWTVerificationException e) {
             logger.warn("AuthService.validateToken() - JWT verification failed: {}", e.getMessage());
             logger.debug("AuthService.validateToken() - JWT verification exception details", e);
+            logger.debug("AuthService.validateToken() - Exception type: {}", e.getClass().getSimpleName());
             return null;
         } catch (Exception e) {
             logger.error("AuthService.validateToken() - Unexpected error during token validation", e);
+            logger.error("AuthService.validateToken() - Exception type: {}", e.getClass().getName());
             return null;
         }
     }

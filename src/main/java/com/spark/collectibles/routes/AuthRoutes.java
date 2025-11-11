@@ -153,21 +153,35 @@ public class AuthRoutes {
             String authHeader = request.headers("Authorization");
             
             logger.info("GET /api/auth/me - Token validation request from IP: {}", clientIp);
+            logger.debug("GET /api/auth/me - Authorization header present: {}, starts with Bearer: {}", 
+                        authHeader != null, authHeader != null && authHeader.startsWith("Bearer "));
             
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 logger.warn("GET /api/auth/me - Missing or invalid Authorization header from IP: {}", clientIp);
+                if (authHeader != null) {
+                    logger.debug("GET /api/auth/me - Authorization header value (first 50 chars): {}", 
+                               authHeader.length() > 50 ? authHeader.substring(0, 50) + "..." : authHeader);
+                }
                 response.status(401);
                 return new ErrorResponse("Authentication required");
             }
             
-            User currentUser = request.attribute("currentUser");
+            // Extract and validate token directly
+            String token = authHeader.substring(7);
+            logger.debug("GET /api/auth/me - Token extracted, length: {}", token.length());
+            logger.debug("GET /api/auth/me - Token preview: {}", 
+                        token.length() > 20 ? token.substring(0, 20) + "..." : token);
+            
+            User currentUser = authService.validateToken(token);
+            
             if (currentUser == null) {
-                logger.warn("GET /api/auth/me - Invalid or expired token from IP: {}", clientIp);
+                logger.warn("GET /api/auth/me - Invalid or expired token from IP: {} (token length: {})", 
+                           clientIp, token.length());
                 response.status(401);
                 return new ErrorResponse("Invalid or expired token");
             }
             
-            logger.debug("GET /api/auth/me - Valid token for user: {} (ID: {}) from IP: {}", 
+            logger.info("GET /api/auth/me - Valid token for user: {} (ID: {}) from IP: {}", 
                        currentUser.getUsername(), currentUser.getId(), clientIp);
             
             // Remove password hash if present
