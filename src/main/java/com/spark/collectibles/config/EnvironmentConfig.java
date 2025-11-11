@@ -174,7 +174,7 @@ public class EnvironmentConfig {
                 throw new RuntimeException("JWT_SECRET environment variable is required but not set");
             } else {
                 logger.warn("JWT_SECRET not set in environment. Using development default (NOT SECURE FOR PRODUCTION)");
-                // Generate a deterministic secret from "Hello World" for development
+                // Generate a deterministic secret using system properties
                 // In production, this MUST be set via environment variable
                 return generateDevelopmentSecret();
             }
