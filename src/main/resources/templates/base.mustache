@@ -149,6 +149,14 @@
                 <a href="/products">Browse Products</a>
                 <a href="/admin/products">Manage Products</a>
                 <a href="/api/docs">API Docs</a>
+                <span id="authNav">
+                    <a href="/login" id="loginLink">Login</a>
+                    <a href="/register" id="registerLink">Register</a>
+                </span>
+                <span id="userNav" style="display: none;">
+                    <span id="userInfo" style="margin-right: 15px;"></span>
+                    <a href="#" id="logoutLink" onclick="Auth.logout(); return false;">Logout</a>
+                </span>
             </nav>
         </header>
         
@@ -179,6 +187,35 @@
         </footer>
     </div>
     
+    <script src="/static/auth.js"></script>
+    <script>
+        // Update navigation based on authentication status
+        document.addEventListener('DOMContentLoaded', function() {
+            const authNav = document.getElementById('authNav');
+            const userNav = document.getElementById('userNav');
+            const userInfo = document.getElementById('userInfo');
+            
+            if (Auth.isAuthenticated()) {
+                const user = Auth.getCurrentUser();
+                if (user) {
+                    authNav.style.display = 'none';
+                    userNav.style.display = 'inline';
+                    userInfo.textContent = user.username + (user.role === 'ADMIN' ? ' (Admin)' : '');
+                } else {
+                    // User data not found, try to validate token
+                    Auth.validateToken().then(valid => {
+                        if (!valid) {
+                            authNav.style.display = 'inline';
+                            userNav.style.display = 'none';
+                        }
+                    });
+                }
+            } else {
+                authNav.style.display = 'inline';
+                userNav.style.display = 'none';
+            }
+        });
+    </script>
     {{#additionalScripts}}
     <script>
         {{{additionalScripts}}}
