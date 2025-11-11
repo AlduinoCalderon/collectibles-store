@@ -290,8 +290,23 @@
                     setTimeout(() => {
                         console.log('[AUTH] Executing redirect now...');
                         const tokenBeforeRedirect = localStorage.getItem('authToken');
-                        console.log('[AUTH] Token before redirect:', tokenBeforeRedirect ? 'EXISTS' : 'MISSING');
-                        window.location.href = '/';
+                        const userBeforeRedirect = localStorage.getItem('currentUser');
+                        console.log('[AUTH] Token before redirect:', tokenBeforeRedirect ? 'EXISTS (' + tokenBeforeRedirect.length + ' chars)' : 'MISSING');
+                        console.log('[AUTH] User before redirect:', userBeforeRedirect ? 'EXISTS' : 'MISSING');
+                        
+                        // Double-check token is still there
+                        if (!tokenBeforeRedirect) {
+                            console.error('[AUTH] CRITICAL: Token was lost before redirect!');
+                            errorDiv.textContent = 'Error: Authentication token was lost. Please try logging in again.';
+                            errorDiv.style.display = 'block';
+                            loginBtn.disabled = false;
+                            loginBtn.textContent = 'Sign In';
+                            return;
+                        }
+                        
+                        // Use replace instead of href to avoid back button issues
+                        console.log('[AUTH] Performing redirect with window.location.replace()');
+                        window.location.replace('/');
                     }, 1000);
                 } else {
                     errorDiv.textContent = data.message || 'Login failed. Please check your credentials.';
