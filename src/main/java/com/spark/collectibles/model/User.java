@@ -37,6 +37,9 @@ public class User {
     @SerializedName("updatedAt")
     private LocalDateTime updatedAt;
     
+    // Password hash - NOT serialized in JSON responses for security
+    private String passwordHash;
+    
     // Default constructor
     public User() {
         this.createdAt = LocalDateTime.now();
@@ -129,7 +132,23 @@ public class User {
     }
     
     /**
-     * Validates the user data
+     * Get password hash (internal use only, never returned in API responses)
+     * @return Password hash
+     */
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+    
+    /**
+     * Set password hash (internal use only)
+     * @param passwordHash Password hash
+     */
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+    
+    /**
+     * Validates the user data (excluding password hash)
      * @return true if user data is valid, false otherwise
      */
     public boolean isValid() {
@@ -174,6 +193,7 @@ public class User {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
+        // Note: passwordHash is intentionally excluded from toString for security
     }
     
     /**

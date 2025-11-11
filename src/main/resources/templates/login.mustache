@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Collectibles Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 450px;
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        main {
+            padding: 40px 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .form-footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏺 Collectibles Store</h1>
+            <p>Sign in to your account</p>
+        </header>
+        
+        <main>
+            <div id="errorMessage" class="alert alert-error" style="display: none;"></div>
+            <div id="successMessage" class="alert alert-success" style="display: none;"></div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="usernameOrEmail">Username or Email</label>
+                    <input type="text" id="usernameOrEmail" name="usernameOrEmail" required autofocus>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="loginBtn">Sign In</button>
+            </form>
+            
+            <div class="form-footer">
+                Don't have an account? <a href="/register">Register here</a>
+            </div>
+            
+            <a href="/" class="back-link">← Back to Home</a>
+        </main>
+    </div>
+    
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            // Hide previous messages
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            // Disable button
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Signing in...';
+            
+            const usernameOrEmail = document.getElementById('usernameOrEmail').value.trim();
+            const password = document.getElementById('password').value;
+            
+            try {
+                console.log('[AUTH] Sending login request for:', usernameOrEmail);
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        usernameOrEmail: usernameOrEmail,
+                        password: password
+                    })
+                });
+                
+                console.log('[AUTH] Login response status:', response.status);
+                console.log('[AUTH] Login response headers:', {
+                    'content-type': response.headers.get('content-type'),
+                    'status': response.status,
+                    'statusText': response.statusText
+                });
+                
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                let data;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                    console.log('[AUTH] Login response data received');
+                } else {
+                    // Server returned HTML or other format (likely an error page)
+                    const text = await response.text();
+                    console.error('[AUTH] Server returned non-JSON response:', text.substring(0, 200));
+                    throw new Error(`Server error (${response.status}): Expected JSON but got ${contentType || 'unknown'}`);
+                }
+                
+                if (response.ok) {
+                    // Save token to localStorage
+                    if (data.token) {
+                        console.log('[AUTH] Login successful, saving token to localStorage');
+                        console.log('[AUTH] Token length:', data.token.length);
+                        console.log('[AUTH] User:', data.user ? data.user.username : 'null');
+                        
+                        localStorage.setItem('authToken', data.token);
+                        localStorage.setItem('currentUser', JSON.stringify(data.user));
+                        
+                        // Verify token was saved
+                        const savedToken = localStorage.getItem('authToken');
+                        const savedUser = localStorage.getItem('currentUser');
+                        console.log('[AUTH] Token saved verification - Token exists:', !!savedToken);
+                        console.log('[AUTH] User saved verification - User exists:', !!savedUser);
+                        
+                        if (!savedToken) {
+                            console.error('[AUTH] ERROR: Token was not saved to localStorage!');
+                            errorDiv.textContent = 'Error: Failed to save authentication token. Please try again.';
+                            errorDiv.style.display = 'block';
+                            loginBtn.disabled = false;
+                            loginBtn.textContent = 'Sign In';
+                            return;
+                        }
+                    } else {
+                        console.error('[AUTH] ERROR: No token in response!');
+                        errorDiv.textContent = 'Error: No authentication token received from server.';
+                        errorDiv.style.display = 'block';
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'Sign In';
+                        return;
+                    }
+                    
+                    successDiv.textContent = 'Login successful! Redirecting...';
+                    successDiv.style.display = 'block';
+                    
+                    // Redirect to home page
+                    console.log('[AUTH] Redirecting to home page in 1 second...');
+                    setTimeout(() => {
+                        console.log('[AUTH] Executing redirect now...');
+                        const tokenBeforeRedirect = localStorage.getItem('authToken');
+                        const userBeforeRedirect = localStorage.getItem('currentUser');
+                        console.log('[AUTH] Token before redirect:', tokenBeforeRedirect ? 'EXISTS (' + tokenBeforeRedirect.length + ' chars)' : 'MISSING');
+                        console.log('[AUTH] User before redirect:', userBeforeRedirect ? 'EXISTS' : 'MISSING');
+                        
+                        // Double-check token is still there
+                        if (!tokenBeforeRedirect) {
+                            console.error('[AUTH] CRITICAL: Token was lost before redirect!');
+                            errorDiv.textContent = 'Error: Authentication token was lost. Please try logging in again.';
+                            errorDiv.style.display = 'block';
+                            loginBtn.disabled = false;
+                            loginBtn.textContent = 'Sign In';
+                            return;
+                        }
+                        
+                        // Use replace instead of href to avoid back button issues
+                        console.log('[AUTH] Performing redirect with window.location.replace()');
+                        window.location.replace('/');
+                    }, 1000);
+                } else {
+                    errorDiv.textContent = data.message || 'Login failed. Please check your credentials.';
+                    errorDiv.style.display = 'block';
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Sign In';
+                }
+            } catch (error) {
+                console.error('[AUTH] Login error:', error);
+                console.error('[AUTH] Error details:', {
+                    name: error.name,
+                    message: error.message,
+                    stack: error.stack
+                });
+                
+                // Try to get response text if available
+                if (error.response) {
+                    error.response.text().then(text => {
+                        console.error('[AUTH] Response text:', text);
+                    }).catch(e => console.error('[AUTH] Could not read response text:', e));
+                }
+                
+                errorDiv.textContent = 'An error occurred. Please try again. Error: ' + error.message;
+                errorDiv.style.display = 'block';
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign In';
+            }
+        });
+        
+        // Check if already logged in - validate token first
+        (async function() {
+            console.log('[AUTH] Checking authentication status on login page load...');
+            const token = localStorage.getItem('authToken');
+            const user = localStorage.getItem('currentUser');
+            
+            console.log('[AUTH] Token in localStorage:', token ? 'EXISTS (' + token.length + ' chars)' : 'MISSING');
+            console.log('[AUTH] User in localStorage:', user ? 'EXISTS' : 'MISSING');
+            
+            if (token) {
+                console.log('[AUTH] Token found, validating with server...');
+                try {
+                    const response = await fetch('/api/auth/me', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    console.log('[AUTH] Token validation response status:', response.status);
+                    
+                    if (response.ok) {
+                        const userData = await response.json();
+                        console.log('[AUTH] Token is valid, user:', userData.username);
+                        localStorage.setItem('currentUser', JSON.stringify(userData));
+                        console.log('[AUTH] Redirecting to home page (user already authenticated)');
+                        window.location.href = '/';
+                    } else {
+                        const errorText = await response.text();
+                        console.warn('[AUTH] Token validation failed, status:', response.status);
+                        console.warn('[AUTH] Error response:', errorText);
+                        console.log('[AUTH] Clearing invalid token from localStorage');
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('currentUser');
+                        console.log('[AUTH] Staying on login page');
+                    }
+                } catch (error) {
+                    console.error('[AUTH] Error validating token:', error);
+                    console.error('[AUTH] Error details:', {
+                        name: error.name,
+                        message: error.message
+                    });
+                    // Don't clear token on network errors - might be temporary
+                    console.log('[AUTH] Network error - keeping token, staying on login page');
+                }
+            } else {
+                console.log('[AUTH] No token found, user needs to login');
+            }
+        })();
+    </script>
+</body>
+</html>
+

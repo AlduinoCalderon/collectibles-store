@@ -1,68 +1,71 @@
-# Project Backlog: Spark in Java Web Application Development
+# Project Backlog: Programming Procedures
 
 ## User Stories
 
 ### User Story 1
-**As a** store administrator  
-**I want to** manage users (create, read, update, delete) via an API  
-**So that** I can control who has access to the system
+**As a** Java developer (Karen)  
+**I want to** create a comprehensive suite of unit tests for the reservations module using JUnit  
+**So that** I can ensure its reliability and achieve at least 90% code coverage.
 
 **Acceptance Criteria:**
-- [x] API exposes endpoints for user CRUD operations
-- [x] Requests return appropriate status codes and error messages
-- [x] User data is validated and persisted
+- [ ] The JUnit testing environment is configured in the project.
+- [ ] Unit tests are written for all critical functions of the reservations module.
+- [ ] A code coverage report confirms at least 90% coverage.
+- [ ] All implemented tests pass without errors.
 
 ### User Story 2
-**As a** store visitor  
-**I want to** browse and filter collectible items  
-**So that** I can easily find items of interest
+**As a** JavaScript developer (Teresa)  
+**I want to** develop unit tests for the graph visualization module using Jest  
+**So that** I can validate its functionality and guarantee at least 90% code coverage.
 
 **Acceptance Criteria:**
-- [x] Website shows a list of collectible items (✅ Completed Sprint 2)
-- [x] Visitors can filter items by category or price (✅ Completed Sprint 2)
-- [x] Filtering updates the displayed items without reloading the page (✅ Completed Sprint 2 - Client-side filtering)
+- [ ] The Jest testing environment is set up for the JavaScript module.
+- [ ] Unit tests cover all key features of the graph visualization.
+- [ ] A code coverage report shows at least 90% test coverage.
+- [ ] All Jest tests run successfully.
 
 ### User Story 3
-**As a** store administrator  
-**I want to** add, edit, and remove item offers through a web form  
-**So that** I can keep the store's inventory up to date
+**As a** project manager  
+**I want to** create complete and clear project documentation  
+**So that** current and future developers can understand, install, and maintain the system.
 
 **Acceptance Criteria:**
-- [x] Admin panel with item management form is present (✅ Completed Sprint 2)
-- [x] Item changes are reflected in the item list (✅ Completed Sprint 2)
-- [x] Input validation and error handling are implemented (✅ Completed Sprint 2)
+- [ ] Documentation includes detailed installation and setup instructions.
+- [ ] Information about the implemented unit tests and how to run them is included.
+- [ ] The codebase is well-commented.
+- [ ] System diagrams are created and added to the documentation.
 
 ### User Story 4
-**As a** store visitor  
-**I want to** see real-time price updates for items  
-**So that** I can make informed purchasing decisions based on current prices
+**As a** development team member  
+**I want to** have a well-organized GitHub repository  
+**So that** all project artifacts, including code, tests, and documentation, are easily accessible.
 
 **Acceptance Criteria:**
-- [x] Price changes are pushed instantly to the website via WebSockets (✅ Completed Sprint 3)
-- [x] No manual refresh is required to view updates (✅ Completed Sprint 3)
-- [x] Real-time system is robust against failures (✅ Completed Sprint 3 - Auto-reconnect implemented)
+- [ ] The repository has a clear directory structure.
+- [ ] All code, tests, and documentation are committed to the repository.
+- [ ] The `README.md` file is updated with relevant project information.
 
 ## Requirements Tracking Table 1: User Stories and Requirements
 
 | User Story | Requirements |
 |------------|-------------|
-| User Story 1 | - Requirement 1.1: API endpoints for user CRUD<br>- Requirement 1.2: Input validation<br>- Requirement 1.3: Error handling and status codes |
-| User Story 2 | - Requirement 2.1: Item browsing view<br>- Requirement 2.2: Filtering logic<br>- Requirement 2.3: Dynamic client updates |
-| User Story 3 | - Requirement 3.1: Admin item management form<br>- Requirement 3.2: Inventory update logic<br>- Requirement 3.3: Validation and feedback |
-| User Story 4 | - Requirement 4.1: Real-time price update via WebSockets<br>- Requirement 4.2: Resilience to connection issues |
+| User Story 1 | - Requirement 1.1: Set up JUnit environment.<br>- Requirement 1.2: Implement JUnit tests for reservations module.<br>- Requirement 1.3: Generate and analyze code coverage report. |
+| User Story 2 | - Requirement 2.1: Set up Jest environment.<br>- Requirement 2.2: Implement Jest tests for graph visualization.<br>- Requirement 2.3: Generate and analyze code coverage report. |
+| User Story 3 | - Requirement 3.1: Write installation and test execution guides.<br>- Requirement 3.2: Add in-code comments and create system diagrams.<br>- Requirement 3.3: Draft final project documentation. |
+| User Story 4 | - Requirement 4.1: Structure and clean up the GitHub repository.<br>- Requirement 4.2: Push all final code and documentation to GitHub. |
 
 ## Requirements Tracking Table 2: Prioritized Requirements
 
-| Requirements | Stages | Time Estimation (hours) | Deliverables | Status |
-|-------------|--------|------------------------|--------------|--------|
-| Requirement 1.1: API endpoints for user CRUD | Sprint 1 | 5 | User API implemented | ✅ |
-| Requirement 1.2: Input validation | Sprint 1 | 3 | User API validation | ✅ |
-| Requirement 1.3: Error handling and status codes | Sprint 1 | 3 | User API error handling | ✅ |
-| Requirement 2.1: Item browsing view | Sprint 2 | 4 | Item list page | ✅ |
-| Requirement 2.2: Filtering logic | Sprint 2 | 3 | Filtering functionality | ✅ |
-| Requirement 2.3: Dynamic client updates | Sprint 2 | 3 | Live item update mechanism | ✅ (Client-side filtering) |
-| Requirement 3.1: Admin item management form | Sprint 2 | 5 | Admin form for item management | ✅ |
-| Requirement 3.2: Inventory update logic | Sprint 2 | 3 | Inventory update | ✅ |
-| Requirement 3.3: Validation and feedback | Sprint 2 | 2 | Form validation and feedback | ✅ |
-| Requirement 4.1: Real-time price update via WebSockets | Sprint 3 | 6 | WebSocket price update | ✅ |
-| Requirement 4.2: Resilience to connection issues | Sprint 3 | 2 | Robust real-time system | ✅ |
+| Requirements | Stages | Time Estimation (hours) | Deliverables |
+|-------------|--------|------------------------|--------------|
+| Requirement 1.1 | Sprint 1 | 4 | Configured JUnit environment |
+| Requirement 1.2 | Sprint 1 | 10 | JUnit test suite for reservations module |
+| Requirement 1.3 | Sprint 1 | 2 | Java code coverage report (>=90%) |
+| Requirement 2.1 | Sprint 2 | 4 | Configured Jest environment |
+| Requirement 2.2 | Sprint 2 | 16 | Jest test suite for graph module |
+| Requirement 2.3 | Sprint 2 | 4 | JavaScript code coverage report (>=90%) |
+| Requirement 3.1 | Sprint 3 | 6 | Installation and testing guides |
+| Requirement 3.2 | Sprint 3 | 6 | Commented code and system diagrams |
+| Requirement 3.3 | Sprint 3 | 4 | Final comprehensive documentation |
+| Requirement 4.1 | Sprint 3 | 2 | Organized GitHub repository structure |
+| Requirement 4.2 | Final Delivery | 2 | Final commit with all project artifacts |

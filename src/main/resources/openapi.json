@@ -3,7 +3,7 @@
   "info": {
     "title": "Collectibles Store API",
     "version": "1.0.0",
-    "description": "A RESTful API for managing collectible items. Note: HTML views are available at / (home), /products (browsing), and /admin/products (management). See Sprint 2 deliverables for view routes."
+    "description": "A RESTful API for managing collectible items with JWT-based authentication. Note: HTML views are available at / (home), /products (browsing), and /admin/products (management). Protected routes require JWT authentication with ADMIN role."
   },
   "servers": [
     { 
@@ -33,7 +33,8 @@
       },
       "post": {
         "summary": "Create a product",
-        "description": "Create a new product.",
+        "description": "Create a new product. Requires ADMIN authentication.",
+        "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -50,7 +51,9 @@
                 "schema": { "$ref": "#/components/schemas/Product" }
               }
             }
-          }
+          },
+          "401": { "description": "Unauthorized - Authentication required" },
+          "403": { "description": "Forbidden - ADMIN role required" }
         }
       }
     },
@@ -74,6 +77,8 @@
       },
       "put": {
         "summary": "Update product",
+        "description": "Update an existing product. Requires ADMIN authentication.",
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
@@ -94,16 +99,22 @@
               }
             }
           },
+          "401": { "description": "Unauthorized - Authentication required" },
+          "403": { "description": "Forbidden - ADMIN role required" },
           "404": { "description": "Product not found" }
         }
       },
       "delete": {
         "summary": "Soft delete product",
+        "description": "Soft delete a product. Requires ADMIN authentication.",
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
           "200": { "description": "Product soft deleted" },
+          "401": { "description": "Unauthorized - Authentication required" },
+          "403": { "description": "Forbidden - ADMIN role required" },
           "404": { "description": "Product not found" }
         }
       },
@@ -121,11 +132,15 @@
     "/products/{id}/restore": {
       "post": {
         "summary": "Restore soft-deleted product",
+        "description": "Restore a soft-deleted product. Requires ADMIN authentication.",
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
           "200": { "description": "Product restored" },
+          "401": { "description": "Unauthorized - Authentication required" },
+          "403": { "description": "Forbidden - ADMIN role required" },
           "404": { "description": "Product not found" }
         }
       }
@@ -133,12 +148,101 @@
     "/products/{id}/hard": {
       "delete": {
         "summary": "Hard delete product",
+        "description": "Permanently delete a product. Requires ADMIN authentication.",
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
           "200": { "description": "Product permanently deleted" },
+          "401": { "description": "Unauthorized - Authentication required" },
+          "403": { "description": "Forbidden - ADMIN role required" },
           "404": { "description": "Product not found" }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "description": "Register a new user account. Returns user information and JWT token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RegisterRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthResponse" }
+              }
+            }
+          },
+          "400": { "description": "Bad Request - Invalid input data" },
+          "409": { "description": "Conflict - Username or email already exists" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login user",
+        "description": "Authenticate user and receive JWT token. Can use username or email.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized - Invalid credentials" }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Get current user",
+        "description": "Get information about the currently authenticated user.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "User information",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized - Authentication required" }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Logout user",
+        "description": "Logout endpoint. Client should remove JWT token from storage.",
+        "responses": {
+          "200": {
+            "description": "Logout successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/StatusResponse" }
+              }
+            }
+          }
         }
       }
     },
@@ -265,6 +369,70 @@
           "activeProducts": { "type": "integer" },
           "deletedProducts": { "type": "integer" }
         }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "username": { "type": "string" },
+          "email": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "role": { "type": "string", "enum": ["ADMIN", "CUSTOMER", "MODERATOR"] },
+          "isActive": { "type": "boolean" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "username", "email", "role", "isActive", "createdAt", "updatedAt"]
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string", "minLength": 1 },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 6 },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "role": { "type": "string", "enum": ["ADMIN", "CUSTOMER", "MODERATOR"], "default": "CUSTOMER" }
+        },
+        "required": ["username", "email", "password"]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "usernameOrEmail": { "type": "string" },
+          "password": { "type": "string" }
+        },
+        "required": ["usernameOrEmail", "password"]
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "user": { "$ref": "#/components/schemas/User" },
+          "token": { "type": "string", "description": "JWT token for authentication" }
+        },
+        "required": ["user", "token"]
+      },
+      "StatusResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" },
+          "success": { "type": "boolean" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token obtained from /api/auth/login or /api/auth/register"
       }
     }
   }

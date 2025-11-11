@@ -5,241 +5,186 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 40px;
         }
         .gantt-container {
             width: 100%;
             overflow-x: auto;
         }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-            position: sticky;
-            top: 0;
-        }
-        .gantt-chart {
-            margin-top: 20px;
-            position: relative;
-            width: 100%;
-        }
         .timeline {
             display: flex;
-            margin-left: 320px;
-        }
-        .day {
-            width: 40px;
-            text-align: center;
-            font-size: 12px;
-            padding: 5px 0;
-            border-right: 1px solid #ddd;
+            margin-left: 250px; /* Task name width */
             background-color: #f9f9f9;
         }
-        .sprint {
-            border-left: 2px solid #333;
-            font-weight: bold;
-            background-color: #e0f7fa;
+        .day {
+            flex-basis: 50px;
+            flex-shrink: 0;
+            text-align: center;
+            font-size: 12px;
+            padding: 8px 0;
+            border-right: 1px solid #ddd;
+            position: relative;
         }
+        .day-header {
+             font-weight: bold;
+        }
+        .sprint-label {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            width: 100%;
+            font-size: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+        .sprint1-bg { background-color: rgba(76, 175, 80, 0.1); }
+        .sprint2-bg { background-color: rgba(33, 150, 243, 0.1); }
+        .sprint3-bg { background-color: rgba(156, 39, 176, 0.1); }
+        .final-bg { background-color: rgba(255, 87, 34, 0.1); }
+
         .tasks {
             margin-top: 10px;
         }
         .task-row {
             display: flex;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             align-items: center;
+            height: 30px;
         }
         .task-name {
-            width: 300px;
-            padding: 5px;
-            margin-right: 20px;
+            width: 240px;
+            flex-shrink: 0;
+            padding-right: 10px;
             font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .task-bar-container {
             flex-grow: 1;
-            display: flex;
             position: relative;
-            height: 26px;
+            height: 100%;
         }
         .task-bar {
             position: absolute;
-            height: 20px;
-            border-radius: 3px;
+            height: 24px;
+            top: 3px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 12px;
             color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            padding: 0 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .sprint1 {
-            background-color: #4CAF50;
-        }
-        .sprint2 {
-            background-color: #2196F3;
-        }
-        .sprint3 {
-            background-color: #9C27B0;
-        }
-        .final {
-            background-color: #FF5722;
-        }
-        .dependency {
-            position: absolute;
-            height: 2px;
-            background-color: #999;
-            z-index: -1;
-        }
-        .dependency:before {
-            content: '';
-            position: absolute;
-            right: -5px;
-            top: -4px;
-            border-left: 5px solid #999;
-            border-top: 5px solid transparent;
-            border-bottom: 5px solid transparent;
-        }
+        .sprint1 { background-color: #4CAF50; }
+        .sprint2 { background-color: #2196F3; }
+        .sprint3 { background-color: #9C27B0; }
+        .final { background-color: #FF5722; }
     </style>
 </head>
 <body>
-    <h1>Project Gantt Chart: Spark in Java Web Application Development</h1>
+    <h1>Project Gantt Chart: Programming Procedures</h1>
     <div class="gantt-container">
-        <h3>Project Timeline: Oct 24, 2025 to Nov 5, 2025</h3>
+        <h3>Project Timeline: Nov 6, 2025 to Nov 16, 2025</h3>
         
         <div class="gantt-chart">
-            <!-- Timeline -->
+            <!-- Timeline Header -->
             <div class="timeline">
-                <div class="day sprint">Oct 24</div>
-                <div class="day">Oct 25</div>
-                <div class="day">Oct 26</div>
-                <div class="day">Oct 27</div>
-                <div class="day sprint">Oct 28</div>
-                <div class="day">Oct 29</div>
-                <div class="day">Oct 30</div>
-                <div class="day sprint">Oct 31</div>
-                <div class="day">Nov 1</div>
-                <div class="day">Nov 2</div>
-                <div class="day">Nov 3</div>
-                <div class="day sprint">Nov 4</div>
-                <div class="day">Nov 5</div>
+                <div class="day day-header sprint1-bg"><span class="sprint-label">Sprint 1</span>Nov 6</div>
+                <div class="day day-header sprint1-bg">Nov 7</div>
+                <div class="day day-header sprint2-bg"><span class="sprint-label">Sprint 2</span>Nov 8</div>
+                <div class="day day-header sprint2-bg">Nov 9</div>
+                <div class="day day-header sprint2-bg">Nov 10</div>
+                <div class="day day-header sprint3-bg"><span class="sprint-label">Sprint 3</span>Nov 11</div>
+                <div class="day day-header sprint3-bg">Nov 12</div>
+                <div class="day day-header final-bg"><span class="sprint-label">Final</span>Nov 13</div>
+                <div class="day day-header final-bg">Nov 14</div>
+                <div class="day day-header final-bg">Nov 15</div>
+                <div class="day day-header final-bg">Nov 16</div>
             </div>
             
             <!-- Tasks -->
             <div class="tasks">
-                <!-- Sprint 1 Tasks -->
+                <!-- Sprint 1 -->
                 <div class="task-row">
-                    <div class="task-name">1. Project Setup & Maven Config</div>
+                    <div class="task-name">JUnit Environment Setup</div>
                     <div class="task-bar-container">
-                        <div class="task-bar sprint1" style="left: 0px; width: 80px;">4h</div>
+                        <div class="task-bar sprint1" style="left: 0px; width: 48px;">4h</div>
+                    </div>
+                </div>
+                 <div class="task-row">
+                    <div class="task-name">Implement JUnit Tests</div>
+                    <div class="task-bar-container">
+                        <div class="task-bar sprint1" style="left: 0px; width: 98px;">10h</div>
                     </div>
                 </div>
                 <div class="task-row">
-                    <div class="task-name">2. User API Endpoints (CRUD)</div>
+                    <div class="task-name">Java Coverage Report</div>
                     <div class="task-bar-container">
-                        <div class="task-bar sprint1" style="left: 40px; width: 120px;">5h</div>
-                        <div class="dependency" style="left: 40px; width: 40px; top: 16px;"></div>
+                        <div class="task-bar sprint1" style="left: 50px; width: 48px;">2h</div>
+                    </div>
+                </div>
+
+                <!-- Sprint 2 -->
+                <div class="task-row">
+                    <div class="task-name">Jest Environment Setup</div>
+                    <div class="task-bar-container">
+                        <div class="task-bar sprint2" style="left: 100px; width: 48px;">4h</div>
                     </div>
                 </div>
                 <div class="task-row">
-                    <div class="task-name">3. Input Validation & Error Handling (API)</div>
+                    <div class="task-name">Implement Jest Tests</div>
                     <div class="task-bar-container">
-                        <div class="task-bar sprint1" style="left: 120px; width: 80px;">6h</div>
-                        <div class="dependency" style="left: 120px; width: 40px; top: 16px;"></div>
+                        <div class="task-bar sprint2" style="left: 100px; width: 148px;">16h</div>
                     </div>
                 </div>
-                
-                <!-- Sprint 2 Tasks -->
-                <div class="task-row">
-                    <div class="task-name">4. Mustache Templates & Views ✅</div>
+                 <div class="task-row">
+                    <div class="task-name">JS Coverage Report</div>
                     <div class="task-bar-container">
-                        <div class="task-bar sprint2" style="left: 160px; width: 80px; opacity: 0.6;">5h</div>
+                        <div class="task-bar sprint2" style="left: 200px; width: 48px;">4h</div>
                     </div>
                 </div>
+
+                <!-- Sprint 3 -->
                 <div class="task-row">
-                    <div class="task-name">5. Item Management Form ✅</div>
+                    <div class="task-name">Write Documentation</div>
                     <div class="task-bar-container">
-                        <div class="task-bar sprint2" style="left: 200px; width: 64px; opacity: 0.6;">4h</div>
-                        <div class="dependency" style="left: 200px; width: 40px; top: 16px;"></div>
+                        <div class="task-bar sprint3" style="left: 250px; width: 98px;">10h</div>
                     </div>
                 </div>
                 <div class="task-row">
-                    <div class="task-name">6. Filtering & Dynamic Updates ✅</div>
+                    <div class="task-name">Add Code Comments & Diagrams</div>
                     <div class="task-bar-container">
-                        <div class="task-bar sprint2" style="left: 240px; width: 48px; opacity: 0.6;">3h</div>
-                        <div class="dependency" style="left: 240px; width: 24px; top: 16px;"></div>
+                        <div class="task-bar sprint3" style="left: 250px; width: 98px;">6h</div>
                     </div>
                 </div>
-                <div class="task-row">
-                    <div class="task-name">7. Form Validation & Exception Handling ✅</div>
+                 <div class="task-row">
+                    <div class="task-name">Organize GitHub Repo</div>
                     <div class="task-bar-container">
-                        <div class="task-bar sprint2" style="left: 272px; width: 32px; opacity: 0.6;">2h</div>
-                        <div class="dependency" style="left: 272px; width: 24px; top: 16px;"></div>
+                        <div class="task-bar sprint3" style="left: 300px; width: 48px;">2h</div>
                     </div>
                 </div>
-                
-                <!-- Sprint 3 Tasks -->
-                <div class="task-row">
-                    <div class="task-name">8. Item Filtering Feature</div>
-                    <div class="task-bar-container">
-                        <div class="task-bar sprint3" style="left: 312px; width: 56px;">3h</div>
-                    </div>
-                </div>
-                <div class="task-row">
-                    <div class="task-name">9. WebSocket Real-time Price Updates</div>
-                    <div class="task-bar-container">
-                        <div class="task-bar sprint3" style="left: 344px; width: 112px;">6h</div>
-                        <div class="dependency" style="left: 344px; width: 24px; top: 16px;"></div>
-                    </div>
-                </div>
-                <div class="task-row">
-                    <div class="task-name">10. Robustness & Resilience (WebSockets)</div>
-                    <div class="task-bar-container">
-                        <div class="task-bar sprint3" style="left: 424px; width: 40px;">2h</div>
-                        <div class="dependency" style="left: 424px; width: 40px; top: 16px;"></div>
-                    </div>
-                </div>
-                
+
                 <!-- Final Delivery -->
                 <div class="task-row">
-                    <div class="task-name">11. Final Integration & Testing</div>
+                    <div class="task-name">Final Submission</div>
                     <div class="task-bar-container">
-                        <div class="task-bar final" style="left: 464px; width: 56px;">4h</div>
-                        <div class="dependency" style="left: 464px; width: 40px; top: 16px;"></div>
-                    </div>
-                </div>
-                <div class="task-row">
-                    <div class="task-name">12. Documentation PDF & Video</div>
-                    <div class="task-bar-container">
-                        <div class="task-bar final" style="left: 504px; width: 40px;">2h</div>
-                        <div class="dependency" style="left: 504px; width: 32px; top: 16px;"></div>
+                        <div class="task-bar final" style="left: 350px; width: 198px;">Final Delivery</div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <h3>Legend</h3>
-        <div style="display: flex; margin-top: 10px;">
-            <div style="margin-right: 20px;">
-                <div style="width: 20px; height: 20px; background-color: #4CAF50; display: inline-block; margin-right: 5px;"></div>
-                Sprint 1 (Oct 24-27)
-            </div>
-            <div style="margin-right: 20px;">
-                <div style="width: 20px; height: 20px; background-color: #2196F3; display: inline-block; margin-right: 5px;"></div>
-                Sprint 2 (Oct 28-30)
-            </div>
-            <div style="margin-right: 20px;">
-                <div style="width: 20px; height: 20px; background-color: #9C27B0; display: inline-block; margin-right: 5px;"></div>
-                Sprint 3 (Oct 31-Nov 3)
-            </div>
-            <div>
-                <div style="width: 20px; height: 20px; background-color: #FF5722; display: inline-block; margin-right: 5px;"></div>
-                Final Delivery (Nov 4-5)
-            </div>
+        <h3 style="margin-top: 40px;">Legend</h3>
+        <div style="display: flex; gap: 20px;">
+            <div><div style="width: 20px; height: 20px; background-color: #4CAF50; display: inline-block; vertical-align: middle; margin-right: 5px;"></div>Sprint 1</div>
+            <div><div style="width: 20px; height: 20px; background-color: #2196F3; display: inline-block; vertical-align: middle; margin-right: 5px;"></div>Sprint 2</div>
+            <div><div style="width: 20px; height: 20px; background-color: #9C27B0; display: inline-block; vertical-align: middle; margin-right: 5px;"></div>Sprint 3</div>
+            <div><div style="width: 20px; height: 20px; background-color: #FF5722; display: inline-block; vertical-align: middle; margin-right: 5px;"></div>Final Delivery</div>
         </div>
     </div>
 </body>
