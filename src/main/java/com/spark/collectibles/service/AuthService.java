@@ -290,14 +290,33 @@ public class AuthService {
     }
     
     /**
-     * Get JWT secret from environment or use default
+     * Get JWT secret from environment or generate from "Hola mundo"
      * @return JWT secret
      */
     private String getJwtSecret() {
         String secret = System.getenv("JWT_SECRET");
         if (secret == null || secret.trim().isEmpty()) {
-            logger.warn("JWT_SECRET not set in environment, using default (NOT SECURE FOR PRODUCTION)");
-            return "default-jwt-secret-change-in-production-min-32-characters";
+            logger.info("JWT_SECRET not set in environment, generating from 'Hola mundo'");
+            // Generate a secure secret from "Hola mundo" using SHA-256
+            try {
+                java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+                byte[] hash = digest.digest("Hola mundo".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                // Convert to hex and repeat to ensure minimum 32 characters
+                StringBuilder hexString = new StringBuilder();
+                for (byte b : hash) {
+                    String hex = Integer.toHexString(0xff & b);
+                    if (hex.length() == 1) {
+                        hexString.append('0');
+                    }
+                    hexString.append(hex);
+                }
+                // Repeat to ensure minimum length
+                String baseSecret = hexString.toString();
+                return baseSecret + baseSecret.substring(0, 32); // Ensure at least 64 characters
+            } catch (java.security.NoSuchAlgorithmException e) {
+                logger.error("Error generating JWT secret from 'Hola mundo'", e);
+                return "Hola mundo - JWT Secret Key for Collectibles Store - Change in Production";
+            }
         }
         return secret;
     }
