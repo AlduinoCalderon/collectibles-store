@@ -1,0 +1,139 @@
+{
+  "presentation": {
+    "title": "Collectibles Store: Modern E-commerce Solution",
+    "slides": [
+      {
+        "slideNumber": 1,
+        "title": "Problem & Solution Overview",
+        "key_points": [
+          {
+            "point": "Current Market Challenges",
+            "description": "Manual updates & poor synchronization",
+            "image_prompt": "Split screen showing frustrated store owner manually updating prices vs modern digital price tags with real-time updates"
+          },
+          {
+            "point": "Business Impact",
+            "description": "Inefficient workflows & customer experience",
+            "image_prompt": "Diagram showing bottlenecks in traditional collectibles store operations"
+          },
+          {
+            "point": "Our Solution",
+            "description": "Real-time, modern web platform",
+            "image_prompt": "Modern responsive web interface showing real-time price updates across multiple devices"
+          }
+        ],
+        "narrative": "Today we'll explore how our Collectibles Store solution transforms traditional e-commerce challenges into opportunities through modern technology and real-time capabilities."
+      },
+      {
+        "slideNumber": 2,
+        "title": "Architecture & Technology Stack",
+        "key_points": [
+          {
+            "point": "Three-Tier Architecture",
+            "description": "Scalable, maintainable design",
+            "image_prompt": "Clean architectural diagram showing presentation, business logic, and data layers with connecting arrows"
+          },
+          {
+            "point": "Modern Tech Stack",
+            "description": "Java 17, Spark Framework, MySQL",
+            "image_prompt": "Technology logos arranged in a modern stack visualization"
+          },
+          {
+            "point": "Real-Time Features",
+            "description": "WebSocket for instant updates",
+            "image_prompt": "Animation concept showing real-time data flow between server and multiple client devices"
+          }
+        ],
+        "narrative": "Our solution leverages a modern, three-tier architecture built with proven technologies, ensuring scalability and real-time capabilities while maintaining simplicity."
+      },
+      {
+        "slideNumber": 3,
+        "title": "Key Features & Benefits",
+        "key_points": [
+          {
+            "point": "Real-Time Updates",
+            "description": "Instant price synchronization",
+            "image_prompt": "Multiple devices showing synchronized price updates with WebSocket connection indicators"
+          },
+          {
+            "point": "Admin Dashboard",
+            "description": "Intuitive management interface",
+            "image_prompt": "Clean, modern admin dashboard interface with product management features"
+          },
+          {
+            "point": "Security & Performance",
+            "description": "Enterprise-grade protection",
+            "image_prompt": "Security layers diagram showing input validation, SQL injection protection, and error handling"
+          }
+        ],
+        "narrative": "Our platform delivers immediate value through real-time synchronization, intuitive management, and enterprise-grade security features."
+      },
+      {
+        "slideNumber": 4,
+        "title": "Development & Deployment",
+        "key_points": [
+          {
+            "point": "CI/CD Pipeline",
+            "description": "Automated deployment workflow",
+            "image_prompt": "CI/CD pipeline visualization showing automated testing, building, and deployment stages"
+          },
+          {
+            "point": "Docker Containerization",
+            "description": "Consistent deployment",
+            "image_prompt": "Docker containers and orchestration visualization"
+          },
+          {
+            "point": "Cloud Ready",
+            "description": "Scalable cloud deployment",
+            "image_prompt": "Cloud infrastructure diagram showing load balancing and scaling capabilities"
+          }
+        ],
+        "narrative": "Our modern DevOps approach ensures reliable, consistent deployments and makes scaling simple."
+      },
+      {
+        "slideNumber": 5,
+        "title": "Success Metrics & ROI",
+        "key_points": [
+          {
+            "point": "Performance Metrics",
+            "description": "< 50ms response times",
+            "image_prompt": "Performance dashboard showing response times and system metrics"
+          },
+          {
+            "point": "Business Impact",
+            "description": "Improved efficiency & UX",
+            "image_prompt": "Before/After comparison of business process efficiency improvements"
+          },
+          {
+            "point": "Cost Efficiency",
+            "description": "Minimal infrastructure needs",
+            "image_prompt": "Cost comparison chart showing traditional vs new solution infrastructure costs"
+          }
+        ],
+        "narrative": "Our solution delivers measurable improvements in performance, user experience, and operational efficiency while maintaining cost-effectiveness."
+      },
+      {
+        "slideNumber": 6,
+        "title": "Live Demo & Next Steps",
+        "key_points": [
+          {
+            "point": "Live Application",
+            "description": "Production environment demo",
+            "image_prompt": "Screenshot of live application with key features highlighted"
+          },
+          {
+            "point": "Future Roadmap",
+            "description": "Planned enhancements",
+            "image_prompt": "Timeline visualization showing future feature implementations"
+          },
+          {
+            "point": "Implementation Path",
+            "description": "Quick deployment process",
+            "image_prompt": "Step-by-step implementation timeline with key milestones"
+          }
+        ],
+        "narrative": "The solution is production-ready and live. Let's explore how we can implement this for your business and discuss our roadmap for future enhancements."
+      }
+    ]
+  }
+}
