@@ -12,3 +12,4 @@ jobs:
       - name: Call /api/health endpoint
         run: |
           curl -f https://collectibles-store-09ew.onrender.com/api/health || echo "Health check failed"
+          curl -f https://collectibles-store.onrender.com/api/health || echo "Health check failed"
