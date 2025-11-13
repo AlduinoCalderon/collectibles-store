@@ -52,13 +52,22 @@ public class AuthService {
     
     /**
      * Register a new user
-     * @param username Username
-     * @param email Email address
-     * @param password Plain text password
-     * @param firstName First name
-     * @param lastName Last name
+     * 
+     * Validates input, checks for duplicate username/email, hashes the password
+     * using BCrypt, creates the user in the database, and generates a JWT token.
+     * 
+     * Password requirements:
+     * - Minimum 6 characters
+     * - Will be hashed using BCrypt (10 rounds by default)
+     * 
+     * @param username Username (must be unique, non-empty)
+     * @param email Email address (must be unique, valid format)
+     * @param password Plain text password (minimum 6 characters)
+     * @param firstName First name (optional, can be empty)
+     * @param lastName Last name (optional, can be empty)
      * @param role User role (defaults to CUSTOMER if null)
      * @return AuthResult containing user and JWT token, or null if registration fails
+     *         (e.g., duplicate username/email, invalid input)
      */
     public AuthResult register(String username, String email, String password, 
                                String firstName, String lastName, User.UserRole role) {
@@ -119,9 +128,14 @@ public class AuthService {
     
     /**
      * Login user with username and password
-     * @param usernameOrEmail Username or email address
-     * @param password Plain text password
-     * @return AuthResult containing user and JWT token, or null if login fails
+     * 
+     * Searches for user by username or email, verifies password against stored
+     * BCrypt hash, checks if user is active, and generates a JWT token.
+     * 
+     * @param usernameOrEmail Username or email address (case-insensitive for email)
+     * @param password Plain text password to verify
+     * @return AuthResult containing user (without password hash) and JWT token,
+     *         or null if login fails (invalid credentials, inactive user, etc.)
      */
     public AuthResult login(String usernameOrEmail, String password) {
         logger.debug("AuthService.login() called for: {}", usernameOrEmail);
@@ -187,8 +201,13 @@ public class AuthService {
     
     /**
      * Validate JWT token and return user
-     * @param token JWT token
-     * @return User if token is valid, null otherwise
+     * 
+     * Verifies JWT signature, checks expiration, retrieves user from database,
+     * and verifies user is active. Token must be valid and not expired.
+     * 
+     * @param token JWT token string (with or without "Bearer " prefix)
+     * @return User object if token is valid and user is active, null otherwise
+     *         (invalid signature, expired, user not found, or inactive)
      */
     public User validateToken(String token) {
         logger.info("AuthService.validateToken() called");
@@ -276,8 +295,12 @@ public class AuthService {
     
     /**
      * Hash password using BCrypt
-     * @param password Plain text password
-     * @return BCrypt hash
+     * 
+     * Uses BCrypt with configurable rounds (default: 10, set via BCRYPT_ROUNDS).
+     * BCrypt automatically includes salt in the hash.
+     * 
+     * @param password Plain text password to hash
+     * @return BCrypt hash string (starts with $2a$ or $2b$)
      */
     public String hashPassword(String password) {
         int rounds = EnvironmentConfig.getBcryptRounds();
@@ -286,9 +309,13 @@ public class AuthService {
     
     /**
      * Verify password against BCrypt hash
-     * @param password Plain text password
-     * @param hash BCrypt hash
-     * @return true if password matches, false otherwise
+     * 
+     * Uses BCrypt's checkpw method to securely compare plain text password
+     * with stored hash. Handles timing attacks and invalid hash formats.
+     * 
+     * @param password Plain text password to verify
+     * @param hash BCrypt hash from database
+     * @return true if password matches hash, false otherwise (wrong password, invalid hash, etc.)
      */
     public boolean verifyPassword(String password, String hash) {
         if (password == null || hash == null) {
@@ -305,8 +332,13 @@ public class AuthService {
     
     /**
      * Generate JWT token for user
-     * @param user User object
+     * 
+     * Creates a JWT token with user ID as subject, username and role as claims,
+     * and expiration time based on JWT_EXPIRATION_HOURS (default: 24 hours).
+     * 
+     * @param user User object to generate token for
      * @return JWT token string
+     * @throws RuntimeException if token generation fails
      */
     private String generateToken(User user) {
         try {
