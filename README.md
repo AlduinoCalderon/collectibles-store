@@ -572,7 +572,7 @@ BCRYPT_ROUNDS=10         # Default: 10 (4-31 range)
 **Solution**: Verify your user has the required role (ADMIN for protected routes).
 
 #### Issue: Token loss after login
-**Solution**: Check browser console for `[AUTH]` messages. Verify `auth.js` is loading correctly. See [AUTHENTICATION-TOKEN-DEBUGGING.md](docs/AUTHENTICATION-TOKEN-DEBUGGING.md) for detailed debugging steps.
+**Solution**: Check browser console for `[AUTH]` messages. Verify `auth.js` is loading correctly. See the "Debugging" section above for detailed debugging steps.
 
 ## 📖 API Usage Examples
 
@@ -803,9 +803,7 @@ Look for `[AUTH]` prefixed messages:
 [AUTH] Token validation failed, clearing localStorage
 ```
 
-For detailed debugging steps, see:
-- [AUTHENTICATION-DEBUGGING-GUIDE.md](docs/AUTHENTICATION-DEBUGGING-GUIDE.md)
-- [AUTHENTICATION-TOKEN-DEBUGGING.md](docs/AUTHENTICATION-TOKEN-DEBUGGING.md)
+For detailed debugging steps, see the "Debugging" section in this README.
 
 ## 📐 Architecture Diagrams
 
@@ -1024,10 +1022,6 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 - [Project Backlog](docs/backlog.md) - User stories and requirements
 - [Project Roadmap](docs/roadmap.md) - Development timeline and milestones
 - [OpenAPI Specification](docs/openapi.json) - Complete API specification
-- [AUTHENTICATION-GUIDE.md](docs/AUTHENTICATION-GUIDE.md) - Authentication overview
-- [AUTHENTICATION-TESTING-GUIDE.md](docs/AUTHENTICATION-TESTING-GUIDE.md) - Testing authentication
-- [AUTHENTICATION-DEBUGGING-GUIDE.md](docs/AUTHENTICATION-DEBUGGING-GUIDE.md) - Debugging authentication issues
-- [AUTHENTICATION-TOKEN-DEBUGGING.md](docs/AUTHENTICATION-TOKEN-DEBUGGING.md) - Token debugging guide
 
 ## 🎯 Development Sprints
 
