@@ -1,0 +1,59 @@
+sequenceDiagram
+    participant Client
+    participant AuthRoutes
+    participant AuthService
+    participant UserRepository
+    participant MySQL
+    participant JWT
+    participant BCrypt
+
+    Note over Client,BCrypt: User Registration Flow
+    Client->>AuthRoutes: POST /api/auth/register<br/>{username, email, password}
+    AuthRoutes->>AuthService: register(username, email, password)
+    AuthService->>UserRepository: existsByUsername(username)
+    UserRepository->>MySQL: SELECT username FROM users
+    MySQL-->>UserRepository: false (not exists)
+    AuthService->>UserRepository: existsByEmail(email)
+    UserRepository->>MySQL: SELECT email FROM users
+    MySQL-->>UserRepository: false (not exists)
+    AuthService->>BCrypt: hashPassword(password)
+    BCrypt-->>AuthService: password_hash
+    AuthService->>UserRepository: create(user)
+    UserRepository->>MySQL: INSERT INTO users
+    MySQL-->>UserRepository: user (created)
+    AuthService->>JWT: generateToken(user)
+    JWT-->>AuthService: JWT token
+    AuthService-->>AuthRoutes: AuthResult(user, token)
+    AuthRoutes-->>Client: 201 Created<br/>{user, token}
+    Client->>Client: Store token in localStorage
+    
+    Note over Client,BCrypt: User Login Flow
+    Client->>AuthRoutes: POST /api/auth/login<br/>{usernameOrEmail, password}
+    AuthRoutes->>AuthService: login(usernameOrEmail, password)
+    AuthService->>UserRepository: findByUsername(username)
+    UserRepository->>MySQL: SELECT * FROM users WHERE username=?
+    MySQL-->>UserRepository: user with password_hash
+    AuthService->>BCrypt: verifyPassword(password, hash)
+    BCrypt-->>AuthService: true (password matches)
+    AuthService->>JWT: generateToken(user)
+    JWT-->>AuthService: JWT token
+    AuthService-->>AuthRoutes: AuthResult(user, token)
+    AuthRoutes-->>Client: 200 OK<br/>{user, token}
+    Client->>Client: Store token in localStorage
+    
+    Note over Client,BCrypt: Protected Route Access Flow
+    Client->>ProductRoutes: POST /api/products<br/>Authorization: Bearer token
+    ProductRoutes->>AuthFilter: requireAuth()
+    AuthFilter->>AuthService: validateToken(token)
+    AuthService->>JWT: verify(token)
+    JWT-->>AuthService: decodedJWT (valid)
+    AuthService->>UserRepository: findById(userId)
+    UserRepository->>MySQL: SELECT * FROM users WHERE id=?
+    MySQL-->>UserRepository: user (active)
+    AuthService-->>AuthFilter: user (valid)
+    AuthFilter->>AuthFilter: Check role (ADMIN)
+    AuthFilter-->>ProductRoutes: user (in request attribute)
+    ProductRoutes->>ProductService: createProduct(product, user)
+    ProductService-->>ProductRoutes: product (created)
+    ProductRoutes-->>Client: 201 Created<br/>{product}
+
