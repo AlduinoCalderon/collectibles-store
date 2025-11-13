@@ -26,7 +26,13 @@ public class AuthFilter {
     
     /**
      * Create a filter that requires authentication
-     * @return Filter that validates JWT token
+     * 
+     * This filter checks for a valid JWT token in the Authorization header.
+     * If the token is missing or invalid, the request is halted with a 401 status.
+     * If valid, the user is set in request attributes for use in route handlers.
+     * 
+     * @return Filter that validates JWT token and sets currentUser in request attributes
+     * @throws spark.HaltException if authentication fails (401 Unauthorized)
      */
     public Filter requireAuth() {
         return (Request request, Response response) -> {
@@ -53,8 +59,14 @@ public class AuthFilter {
     
     /**
      * Create a filter that requires a specific role
-     * @param requiredRole Required user role
+     * 
+     * This filter first validates authentication, then checks if the user has
+     * the required role. If authentication fails, returns 401. If role check
+     * fails, returns 403 Forbidden.
+     * 
+     * @param requiredRole Required user role (e.g., User.UserRole.ADMIN)
      * @return Filter that validates JWT token and role
+     * @throws spark.HaltException if authentication fails (401) or role check fails (403)
      */
     public Filter requireRole(User.UserRole requiredRole) {
         return (Request request, Response response) -> {
@@ -77,8 +89,13 @@ public class AuthFilter {
     
     /**
      * Create a filter that requires one of the specified roles
-     * @param allowedRoles Allowed user roles
-     * @return Filter that validates JWT token and role
+     * 
+     * This filter validates authentication and checks if the user has any
+     * of the allowed roles. Useful for endpoints accessible by multiple roles.
+     * 
+     * @param allowedRoles Variable number of allowed user roles
+     * @return Filter that validates JWT token and checks if user has any allowed role
+     * @throws spark.HaltException if authentication fails (401) or no allowed role matches (403)
      */
     public Filter requireAnyRole(User.UserRole... allowedRoles) {
         return (Request request, Response response) -> {

@@ -1,0 +1,33 @@
+graph TB
+    Client[Web Browser] -->|HTTP/WebSocket| Spark[Spark Framework]
+    Spark --> AuthRoutes[AuthRoutes]
+    Spark --> ProductRoutes[ProductRoutes]
+    Spark --> ViewRoutes[ViewRoutes]
+    Spark --> WebSocket[WebSocket Handler]
+    
+    AuthRoutes --> AuthService[AuthService]
+    ProductRoutes --> ProductService[ProductService]
+    ViewRoutes --> Templates[Mustache Templates]
+    
+    AuthService --> UserRepository[UserRepository]
+    ProductService --> ProductRepository[ProductRepository]
+    
+    UserRepository --> MySQL[(MySQL Database)]
+    ProductRepository --> MySQL
+    
+    AuthService --> JWT[JWT Token<br/>Generation/Validation]
+    AuthService --> BCrypt[BCrypt<br/>Password Hashing]
+    
+    Client --> StaticFiles[Static Files<br/>JS/CSS]
+    StaticFiles --> AuthJS[Auth JavaScript<br/>Modules]
+    
+    AuthJS --> Storage[Storage Module<br/>localStorage]
+    AuthJS --> API[API Module<br/>HTTP Requests]
+    AuthJS --> UI[UI Module<br/>DOM Updates]
+    
+    style Client fill:#e1f5ff
+    style Spark fill:#fff4e1
+    style MySQL fill:#ffe1f5
+    style AuthService fill:#e1ffe1
+    style ProductService fill:#e1ffe1
+

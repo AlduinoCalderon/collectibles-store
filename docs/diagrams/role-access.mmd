@@ -1,0 +1,20 @@
+graph LR
+    Request[HTTP Request] --> AuthFilter{AuthFilter}
+    AuthFilter -->|No Token| Reject1[401 Unauthorized<br/>Authentication required]
+    AuthFilter -->|Has Token| ValidateToken[Validate Token<br/>with AuthService]
+    ValidateToken -->|Invalid/Expired| Reject2[401 Unauthorized<br/>Invalid or expired token]
+    ValidateToken -->|Valid| CheckRole{Role Check}
+    CheckRole -->|ADMIN| Allow[Allow Access<br/>Set user in request]
+    CheckRole -->|CUSTOMER| CheckEndpoint{Endpoint Type}
+    CheckEndpoint -->|Public GET<br/>GET /api/products| Allow
+    CheckEndpoint -->|Protected<br/>POST/PUT/DELETE| Reject3[403 Forbidden<br/>Insufficient permissions]
+    
+    style Allow fill:#90EE90
+    style Reject1 fill:#FFB6C1
+    style Reject2 fill:#FFB6C1
+    style Reject3 fill:#FFB6C1
+    style AuthFilter fill:#FFE4B5
+    style ValidateToken fill:#FFE4B5
+    style CheckRole fill:#FFE4B5
+    style CheckEndpoint fill:#FFE4B5
+

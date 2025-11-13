@@ -22,6 +22,15 @@ public class AuthRoutes {
     
     /**
      * Initialize all authentication-related routes
+     * 
+     * Sets up the following endpoints:
+     * - POST /api/auth/register - Register new user
+     * - POST /api/auth/login - Login and get JWT token
+     * - GET /api/auth/me - Get current user info (requires authentication)
+     * - POST /api/auth/logout - Logout (client-side token removal)
+     * 
+     * All endpoints return JSON responses and include proper error handling.
+     * 
      * @param authService AuthService instance for authentication logic
      */
     public static void initialize(AuthService authService) {
