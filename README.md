@@ -809,127 +809,41 @@ For detailed debugging steps, see the "Debugging" section in this README.
 
 ### System Architecture
 
-```mermaid
-graph TB
-    Client[Web Browser] -->|HTTP/WebSocket| Spark[Spark Framework]
-    Spark --> AuthRoutes[AuthRoutes]
-    Spark --> ProductRoutes[ProductRoutes]
-    Spark --> ViewRoutes[ViewRoutes]
-    Spark --> WebSocket[WebSocket Handler]
-    
-    AuthRoutes --> AuthService[AuthService]
-    ProductRoutes --> ProductService[ProductService]
-    
-    AuthService --> UserRepository[UserRepository]
-    ProductService --> ProductRepository[ProductRepository]
-    
-    UserRepository --> MySQL[(MySQL Database)]
-    ProductRepository --> MySQL
-    
-    AuthService --> JWT[JWT Token]
-    AuthService --> BCrypt[BCrypt Hashing]
-    
-    Client --> StaticFiles[Static Files<br/>JS/CSS]
-    StaticFiles --> AuthJS[Auth JavaScript<br/>Modules]
-```
+![System Architecture](docs/diagrams/system-architecture.png)
+
+**Source**: [docs/diagrams/system-architecture.mmd](docs/diagrams/system-architecture.mmd)
 
 ### Authentication Flow
 
-```mermaid
-sequenceDiagram
-    participant Client
-    participant AuthRoutes
-    participant AuthService
-    participant UserRepository
-    participant MySQL
-    participant JWT
+![Authentication Flow](docs/diagrams/auth-flow.png)
 
-    Client->>AuthRoutes: POST /api/auth/register
-    AuthRoutes->>AuthService: register(username, email, password)
-    AuthService->>UserRepository: existsByUsername(username)
-    UserRepository->>MySQL: SELECT username
-    MySQL-->>UserRepository: false
-    AuthService->>AuthService: hashPassword(password)
-    AuthService->>UserRepository: create(user)
-    UserRepository->>MySQL: INSERT INTO users
-    MySQL-->>UserRepository: user
-    AuthService->>JWT: generateToken(user)
-    JWT-->>AuthService: token
-    AuthService-->>AuthRoutes: AuthResult(user, token)
-    AuthRoutes-->>Client: 201 Created + {user, token}
-    
-    Client->>Client: Store token in localStorage
-    
-    Client->>AuthRoutes: POST /api/auth/login
-    AuthRoutes->>AuthService: login(username, password)
-    AuthService->>UserRepository: findByUsername(username)
-    UserRepository->>MySQL: SELECT * FROM users
-    MySQL-->>UserRepository: user with password_hash
-    AuthService->>AuthService: verifyPassword(password, hash)
-    AuthService->>JWT: generateToken(user)
-    JWT-->>AuthService: token
-    AuthService-->>AuthRoutes: AuthResult(user, token)
-    AuthRoutes-->>Client: 200 OK + {user, token}
-    
-    Client->>ProductRoutes: POST /api/products<br/>Authorization: Bearer token
-    ProductRoutes->>AuthFilter: requireAuth()
-    AuthFilter->>AuthService: validateToken(token)
-    AuthService->>JWT: verify(token)
-    JWT-->>AuthService: decodedJWT
-    AuthService->>UserRepository: findById(userId)
-    UserRepository->>MySQL: SELECT * FROM users
-    MySQL-->>UserRepository: user
-    AuthService-->>AuthFilter: user
-    AuthFilter-->>ProductRoutes: user (in request attribute)
-    ProductRoutes->>ProductService: createProduct(product, user)
-    ProductService-->>ProductRoutes: product
-    ProductRoutes-->>Client: 201 Created + product
-```
+**Source**: [docs/diagrams/auth-flow.mmd](docs/diagrams/auth-flow.mmd)
 
 ### Role-Based Access Control
 
-```mermaid
-graph LR
-    Request[HTTP Request] --> AuthFilter{AuthFilter}
-    AuthFilter -->|No Token| Reject1[401 Unauthorized]
-    AuthFilter -->|Has Token| ValidateToken[Validate Token]
-    ValidateToken -->|Invalid| Reject2[401 Invalid Token]
-    ValidateToken -->|Valid| CheckRole{Role Check}
-    CheckRole -->|ADMIN| Allow[Allow Access]
-    CheckRole -->|CUSTOMER| CheckEndpoint{Endpoint Type}
-    CheckEndpoint -->|Public GET| Allow
-    CheckEndpoint -->|Protected| Reject3[403 Forbidden]
-    
-    style Allow fill:#90EE90
-    style Reject1 fill:#FFB6C1
-    style Reject2 fill:#FFB6C1
-    style Reject3 fill:#FFB6C1
-```
+![Role-Based Access Control](docs/diagrams/role-access.png)
+
+**Source**: [docs/diagrams/role-access.mmd](docs/diagrams/role-access.mmd)
 
 ### How to Regenerate Diagrams
 
-The diagrams are written in Mermaid format and can be rendered in GitHub, or converted to images:
+The diagrams are written in Mermaid format (`.mmd` files) and have been generated as PNG images. To regenerate the images:
 
 **Using Mermaid CLI:**
 ```bash
-# Install Mermaid CLI
+# Install Mermaid CLI (if not already installed)
 npm install -g @mermaid-js/mermaid-cli
 
-# Generate PNG
+# Generate PNG from Mermaid source
+mmdc -i docs/diagrams/system-architecture.mmd -o docs/diagrams/system-architecture.png
 mmdc -i docs/diagrams/auth-flow.mmd -o docs/diagrams/auth-flow.png
+mmdc -i docs/diagrams/role-access.mmd -o docs/diagrams/role-access.png
 
-# Generate SVG
+# Or generate SVG (vector format)
 mmdc -i docs/diagrams/auth-flow.mmd -o docs/diagrams/auth-flow.svg
 ```
 
-**Using PlantUML (for more complex diagrams):**
-```bash
-# Using Docker
-docker run --rm -v $(pwd):/workspace plantuml/plantuml docs/diagrams/*.puml
-
-# Or install PlantUML locally
-plantuml docs/diagrams/*.puml
-```
+**Note**: The source Mermaid files (`.mmd`) are version-controlled, so you can edit them and regenerate the images as needed.
 
 ## 📝 Code Documentation
 
