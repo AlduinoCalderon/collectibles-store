@@ -962,15 +962,6 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 - **Frontend Authentication**: Modular JavaScript authentication module
 - **Comprehensive Testing**: Unit and integration tests for authentication
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👥 Team
-
-- **Rafael**: Lead Developer
-- **Ramón**: Client and Domain Expert
-- **Sofía**: Technical Advisor
 
 ## 📞 Support
 
