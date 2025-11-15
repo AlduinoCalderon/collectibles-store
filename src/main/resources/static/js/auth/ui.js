@@ -64,7 +64,7 @@ export function updateNavigation(user = null) {
  */
 export function hasRole(role) {
     const user = getCurrentUser();
-    return user && user.role === role;
+    return user ? user.role === role : false;
 }
 
 /**

@@ -151,7 +151,7 @@ describe('UI Module', () => {
             expect(container.querySelector('.alert-error')).not.toBeNull();
         });
 
-        test('should auto-hide error after 5 seconds', (done) => {
+        test('should auto-hide error after 5 seconds', () => {
             jest.useFakeTimers();
             const container = document.createElement('div');
             document.body.appendChild(container);
@@ -159,14 +159,13 @@ describe('UI Module', () => {
             showError('Test error', container);
 
             expect(container.innerHTML).not.toBe('');
+            expect(container.querySelector('.alert-error')).not.toBeNull();
 
             jest.advanceTimersByTime(5000);
 
-            setTimeout(() => {
-                expect(container.innerHTML).toBe('');
-                jest.useRealTimers();
-                done();
-            }, 100);
+            expect(container.innerHTML).toBe('');
+            
+            jest.useRealTimers();
         });
     });
 
