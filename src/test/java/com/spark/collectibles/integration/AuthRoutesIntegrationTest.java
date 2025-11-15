@@ -303,8 +303,8 @@ class AuthRoutesIntegrationTest {
         sendRequest(productConn, productBody);
         
         // Assert
-        int responseCode = productConn.getResponseCode();
-        assertTrue(responseCode == 201 || responseCode == 200, "Expected 201 Created or 200 OK");
+        int productResponseCode = productConn.getResponseCode();
+        assertTrue(productResponseCode == 201 || productResponseCode == 200, "Expected 201 Created or 200 OK");
     }
     
     // Helper methods
