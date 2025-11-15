@@ -825,25 +825,7 @@ For detailed debugging steps, see the "Debugging" section in this README.
 
 **Source**: [docs/diagrams/role-access.mmd](docs/diagrams/role-access.mmd)
 
-### How to Regenerate Diagrams
-
-The diagrams are written in Mermaid format (`.mmd` files) and have been generated as PNG images. To regenerate the images:
-
-**Using Mermaid CLI:**
-```bash
-# Install Mermaid CLI (if not already installed)
-npm install -g @mermaid-js/mermaid-cli
-
-# Generate PNG from Mermaid source
-mmdc -i docs/diagrams/system-architecture.mmd -o docs/diagrams/system-architecture.png
-mmdc -i docs/diagrams/auth-flow.mmd -o docs/diagrams/auth-flow.png
-mmdc -i docs/diagrams/role-access.mmd -o docs/diagrams/role-access.png
-
-# Or generate SVG (vector format)
-mmdc -i docs/diagrams/auth-flow.mmd -o docs/diagrams/auth-flow.svg
-```
-
-**Note**: The source Mermaid files (`.mmd`) are version-controlled, so you can edit them and regenerate the images as needed.
+> **Note for Contributors**: To update or regenerate diagrams, see [docs/diagrams/README.md](docs/diagrams/README.md) for instructions.
 
 ## 📝 Code Documentation
 
