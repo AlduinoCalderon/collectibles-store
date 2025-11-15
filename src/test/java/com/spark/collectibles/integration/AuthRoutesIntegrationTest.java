@@ -211,9 +211,9 @@ class AuthRoutesIntegrationTest {
         
         // Ensure registration was successful
         int responseCode = registerConn.getResponseCode();
-        assertEquals(201, responseCode, "Registration should succeed. Response: " + getResponse(registerConn));
-        
         String registerResponse = getResponse(registerConn);
+        assertEquals(201, responseCode, "Registration should succeed. Response code: " + responseCode + ", Response: " + registerResponse);
+        
         assertTrue(registerResponse.contains("token"), "Response should contain token. Response: " + registerResponse);
         assertTrue(registerResponse.contains("user"), "Response should contain user. Response: " + registerResponse);
         
@@ -280,9 +280,9 @@ class AuthRoutesIntegrationTest {
         
         // Ensure registration was successful
         int responseCode = registerConn.getResponseCode();
-        assertEquals(201, responseCode, "Admin registration should succeed. Response: " + getResponse(registerConn));
-        
         String registerResponse = getResponse(registerConn);
+        assertEquals(201, responseCode, "Admin registration should succeed. Response code: " + responseCode + ", Response: " + registerResponse);
+        
         assertTrue(registerResponse.contains("token"), "Response should contain token. Response: " + registerResponse);
         assertTrue(registerResponse.contains("user"), "Response should contain user. Response: " + registerResponse);
         
