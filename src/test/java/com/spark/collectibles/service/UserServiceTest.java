@@ -1,6 +1,7 @@
 package com.spark.collectibles.service;
 
 import com.spark.collectibles.model.User;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -18,17 +19,34 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {
     
     private UserService userService;
+    private AuthService authService;
     
     @BeforeEach
     void setUp() {
         userService = new UserService();
+        authService = new AuthService();
+    }
+    
+    @AfterEach
+    void tearDown() {
+        // Clean up all test users to ensure test isolation
+        List<User> users = userService.getAllUsers();
+        for (User user : users) {
+            userService.deleteUser(user.getId());
+        }
+    }
+    
+    private User createTestUser(String id, String username, String email, String firstName, String lastName) {
+        User user = new User(id, username, email, firstName, lastName);
+        user.setPasswordHash(authService.hashPassword("password123"));
+        return user;
     }
     
     @Test
     @DisplayName("Should create user successfully")
     void testCreateUserSuccess() {
         // Given
-        User user = new User("user1", "john_doe", "john@example.com", "John", "Doe");
+        User user = createTestUser("user1", "john_doe", "john@example.com", "John", "Doe");
         
         // When
         User createdUser = userService.createUser(user);
@@ -48,8 +66,8 @@ class UserServiceTest {
     @DisplayName("Should not create user with duplicate ID")
     void testCreateUserDuplicateId() {
         // Given
-        User user1 = new User("user1", "john_doe", "john@example.com", "John", "Doe");
-        User user2 = new User("user1", "jane_doe", "jane@example.com", "Jane", "Doe");
+        User user1 = createTestUser("user1", "john_doe", "john@example.com", "John", "Doe");
+        User user2 = createTestUser("user1", "jane_doe", "jane@example.com", "Jane", "Doe");
         
         // When
         userService.createUser(user1);
@@ -76,7 +94,7 @@ class UserServiceTest {
     @DisplayName("Should retrieve user by ID")
     void testGetUserById() {
         // Given
-        User user = new User("user1", "john_doe", "john@example.com", "John", "Doe");
+        User user = createTestUser("user1", "john_doe", "john@example.com", "John", "Doe");
         userService.createUser(user);
         
         // When
@@ -102,7 +120,7 @@ class UserServiceTest {
     @DisplayName("Should check if user exists")
     void testUserExists() {
         // Given
-        User user = new User("user1", "john_doe", "john@example.com", "John", "Doe");
+        User user = createTestUser("user1", "john_doe", "john@example.com", "John", "Doe");
         userService.createUser(user);
         
         // When & Then
@@ -114,11 +132,13 @@ class UserServiceTest {
     @DisplayName("Should update user successfully")
     void testUpdateUser() {
         // Given
-        User user = new User("user1", "john_doe", "john@example.com", "John", "Doe");
+        User user = createTestUser("user1", "john_doe", "john@example.com", "John", "Doe");
         userService.createUser(user);
         
-        User updatedUser = new User("user1", "john_doe_updated", "john.updated@example.com", "John", "Doe");
+        User updatedUser = createTestUser("user1", "john_doe_updated", "john.updated@example.com", "John", "Doe");
         updatedUser.setRole(User.UserRole.ADMIN);
+        // For update, preserve existing password hash by setting to null
+        updatedUser.setPasswordHash(null);
         
         // When
         User result = userService.updateUser("user1", updatedUser);
@@ -134,7 +154,7 @@ class UserServiceTest {
     @DisplayName("Should not update non-existent user")
     void testUpdateUserNotFound() {
         // Given
-        User user = new User("user1", "john_doe", "john@example.com", "John", "Doe");
+        User user = createTestUser("user1", "john_doe", "john@example.com", "John", "Doe");
         
         // When
         User result = userService.updateUser("non-existent", user);
@@ -147,7 +167,7 @@ class UserServiceTest {
     @DisplayName("Should delete user successfully")
     void testDeleteUser() {
         // Given
-        User user = new User("user1", "john_doe", "john@example.com", "John", "Doe");
+        User user = createTestUser("user1", "john_doe", "john@example.com", "John", "Doe");
         userService.createUser(user);
         
         // When
@@ -172,8 +192,8 @@ class UserServiceTest {
     @DisplayName("Should retrieve all users")
     void testGetAllUsers() {
         // Given
-        User user1 = new User("user1", "john_doe", "john@example.com", "John", "Doe");
-        User user2 = new User("user2", "jane_doe", "jane@example.com", "Jane", "Doe");
+        User user1 = createTestUser("user1", "john_doe", "john@example.com", "John", "Doe");
+        User user2 = createTestUser("user2", "jane_doe", "jane@example.com", "Jane", "Doe");
         userService.createUser(user1);
         userService.createUser(user2);
         
@@ -190,8 +210,8 @@ class UserServiceTest {
     @DisplayName("Should search users by query")
     void testSearchUsers() {
         // Given
-        User user1 = new User("user1", "john_doe", "john@example.com", "John", "Doe");
-        User user2 = new User("user2", "jane_smith", "jane@example.com", "Jane", "Smith");
+        User user1 = createTestUser("user1", "john_doe", "john@example.com", "John", "Doe");
+        User user2 = createTestUser("user2", "jane_smith", "jane@example.com", "Jane", "Smith");
         userService.createUser(user1);
         userService.createUser(user2);
         
@@ -215,10 +235,10 @@ class UserServiceTest {
     @DisplayName("Should get users by role")
     void testGetUsersByRole() {
         // Given
-        User admin = new User("admin1", "admin_user", "admin@example.com", "Admin", "User");
+        User admin = createTestUser("admin1", "admin_user", "admin@example.com", "Admin", "User");
         admin.setRole(User.UserRole.ADMIN);
         
-        User customer = new User("customer1", "customer_user", "customer@example.com", "Customer", "User");
+        User customer = createTestUser("customer1", "customer_user", "customer@example.com", "Customer", "User");
         customer.setRole(User.UserRole.CUSTOMER);
         
         userService.createUser(admin);
@@ -242,8 +262,8 @@ class UserServiceTest {
         // Given
         assertEquals(0, userService.getUserCount());
         
-        User user1 = new User("user1", "john_doe", "john@example.com", "John", "Doe");
-        User user2 = new User("user2", "jane_doe", "jane@example.com", "Jane", "Doe");
+        User user1 = createTestUser("user1", "john_doe", "john@example.com", "John", "Doe");
+        User user2 = createTestUser("user2", "jane_doe", "jane@example.com", "Jane", "Doe");
         
         // When
         userService.createUser(user1);

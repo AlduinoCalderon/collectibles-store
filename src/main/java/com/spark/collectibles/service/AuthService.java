@@ -303,6 +303,9 @@ public class AuthService {
      * @return BCrypt hash string (starts with $2a$ or $2b$)
      */
     public String hashPassword(String password) {
+        if (password == null) {
+            throw new IllegalArgumentException("Password cannot be null");
+        }
         int rounds = EnvironmentConfig.getBcryptRounds();
         return BCrypt.hashpw(password, BCrypt.gensalt(rounds));
     }

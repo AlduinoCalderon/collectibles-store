@@ -1,5 +1,7 @@
 package com.spark.collectibles.service;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.spark.collectibles.model.User;
 import com.spark.collectibles.repository.UserRepository;
 import com.spark.collectibles.repository.impl.MySQLUserRepository;
@@ -10,6 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -104,6 +108,7 @@ class AuthServiceTokenValidationTest {
         
         // Assert
         assertNull(result, "Token for inactive user should return null");
+        verify(userRepository, times(1)).findById("user1");
     }
     
     @Test
@@ -133,10 +138,21 @@ class AuthServiceTokenValidationTest {
      * Helper method to generate a test JWT token
      */
     private String generateTestToken(String userId, String username, String role) {
+        // Generate a valid JWT token using the same algorithm and secret as AuthService
         try {
-            return authService.hashPassword("dummy"); // This won't work, need actual JWT generation
-            // In real implementation, this would use JWT.create() with proper claims
+            Algorithm algorithm = Algorithm.HMAC256(testJwtSecret);
+            Instant now = Instant.now();
+            Instant expiration = now.plusSeconds(testJwtExpirationHours * 3600L);
+            
+            return JWT.create()
+                    .withSubject(userId)
+                    .withClaim("username", username)
+                    .withClaim("role", role)
+                    .withIssuedAt(Date.from(now))
+                    .withExpiresAt(Date.from(expiration))
+                    .sign(algorithm);
         } catch (Exception e) {
+            // Fallback: return a simple test token (will fail validation but allows test to run)
             return "test-token-" + userId;
         }
     }
