@@ -47,7 +47,17 @@ jobs:
           JWT_EXPIRATION_HOURS: 24
         run: |
           # Run all tests including integration tests (MySQL is available in CI)
-          mvn clean test -Dtest="**/*Test" jacoco:report
+          mvn clean test -Dtest="**/*Test" jacoco:report || {
+            echo "========================================"
+            echo "  Test Execution Summary"
+            echo "========================================"
+            echo ""
+            echo "Some tests failed. Please check the Surefire reports for details."
+            echo ""
+            echo "Test reports available at: target/surefire-reports/"
+            echo ""
+            exit 1
+          }
       
       - name: Upload JaCoCo coverage report
         uses: actions/upload-artifact@v4

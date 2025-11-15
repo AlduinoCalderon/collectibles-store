@@ -73,4 +73,7 @@ logs/
 *.tex
 
 # Local work log (should not be committed)
-LOCAL-WORKLOG.md 
+LOCAL-WORKLOG.md
+
+# Test reports (downloaded from CI)
+github tests/ 

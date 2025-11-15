@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.spark.collectibles.integration.ProductRoutesIntegrationTest
--------------------------------------------------------------------------------
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.142 s -- in com.spark.collectibles.integration.ProductRoutesIntegrationTest

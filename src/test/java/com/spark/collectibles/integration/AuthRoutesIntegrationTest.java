@@ -208,14 +208,18 @@ class AuthRoutesIntegrationTest {
         
         HttpURLConnection registerConn = createConnection("POST", "/api/auth/register");
         sendRequest(registerConn, registerBody);
-        String registerResponse = getResponse(registerConn);
         
         // Ensure registration was successful
-        assertEquals(201, registerConn.getResponseCode(), "Registration should succeed");
+        int responseCode = registerConn.getResponseCode();
+        assertEquals(201, responseCode, "Registration should succeed. Response: " + getResponse(registerConn));
+        
+        String registerResponse = getResponse(registerConn);
+        assertTrue(registerResponse.contains("token"), "Response should contain token. Response: " + registerResponse);
+        assertTrue(registerResponse.contains("user"), "Response should contain user. Response: " + registerResponse);
         
         // Extract token from response
         String token = extractToken(registerResponse);
-        assertNotNull(token, "Token should be present in registration response");
+        assertNotNull(token, "Token should be present in registration response. Response: " + registerResponse);
         
         // Act - Get current user
         HttpURLConnection meConn = createConnection("GET", "/api/auth/me");
@@ -273,13 +277,17 @@ class AuthRoutesIntegrationTest {
         
         HttpURLConnection registerConn = createConnection("POST", "/api/auth/register");
         sendRequest(registerConn, registerBody);
-        String registerResponse = getResponse(registerConn);
         
         // Ensure registration was successful
-        assertEquals(201, registerConn.getResponseCode(), "Admin registration should succeed");
+        int responseCode = registerConn.getResponseCode();
+        assertEquals(201, responseCode, "Admin registration should succeed. Response: " + getResponse(registerConn));
+        
+        String registerResponse = getResponse(registerConn);
+        assertTrue(registerResponse.contains("token"), "Response should contain token. Response: " + registerResponse);
+        assertTrue(registerResponse.contains("user"), "Response should contain user. Response: " + registerResponse);
         
         String token = extractToken(registerResponse);
-        assertNotNull(token, "Token should be present in registration response");
+        assertNotNull(token, "Token should be present in registration response. Response: " + registerResponse);
         
         // Act - Create product with admin token
         String productBody = "{\n" +
@@ -324,11 +332,36 @@ class AuthRoutesIntegrationTest {
     }
     
     private String extractToken(String jsonResponse) {
-        // Simple token extraction - in real scenario, parse JSON properly
+        // Try to parse using Gson first
+        try {
+            com.google.gson.JsonObject jsonObject = gson.fromJson(jsonResponse, com.google.gson.JsonObject.class);
+            if (jsonObject != null && jsonObject.has("token")) {
+                return jsonObject.get("token").getAsString();
+            }
+        } catch (Exception e) {
+            // Fall back to string parsing
+        }
+        
+        // Fallback: Simple token extraction
         int tokenIndex = jsonResponse.indexOf("\"token\":\"");
+        if (tokenIndex == -1) {
+            // Try with spaces
+            tokenIndex = jsonResponse.indexOf("\"token\" : \"");
+            if (tokenIndex != -1) {
+                tokenIndex += 2; // Skip " : "
+            }
+        }
+        
         if (tokenIndex == -1) return null;
         
-        int start = tokenIndex + 9;
+        // Find the start of the token value (after "token":" or "token" : ")
+        int start = jsonResponse.indexOf("\"", tokenIndex);
+        if (start == -1) return null;
+        start = jsonResponse.indexOf("\"", start + 1); // Skip the opening quote
+        if (start == -1) return null;
+        start += 1; // Start after the quote
+        
+        // Find the end of the token value
         int end = jsonResponse.indexOf("\"", start);
         if (end == -1) return null;
         
