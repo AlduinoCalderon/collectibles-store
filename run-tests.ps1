@@ -187,9 +187,9 @@ Write-Host ""
 
 # Integration tests info
 if (-not $includeIntegration) {
-    Write-Host "═══════════════════════════════════════" -ForegroundColor Yellow
+    Write-Host "========================================" -ForegroundColor Yellow
     Write-Host "  Integration Tests Not Run" -ForegroundColor Yellow
-    Write-Host "═══════════════════════════════════════" -ForegroundColor Yellow
+    Write-Host "========================================" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "Integration tests were excluded because MySQL is not available." -ForegroundColor Yellow
     Write-Host ""
@@ -209,17 +209,14 @@ if (-not $includeIntegration) {
     Write-Host "     - DB_PASSWORD=your_password" -ForegroundColor Gray
     Write-Host "  3. Run: mvn test -Dtest=`"**/*Test`"" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "Note: In GitHub Actions CI, integration tests run automatically" -ForegroundColor Gray
-    Write-Host "      because MySQL is provided as a service." -ForegroundColor Gray
-    Write-Host ""
 }
 
 # Coverage report info
 $jacocoReport = "target\site\jacoco\index.html"
 if (Test-Path $jacocoReport) {
-    Write-Host "═══════════════════════════════════════" -ForegroundColor Green
+    Write-Host "========================================" -ForegroundColor Green
     Write-Host "  Coverage Report Generated" -ForegroundColor Green
-    Write-Host "═══════════════════════════════════════" -ForegroundColor Green
+    Write-Host "========================================" -ForegroundColor Green
     Write-Host ""
     Write-Host "Coverage report available at:" -ForegroundColor White
     Write-Host "  $((Get-Item $jacocoReport).FullName)" -ForegroundColor Cyan
