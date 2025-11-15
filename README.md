@@ -346,7 +346,7 @@ start target/site/jacoco/index.html
 mvn test -Dtest="**/*Test"
 ```
 
-**The `run-tests.ps1` script provides:**
+**The test runner scripts (`run-tests.ps1` for Windows, `run-tests.sh` for Linux/macOS) provide:**
 - Automatic MySQL detection
 - Clear summary of which tests ran and why
 - Instructions for running integration tests if MySQL is not available
