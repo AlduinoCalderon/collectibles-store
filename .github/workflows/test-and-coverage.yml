@@ -46,15 +46,26 @@ jobs:
           JWT_SECRET: test-secret-key-for-ci-minimum-32-characters-long
           JWT_EXPIRATION_HOURS: 24
         run: |
-          mvn clean test jacoco:report
+          # Run all tests including integration tests (MySQL is available in CI)
+          mvn clean test -Dtest="**/*Test" jacoco:report
       
       - name: Upload JaCoCo coverage report
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: jacoco-coverage-report
-          path: target/site/jacoco/
+          path: target/site/jacoco/**
           retention-days: 30
+          if-no-files-found: warn
+      
+      - name: Upload Surefire test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: surefire-test-reports
+          path: target/surefire-reports/**
+          retention-days: 30
+          if-no-files-found: warn
       
       - name: Generate Javadoc
         if: success()
