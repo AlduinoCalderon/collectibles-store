@@ -25,9 +25,9 @@ The Collectibles Store addresses these challenges through a modern web architect
 
 The application follows a three-tier architecture:
 
-![Three-Tier Architecture](../diagrams/three-tier-architecture.png)
+![Three-Tier Architecture](./diagrams/three-tier-architecture.png)
 
-**Source**: [docs/diagrams/three-tier-architecture.mmd](../diagrams/three-tier-architecture.mmd)
+**Source**: [docs/diagrams/three-tier-architecture.mmd](./diagrams/three-tier-architecture.mmd)
 
 This architecture provides clear separation of concerns:
 - **Presentation Layer**: Handles user interface and client-side logic
@@ -295,9 +295,9 @@ User user = authService.validateToken(token);
 
 **Database Schema**:
 
-![Database Schema](../diagrams/database-schema.png)
+![Database Schema](./diagrams/database-schema.png)
 
-**Source**: [docs/diagrams/database-schema.mmd](../diagrams/database-schema.mmd)
+**Source**: [docs/diagrams/database-schema.mmd](./diagrams/database-schema.mmd)
 
 The database consists of two main tables:
 
