@@ -1,0 +1,58 @@
+graph TB
+    subgraph "Presentation Layer"
+        Browser[Web Browser]
+        Templates[Mustache Templates<br/>HTML/CSS/JS]
+        AdminPanel[Admin Management Panel]
+        ProductBrowse[Product Browsing Interface]
+        WebSocketClient[WebSocket Client<br/>Real-Time Updates]
+    end
+    
+    subgraph "Business Logic Layer"
+        Spark[Spark Framework<br/>HTTP Server]
+        REST[RESTful API Endpoints]
+        WebSocketHandler[WebSocket Handler<br/>Real-Time Communication]
+        ProductService[ProductService]
+        AuthService[AuthService]
+        ExceptionHandler[Exception Handler]
+        Validation[Input Validation]
+    end
+    
+    subgraph "Data Layer"
+        HikariCP[HikariCP<br/>Connection Pool]
+        Flyway[Flyway<br/>Database Migrations]
+        ProductRepo[ProductRepository<br/>Repository Pattern]
+        UserRepo[UserRepository<br/>Repository Pattern]
+        MySQL[(MySQL 8+ Database)]
+    end
+    
+    Browser -->|HTTP Requests| Spark
+    Browser -->|WebSocket| WebSocketHandler
+    Templates --> Browser
+    AdminPanel --> Browser
+    ProductBrowse --> Browser
+    WebSocketClient --> WebSocketHandler
+    
+    Spark --> REST
+    Spark --> WebSocketHandler
+    REST --> ProductService
+    REST --> AuthService
+    REST --> ExceptionHandler
+    ProductService --> Validation
+    AuthService --> Validation
+    WebSocketHandler --> ProductService
+    
+    ProductService --> ProductRepo
+    AuthService --> UserRepo
+    
+    ProductRepo --> HikariCP
+    UserRepo --> HikariCP
+    HikariCP --> MySQL
+    Flyway --> MySQL
+    
+    style Browser fill:#e1f5ff
+    style Spark fill:#fff4e1
+    style MySQL fill:#ffe1f5
+    style ProductService fill:#e1ffe1
+    style AuthService fill:#e1ffe1
+    style REST fill:#f0e1ff
+

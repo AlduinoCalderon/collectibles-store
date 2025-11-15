@@ -4,25 +4,7 @@
 
 This document describes the main technical difficulties encountered during the implementation of the authentication system and the strategies used to solve them. This promotes reflection and documentation of technical learning.
 
-## 1. JWT Secret Management
-
-### Difficulty
-Initially, the JWT secret was hardcoded or used a default value that could be exposed in the codebase. This is a critical security issue, especially for production deployments.
-
-### Solution
-- Implemented environment variable-based configuration through `EnvironmentConfig`
-- Created a deterministic development secret generated from "Hello World" phrase using SHA-256 hashing
-- Added validation to require `JWT_SECRET` environment variable in production mode
-- Ensured no secrets are hardcoded in the codebase
-- All JWT operations now use `EnvironmentConfig.getJwtSecret()` which enforces proper secret management
-
-### Learning
-- Never hardcode secrets in source code
-- Use environment variables for all sensitive configuration
-- Provide safe defaults for development while enforcing strict requirements for production
-- Use cryptographic hashing to generate deterministic but secure-looking development secrets
-
-## 2. Password Hash Exposure in API Responses
+## 1. Password Hash Exposure in API Responses
 
 ### Difficulty
 The `User` model needed to store password hashes for authentication, but these should never be returned in API responses. Initially, password hashes were being serialized in JSON responses.
@@ -40,7 +22,7 @@ The `User` model needed to store password hashes for authentication, but these s
 - Explicitly null out sensitive fields before API responses
 - Test that sensitive data is never exposed
 
-## 3. Mocking MySQLUserRepository for Unit Tests
+## 2. Mocking MySQLUserRepository for Unit Tests
 
 ### Difficulty
 `AuthService` uses `MySQLUserRepository` which requires database connections. Unit tests should not depend on database infrastructure. The repository has methods like `findByUsernameWithPassword()` that are not in the interface.
@@ -57,7 +39,7 @@ The `User` model needed to store password hashes for authentication, but these s
 - Separate unit tests (fast, isolated) from integration tests (slower, require infrastructure)
 - Mock concrete classes when necessary, but prefer interfaces
 
-## 4. Spark Framework Filter Testing
+## 3. Spark Framework Filter Testing
 
 ### Difficulty
 Spark's `before()` filters use `halt()` which throws exceptions to stop request processing. Testing these filters requires understanding Spark's exception handling mechanism.
@@ -75,24 +57,7 @@ Spark's `before()` filters use `halt()` which throws exceptions to stop request 
 - Mock framework objects (`Request`, `Response`) to isolate filter logic
 - Verify interactions with dependencies (e.g., `authService`)
 
-## 5. Database Migration Ordering
-
-### Difficulty
-The users table migration (`V3__Create_users_table.sql`) needs to run after products table migration. Flyway uses version numbers, but we needed to ensure proper ordering and handle cases where the database might already exist.
-
-### Solution
-- Used Flyway versioning: `V1__Create_products_table.sql`, `V2__Insert_sample_products.sql`, `V3__Create_users_table.sql`
-- Used `CREATE TABLE IF NOT EXISTS` to handle existing tables gracefully
-- Ensured migration scripts are idempotent
-- Tested migrations on fresh databases and existing databases
-
-### Learning
-- Use proper versioning for database migrations
-- Make migrations idempotent when possible
-- Test migrations on both fresh and existing databases
-- Document migration dependencies
-
-## 6. BCrypt Performance in Tests
+## 4. BCrypt Performance in Tests
 
 ### Difficulty
 BCrypt with default 10 rounds takes ~100-200ms per hash, making unit tests slow when hashing passwords multiple times.
@@ -109,7 +74,7 @@ BCrypt with default 10 rounds takes ~100-200ms per hash, making unit tests slow 
 - Document performance considerations
 - Lower security settings are acceptable in test environments, but never in production
 
-## 7. JWT Token Validation Edge Cases
+## 5. JWT Token Validation Edge Cases
 
 ### Difficulty
 JWT token validation needed to handle various edge cases: null tokens, empty tokens, tokens with "Bearer " prefix, expired tokens, tokens for non-existent users, tokens for inactive users.
@@ -128,7 +93,7 @@ JWT token validation needed to handle various edge cases: null tokens, empty tok
 - Validate not just token format, but also business rules (user exists, user is active)
 - Test all edge cases systematically
 
-## 8. Role-Based Access Control Implementation
+## 6. Role-Based Access Control Implementation
 
 ### Difficulty
 Implementing role-based access control required checking user roles after authentication, but Spark filters execute before route handlers, making it challenging to pass user context.
@@ -146,7 +111,7 @@ Implementing role-based access control required checking user roles after authen
 - Design filter API to be composable and reusable
 - Document how filters interact with route handlers
 
-## 9. Integration Test Server Lifecycle
+## 7. Integration Test Server Lifecycle
 
 ### Difficulty
 Integration tests need a running Spark server, but starting/stopping the server for each test is slow and can cause port conflicts.
@@ -164,7 +129,7 @@ Integration tests need a running Spark server, but starting/stopping the server 
 - Separate test configuration from production configuration
 - Create reusable test infrastructure
 
-## 10. Test Coverage Requirements
+## 8. Test Coverage Requirements
 
 ### Difficulty
 Achieving 90% code coverage required testing all code paths, including error cases, edge cases, and exception handling.
@@ -198,6 +163,7 @@ The solutions emphasized:
 - Comprehensive error handling
 - Systematic testing of edge cases
 - Clear separation between unit and integration tests
+
 
 
 
