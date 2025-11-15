@@ -13,67 +13,95 @@ To enhance the Collectibles Store API by designing, implementing, and testing a 
 
 ## Timeline and Milestones
 
-### Sprint 1: Database and Core Logic (Nov 6, 2025 - Nov 7, 2025)
+### Sprint 1: Authentication Implementation (Nov 6, 2025 - Nov 7, 2025)
 -   Finalize the database schema design for user authentication.
 -   Implement tables (`users`, etc.) and relationships in the MySQL database.
--   Develop and test all required stored procedures for user management (e.g., `sp_createUser`, `sp_findUserByEmail`).
--   Create Java data models and initial Data Access Objects (DAO) for the new tables.
--   Work will be done in a new feature branch (e.g., `feature/authentication`).
-
-### Sprint 2: API Development and Testing (Nov 8, 2025 - Nov 10, 2025)
+-   Create Java data models and repositories for the new tables.
 -   Develop the RESTful API endpoints for registration, login, and token validation.
 -   Integrate the authentication logic with the existing Spark framework application.
--   Write comprehensive unit tests for all services, DAOs, and utility classes using JUnit.
--   Verify code coverage for the new Java module, ensuring it meets the 90% target.
--   Ensure all JUnit tests pass successfully.
+-   Work will be done in a new feature branch (e.g., `feature/authentication`).
 
-### Sprint 3: Documentation and Refinement (Nov 11, 2025 - Nov 12, 2025)
+### Sprint 2: Testing Implementation (Nov 8, 2025 - Nov 10, 2025)
+-   Set up JUnit testing environment for backend tests.
+-   Write comprehensive unit tests for all services, repositories, and utility classes using JUnit.
+-   Set up Jest testing environment for frontend tests.
+-   Write comprehensive unit tests for frontend authentication modules using Jest.
+-   Verify code coverage for both Java and JavaScript modules.
+-   Ensure all tests pass successfully.
+
+### Sprint 3: CI/CD, Documentation, and Finalization (Nov 11, 2025 - Nov 16, 2025)
+-   Set up and configure GitHub Actions workflow for automated testing.
+-   Fix and improve test reports and coverage reports.
 -   Draft complete project documentation for the new authentication feature.
--   Document the API endpoints using a tool like Swagger or in Markdown.
--   Add detailed comments within the Java code and stored procedures.
+-   Document the API endpoints and testing procedures.
+-   Add detailed comments within the code and create system diagrams.
 -   Update the main `README.md` to include instructions on the new feature.
+-   Organize and finalize the GitHub repository structure.
 -   Prepare the feature branch for merging into the main branch.
 
-### Final Delivery (Nov 13-16, 2025)
--   Complete final integration testing.
--   Finalize all project documentation and peer-review for clarity.
--   Submit the final project, including a Pull Request from the feature branch to the main branch.
 
 ## Deliverables
 
 ### Sprint 1
--   **SQL Scripts**: Scripts for creating new tables and stored procedures.
+-   **Database Schema**: SQL scripts for creating new tables.
 -   **Feature Branch**: A new branch in the GitHub repository for development.
--   **Java Models/DAOs**: Core Java classes for the database interaction.
+-   **Java Models and Repositories**: Core Java classes for database interaction.
+-   **Authentication API Endpoints**: Functional endpoints for user management.
 
 ### Sprint 2
--   **Authentication API Endpoints**: Functional endpoints for user management.
--   **JUnit Test Suite**: A suite of unit tests for the authentication module.
--   **Code Coverage Report**: A report showing at least 90% test coverage for the new code.
+-   **JUnit Test Suite**: A suite of unit tests for the backend authentication module.
+-   **Jest Test Suite**: A suite of unit tests for the frontend authentication module.
+-   **Code Coverage Reports**: Coverage reports for both Java and JavaScript code.
 
 ### Sprint 3
--   **API Documentation**: Detailed documentation of all new endpoints.
--   **Updated GitHub Repository**: A clean repository with the new feature branch ready for review.
-
-### Final Delivery
--   **Pull Request**: A well-documented Pull Request to merge the feature into the main branch.
--   **Final Project**: The complete, tested, and documented authentication feature integrated into the API.
+-   **GitHub Actions Workflow**: Automated CI/CD pipeline for testing.
+-   **API Documentation**: Detailed documentation of all endpoints and testing procedures.
+-   **System Diagrams**: Architecture and flow diagrams.
+-   **Updated GitHub Repository**: A clean, well-organized repository with complete documentation.
 
 ## Project Gantt Chart
-![Project Gantt Chart](project_gantt.png)
+
+```mermaid
+gantt
+    title Project Timeline: Authentication Feature Implementation
+    dateFormat YYYY-MM-DD
+    section Sprint 1 - Authentication
+    Database Schema Design           :2025-11-06, 4h
+    Implement User Tables            :2025-11-06, 4h
+    Create Java Models              :2025-11-06, 4h
+    Implement Auth Service          :2025-11-06, 8h
+    REST API Endpoints              :2025-11-07, 10h
+    Integration with Spark          :2025-11-07, 4h
+    
+    section Sprint 2 - Testing
+    JUnit Environment Setup         :2025-11-08, 4h
+    Implement JUnit Tests           :2025-11-08, 14h
+    Jest Environment Setup          :2025-11-09, 4h
+    Implement Jest Tests            :2025-11-09, 12h
+    Java Coverage Report            :2025-11-10, 2h
+    JS Coverage Report              :2025-11-10, 2h
+    
+    section Sprint 3 - CI/CD & Documentation
+    GitHub Actions Setup            :2025-11-11, 4h
+    Fix Test Reports                :2025-11-11, 4h
+    Write Documentation             :2025-11-12, 10h
+    Add Code Comments               :2025-11-12, 6h
+    Create System Diagrams          :2025-11-13, 4h
+    Organize GitHub Repo            :2025-11-13, 2h
+    Final Review & Polish           :2025-11-14, 4h
+    Final Submission                :milestone, 2025-11-16, 0h
+```
 
 ## Technologies and Tools
 -   **Java**: Core language for the API.
 -   **Spark Framework**: Web framework for building the RESTful API.
 -   **MySQL**: Database for storing user and collectibles data.
--   **Stored Procedures**: For all database interactions related to authentication.
 -   **JUnit**: Framework for unit testing the Java module.
--   **Git & GitHub**: For version control and repository management in a feature branch.
+-   **Jest**: Framework for unit testing the JavaScript module.
+-   **JaCoCo**: Code coverage tool for Java.
+-   **GitHub Actions**: CI/CD pipeline for automated testing.
+-   **Git & GitHub**: For version control and repository management.
 -   **Render**: Platform where the production environment is hosted.
-
-## Stakeholders
--   **Aldo Calderon**: Lead Developer.
--   **API Consumers**: Users or frontend applications that will use the authentication service.
 
 ## Risk Management
 

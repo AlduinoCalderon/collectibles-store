@@ -3,9 +3,9 @@
 ## User Stories
 
 ### User Story 1
-**As a** Java developer (Karen)  
-**I want to** create a comprehensive suite of unit tests for the reservations module using JUnit  
-**So that** I can ensure its reliability and achieve at least 90% code coverage.
+**As a** Java developer  
+**I want to** create a comprehensive suite of unit tests for the authentication module using JUnit  
+**So that** I can ensure its reliability and achieve good code coverage.
 
 **Acceptance Criteria:**
 - [ ] The JUnit testing environment is configured in the project.
@@ -14,9 +14,9 @@
 - [ ] All implemented tests pass without errors.
 
 ### User Story 2
-**As a** JavaScript developer (Teresa)  
-**I want to** develop unit tests for the graph visualization module using Jest  
-**So that** I can validate its functionality and guarantee at least 90% code coverage.
+**As a** JavaScript developer  
+**I want to** develop unit tests for the frontend authentication module using Jest  
+**So that** I can validate its functionality and ensure good code coverage.
 
 **Acceptance Criteria:**
 - [ ] The Jest testing environment is set up for the JavaScript module.
@@ -25,7 +25,7 @@
 - [ ] All Jest tests run successfully.
 
 ### User Story 3
-**As a** project manager  
+**As a** developer  
 **I want to** create complete and clear project documentation  
 **So that** current and future developers can understand, install, and maintain the system.
 
@@ -36,7 +36,7 @@
 - [ ] System diagrams are created and added to the documentation.
 
 ### User Story 4
-**As a** development team member  
+**As a** developer  
 **I want to** have a well-organized GitHub repository  
 **So that** all project artifacts, including code, tests, and documentation, are easily accessible.
 
