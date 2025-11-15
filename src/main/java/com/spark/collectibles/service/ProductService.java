@@ -295,7 +295,7 @@ public class ProductService {
     
     /**
      * Get products by price range
-     * Supports filtering with only min (>=), only max (<=), or both (between)
+     * Supports filtering with only min (greater than or equal), only max (less than or equal), or both (between)
      * @param minPrice Minimum price (can be null if only max is provided)
      * @param maxPrice Maximum price (can be null if only min is provided)
      * @return List of products in the price range

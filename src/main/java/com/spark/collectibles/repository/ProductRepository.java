@@ -91,14 +91,14 @@ public interface ProductRepository {
     /**
      * Find products with price greater than or equal to minPrice
      * @param minPrice Minimum price
-     * @return List of products with price >= minPrice
+     * @return List of products with price greater than or equal to minPrice
      */
     List<Product> findByMinPrice(java.math.BigDecimal minPrice);
     
     /**
      * Find products with price less than or equal to maxPrice
      * @param maxPrice Maximum price
-     * @return List of products with price <= maxPrice
+     * @return List of products with price less than or equal to maxPrice
      */
     List<Product> findByMaxPrice(java.math.BigDecimal maxPrice);
     
