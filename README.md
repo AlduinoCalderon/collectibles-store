@@ -313,15 +313,23 @@ The project includes comprehensive test coverage for both backend (Java) and fro
 ### Running Backend Tests
 
 ```bash
-# Run all tests
+# Run all unit tests (excludes integration tests by default)
 mvn test
 
 # Run tests with coverage report
 mvn clean test jacoco:report
 
-# View coverage report
-# Open target/site/jacoco/index.html in your browser
+# View coverage report (Windows)
+start target/site/jacoco/index.html
+
+# Run integration tests (requires MySQL)
+mvn test -Dtest="**/*Test"
 ```
+
+**Test Reports:**
+- **Test Results:** `target/surefire-reports/` (XML/text format)
+- **Coverage Report:** `target/site/jacoco/index.html` (HTML format)
+- **In GitHub Actions:** Check Artifacts section after workflow run
 
 **Expected Output:**
 ```
