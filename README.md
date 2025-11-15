@@ -314,6 +314,7 @@ The project includes comprehensive test coverage for both backend (Java) and fro
 
 ```bash
 # Run all unit tests (excludes integration tests by default)
+# This excludes tests ending in *IntegrationTest.java (which require MySQL)
 mvn test
 
 # Run tests with coverage report
@@ -322,9 +323,16 @@ mvn clean test jacoco:report
 # View coverage report (Windows)
 start target/site/jacoco/index.html
 
-# Run integration tests (requires MySQL)
+# Run all tests including integration tests (requires MySQL locally)
+# Note: This will fail locally if MySQL is not running
 mvn test -Dtest="**/*Test"
 ```
+
+**Important Notes:**
+- **Local Development:** By default, `mvn test` excludes integration tests (those ending in `*IntegrationTest.java`) because they require a MySQL database connection
+- **Tests Excluded Locally:** `UserServiceIntegrationTest`, `AuthRoutesIntegrationTest`, and any other `*IntegrationTest.java` files
+- **CI/CD:** In GitHub Actions, all tests (including integration tests) run automatically because MySQL is available as a service
+- **If Tests Fail Locally:** If you see `Connection refused: getsockopt` errors, this is expected - those tests require MySQL and will run in CI
 
 **Test Reports:**
 - **Test Results:** `target/surefire-reports/` (XML/text format)

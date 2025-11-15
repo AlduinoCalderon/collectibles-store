@@ -11,12 +11,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test class for UserService
+ * Integration test class for UserService
  * 
- * This class contains unit tests for the UserService business logic
+ * This class contains integration tests for the UserService business logic
+ * that require a real database connection.
  */
-@DisplayName("UserService Tests")
-class UserServiceTest {
+@DisplayName("UserService Integration Tests")
+class UserServiceIntegrationTest {
     
     private UserService userService;
     private AuthService authService;
