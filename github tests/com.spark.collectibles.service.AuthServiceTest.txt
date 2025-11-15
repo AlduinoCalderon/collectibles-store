@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.spark.collectibles.service.AuthServiceTest
+-------------------------------------------------------------------------------
+Tests run: 26, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.246 s -- in com.spark.collectibles.service.AuthServiceTest

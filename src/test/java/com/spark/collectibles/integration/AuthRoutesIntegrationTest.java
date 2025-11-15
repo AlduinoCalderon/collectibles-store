@@ -198,16 +198,20 @@ class AuthRoutesIntegrationTest {
     @Test
     @DisplayName("Should get current user with valid token")
     void testGetCurrentUser_ValidToken() throws IOException {
-        // Arrange - Register and login
+        // Arrange - Register and login with unique identifiers
+        String uniqueId = String.valueOf(System.currentTimeMillis());
         String registerBody = "{\n" +
-                "  \"username\": \"currentuser\",\n" +
-                "  \"email\": \"current@example.com\",\n" +
+                "  \"username\": \"currentuser" + uniqueId + "\",\n" +
+                "  \"email\": \"current" + uniqueId + "@example.com\",\n" +
                 "  \"password\": \"password123\"\n" +
                 "}";
         
         HttpURLConnection registerConn = createConnection("POST", "/api/auth/register");
         sendRequest(registerConn, registerBody);
         String registerResponse = getResponse(registerConn);
+        
+        // Ensure registration was successful
+        assertEquals(201, registerConn.getResponseCode(), "Registration should succeed");
         
         // Extract token from response
         String token = extractToken(registerResponse);
@@ -221,7 +225,7 @@ class AuthRoutesIntegrationTest {
         // Assert
         assertEquals(200, meConn.getResponseCode(), "Expected 200 OK");
         String response = getResponse(meConn);
-        assertTrue(response.contains("currentuser"));
+        assertTrue(response.contains("currentuser" + uniqueId), "Response should contain username");
         assertFalse(response.contains("passwordHash")); // Password hash should never be returned
     }
     
@@ -258,10 +262,11 @@ class AuthRoutesIntegrationTest {
     @Test
     @DisplayName("Should access protected route with valid ADMIN token")
     void testProtectedRoute_WithAdminToken() throws IOException {
-        // Arrange - Register admin user
+        // Arrange - Register admin user with unique identifiers
+        String uniqueId = String.valueOf(System.currentTimeMillis());
         String registerBody = "{\n" +
-                "  \"username\": \"adminuser\",\n" +
-                "  \"email\": \"admin@example.com\",\n" +
+                "  \"username\": \"adminuser" + uniqueId + "\",\n" +
+                "  \"email\": \"admin" + uniqueId + "@example.com\",\n" +
                 "  \"password\": \"password123\",\n" +
                 "  \"role\": \"ADMIN\"\n" +
                 "}";
@@ -269,7 +274,12 @@ class AuthRoutesIntegrationTest {
         HttpURLConnection registerConn = createConnection("POST", "/api/auth/register");
         sendRequest(registerConn, registerBody);
         String registerResponse = getResponse(registerConn);
+        
+        // Ensure registration was successful
+        assertEquals(201, registerConn.getResponseCode(), "Admin registration should succeed");
+        
         String token = extractToken(registerResponse);
+        assertNotNull(token, "Token should be present in registration response");
         
         // Act - Create product with admin token
         String productBody = "{\n" +
@@ -342,6 +352,7 @@ class IntegrationTestExtension implements org.junit.jupiter.api.extension.Before
         // Cleanup handled in test class
     }
 }
+
 
 
 

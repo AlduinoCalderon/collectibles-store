@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.spark.collectibles.integration.AuthRoutesIntegrationTest" time="5.44" tests="9" errors="0" skipped="0" failures="3">
+  <properties>
+    <property name="APP_ENV" value="test"/>
+    <property name="java.specification.version" value="17"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="JWT_EXPIRATION_HOURS" value="24"/>
+    <property name="java.class.path" value="/home/runner/work/collectibles-store/collectibles-store/target/test-classes:/home/runner/work/collectibles-store/collectibles-store/target/classes:/home/runner/.m2/repository/com/sparkjava/spark-core/2.9.4/spark-core-2.9.4.jar:/home/runner/.m2/repository/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-server/9.4.48.v20220622/jetty-server-9.4.48.v20220622.jar:/home/runner/.m2/repository/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-http/9.4.48.v20220622/jetty-http-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-util/9.4.48.v20220622/jetty-util-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-io/9.4.48.v20220622/jetty-io-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-webapp/9.4.48.v20220622/jetty-webapp-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-xml/9.4.48.v20220622/jetty-xml-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-servlet/9.4.48.v20220622/jetty-servlet-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-security/9.4.48.v20220622/jetty-security-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-util-ajax/9.4.48.v20220622/jetty-util-ajax-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/websocket/websocket-server/9.4.48.v20220622/websocket-server-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/websocket/websocket-common/9.4.48.v20220622/websocket-common-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/websocket/websocket-client/9.4.48.v20220622/websocket-client-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-client/9.4.48.v20220622/jetty-client-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/websocket/websocket-servlet/9.4.48.v20220622/websocket-servlet-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/websocket/websocket-api/9.4.48.v20220622/websocket-api-9.4.48.v20220622.jar:/home/runner/.m2/repository/ch/qos/logback/logback-classic/1.2.12/logback-classic-1.2.12.jar:/home/runner/.m2/repository/ch/qos/logback/logback-core/1.2.12/logback-core-1.2.12.jar:/home/runner/.m2/repository/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar:/home/runner/.m2/repository/com/mysql/mysql-connector-j/8.3.0/mysql-connector-j-8.3.0.jar:/home/runner/.m2/repository/com/google/protobuf/protobuf-java/3.25.1/protobuf-java-3.25.1.jar:/home/runner/.m2/repository/com/zaxxer/HikariCP/5.1.0/HikariCP-5.1.0.jar:/home/runner/.m2/repository/org/flywaydb/flyway-core/10.8.1/flyway-core-10.8.1.jar:/home/runner/.m2/repository/com/fasterxml/jackson/dataformat/jackson-dataformat-toml/2.15.2/jackson-dataformat-toml-2.15.2.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar:/home/runner/.m2/repository/org/flywaydb/flyway-mysql/10.8.1/flyway-mysql-10.8.1.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter/5.9.3/junit-jupiter-5.9.3.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.9.3/junit-jupiter-api-5.9.3.jar:/home/runner/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-commons/1.9.3/junit-platform-commons-1.9.3.jar:/home/runner/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.9.3/junit-jupiter-params-5.9.3.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.9.3/junit-jupiter-engine-5.9.3.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-engine/1.9.3/junit-platform-engine-1.9.3.jar:/home/runner/.m2/repository/org/mockito/mockito-core/5.3.1/mockito-core-5.3.1.jar:/home/runner/.m2/repository/net/bytebuddy/byte-buddy/1.14.4/byte-buddy-1.14.4.jar:/home/runner/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.4/byte-buddy-agent-1.14.4.jar:/home/runner/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/runner/.m2/repository/org/mockito/mockito-junit-jupiter/5.3.1/mockito-junit-jupiter-5.3.1.jar:/home/runner/.m2/repository/com/sparkjava/spark-template-mustache/2.7.1/spark-template-mustache-2.7.1.jar:/home/runner/.m2/repository/com/github/spullara/mustache/java/compiler/0.9.4/compiler-0.9.4.jar:/home/runner/.m2/repository/com/auth0/java-jwt/4.4.0/java-jwt-4.4.0.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.14.2/jackson-databind-2.14.2.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.14.2/jackson-annotations-2.14.2.jar:/home/runner/.m2/repository/org/mindrot/jbcrypt/0.4/jbcrypt-0.4.jar:"/>
+    <property name="java.vm.vendor" value="Eclipse Adoptium"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://adoptium.net/"/>
+    <property name="user.timezone" value="Etc/UTC"/>
+    <property name="JWT_SECRET" value="test-jwt-secret-key-for-integration-testing-minimum-32-characters"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="17"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/temurin-17-jdk-amd64/lib"/>
+    <property name="sun.java.command" value="/home/runner/work/collectibles-store/collectibles-store/target/surefire/surefirebooter-20251115052932102_3.jar /home/runner/work/collectibles-store/collectibles-store/target/surefire 2025-11-15T05-29-31_714-jvmRun1 surefire-20251115052932102_1tmp surefire_0-20251115052932102_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="test" value="**/*Test"/>
+    <property name="surefire.test.class.path" value="/home/runner/work/collectibles-store/collectibles-store/target/test-classes:/home/runner/work/collectibles-store/collectibles-store/target/classes:/home/runner/.m2/repository/com/sparkjava/spark-core/2.9.4/spark-core-2.9.4.jar:/home/runner/.m2/repository/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-server/9.4.48.v20220622/jetty-server-9.4.48.v20220622.jar:/home/runner/.m2/repository/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-http/9.4.48.v20220622/jetty-http-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-util/9.4.48.v20220622/jetty-util-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-io/9.4.48.v20220622/jetty-io-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-webapp/9.4.48.v20220622/jetty-webapp-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-xml/9.4.48.v20220622/jetty-xml-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-servlet/9.4.48.v20220622/jetty-servlet-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-security/9.4.48.v20220622/jetty-security-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-util-ajax/9.4.48.v20220622/jetty-util-ajax-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/websocket/websocket-server/9.4.48.v20220622/websocket-server-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/websocket/websocket-common/9.4.48.v20220622/websocket-common-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/websocket/websocket-client/9.4.48.v20220622/websocket-client-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/jetty-client/9.4.48.v20220622/jetty-client-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/websocket/websocket-servlet/9.4.48.v20220622/websocket-servlet-9.4.48.v20220622.jar:/home/runner/.m2/repository/org/eclipse/jetty/websocket/websocket-api/9.4.48.v20220622/websocket-api-9.4.48.v20220622.jar:/home/runner/.m2/repository/ch/qos/logback/logback-classic/1.2.12/logback-classic-1.2.12.jar:/home/runner/.m2/repository/ch/qos/logback/logback-core/1.2.12/logback-core-1.2.12.jar:/home/runner/.m2/repository/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar:/home/runner/.m2/repository/com/mysql/mysql-connector-j/8.3.0/mysql-connector-j-8.3.0.jar:/home/runner/.m2/repository/com/google/protobuf/protobuf-java/3.25.1/protobuf-java-3.25.1.jar:/home/runner/.m2/repository/com/zaxxer/HikariCP/5.1.0/HikariCP-5.1.0.jar:/home/runner/.m2/repository/org/flywaydb/flyway-core/10.8.1/flyway-core-10.8.1.jar:/home/runner/.m2/repository/com/fasterxml/jackson/dataformat/jackson-dataformat-toml/2.15.2/jackson-dataformat-toml-2.15.2.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar:/home/runner/.m2/repository/org/flywaydb/flyway-mysql/10.8.1/flyway-mysql-10.8.1.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter/5.9.3/junit-jupiter-5.9.3.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.9.3/junit-jupiter-api-5.9.3.jar:/home/runner/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-commons/1.9.3/junit-platform-commons-1.9.3.jar:/home/runner/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.9.3/junit-jupiter-params-5.9.3.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.9.3/junit-jupiter-engine-5.9.3.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-engine/1.9.3/junit-platform-engine-1.9.3.jar:/home/runner/.m2/repository/org/mockito/mockito-core/5.3.1/mockito-core-5.3.1.jar:/home/runner/.m2/repository/net/bytebuddy/byte-buddy/1.14.4/byte-buddy-1.14.4.jar:/home/runner/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.4/byte-buddy-agent-1.14.4.jar:/home/runner/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/runner/.m2/repository/org/mockito/mockito-junit-jupiter/5.3.1/mockito-junit-jupiter-5.3.1.jar:/home/runner/.m2/repository/com/sparkjava/spark-template-mustache/2.7.1/spark-template-mustache-2.7.1.jar:/home/runner/.m2/repository/com/github/spullara/mustache/java/compiler/0.9.4/compiler-0.9.4.jar:/home/runner/.m2/repository/com/auth0/java-jwt/4.4.0/java-jwt-4.4.0.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.14.2/jackson-databind-2.14.2.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.14.2/jackson-annotations-2.14.2.jar:/home/runner/.m2/repository/org/mindrot/jbcrypt/0.4/jbcrypt-0.4.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/runner"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-10-21"/>
+    <property name="java.home" value="/usr/lib/jvm/temurin-17-jdk-amd64"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/home/runner/work/collectibles-store/collectibles-store"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="surefire.real.class.path" value="/home/runner/work/collectibles-store/collectibles-store/target/surefire/surefirebooter-20251115052932102_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="17.0.17+10"/>
+    <property name="user.name" value="runner"/>
+    <property name="BCRYPT_ROUNDS" value="4"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="6.11.0-1018-azure"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Temurin-17.0.17+10"/>
+    <property name="localRepository" value="/home/runner/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/adoptium/adoptium-support/issues"/>
+    <property name="jetty.git.hash" value="6b67c5719d1f4371b33655ff2d047d24e171e49a"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="17.0.17"/>
+    <property name="user.dir" value="/home/runner/work/collectibles-store/collectibles-store"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="java.vendor" value="Eclipse Adoptium"/>
+    <property name="java.vm.version" value="17.0.17+10"/>
+    <property name="java.specification.maintenance.version" value="1"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="61.0"/>
+  </properties>
+  <testcase name="testGetCurrentUser_ValidToken" classname="com.spark.collectibles.integration.AuthRoutesIntegrationTest" time="0.354">
+    <failure message="Token should be present in registration response ==&gt; expected: not &lt;null&gt;" type="org.opentest4j.AssertionFailedError"><![CDATA[org.opentest4j.AssertionFailedError: Token should be present in registration response ==> expected: not <null>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertNotNull.failNull(AssertNotNull.java:49)
+	at org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:35)
+	at org.junit.jupiter.api.Assertions.assertNotNull(Assertions.java:309)
+	at com.spark.collectibles.integration.AuthRoutesIntegrationTest.testGetCurrentUser_ValidToken(AuthRoutesIntegrationTest.java:214)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:727)
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:217)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:147)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:127)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:90)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:55)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:102)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:86)
+	at org.junit.platform.launcher.core.DefaultLauncherSession$DelegatingLauncher.execute(DefaultLauncherSession.java:86)
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
+]]></failure>
+    <system-out><![CDATA[2025-11-15 05:29:35.851 [main] INFO  com.spark.collectibles.Application - Initializing database connection...
+2025-11-15 05:29:35.859 [main] INFO  c.s.c.d.DatabaseConnectionManager - Creating new DatabaseConnectionManager instance
+2025-11-15 05:29:35.871 [main] INFO  c.s.c.config.EnvironmentConfig - Loaded configuration from application.properties
+2025-11-15 05:29:35.875 [main] INFO  c.s.c.config.EnvironmentConfig - Configuration loaded successfully
+2025-11-15 05:29:35.875 [main] INFO  c.s.c.config.EnvironmentConfig - Database configuration - Host: localhost, Port: 3306, Database: collectibles_store_test, User: root
+2025-11-15 05:29:35.881 [main] INFO  c.s.c.d.DatabaseConnectionManager - Connecting to database: Host=localhost, Port=3306, Database=collectibles_store_test, User=root
+2025-11-15 05:29:35.881 [main] DEBUG c.s.c.d.DatabaseConnectionManager - JDBC URL: jdbc:mysql://localhost:3306/collectibles_store_test?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+2025-11-15 05:29:35.894 [main] INFO  com.zaxxer.hikari.HikariDataSource - CollectiblesStorePool - Starting...
+2025-11-15 05:29:36.848 [main] INFO  com.zaxxer.hikari.pool.HikariPool - CollectiblesStorePool - Added connection com.mysql.cj.jdbc.ConnectionImpl@65234a9
+2025-11-15 05:29:36.852 [main] INFO  com.zaxxer.hikari.HikariDataSource - CollectiblesStorePool - Start completed.
+2025-11-15 05:29:36.857 [main] INFO  c.s.c.d.DatabaseConnectionManager - Database connection established successfully
+2025-11-15 05:29:36.857 [main] INFO  c.s.c.d.DatabaseConnectionManager - Connection pool configured: Max=3, MinIdle=1, IdleTimeout=600000ms, MaxLifetime=1800000ms
+2025-11-15 05:29:37.434 [main] INFO  c.s.c.d.DatabaseMigrationManager - Flyway migration manager initialized
+2025-11-15 05:29:37.435 [main] INFO  c.s.c.d.DatabaseMigrationManager - Environment: development, Clean allowed: true, FORCE_DB_CLEAN: null
+2025-11-15 05:29:37.435 [main] INFO  c.s.c.d.DatabaseMigrationManager - Starting database migration...
+2025-11-15 05:29:37.435 [main] INFO  c.s.c.d.DatabaseMigrationManager - Migration location: classpath:db/migration
+2025-11-15 05:29:37.691 [main] INFO  c.s.c.d.DatabaseMigrationManager - Found 3 pending migrations
+2025-11-15 05:29:37.692 [main] INFO  c.s.c.d.DatabaseMigrationManager -   - Pending migration: 1 - Create products table
+2025-11-15 05:29:37.692 [main] INFO  c.s.c.d.DatabaseMigrationManager -   - Pending migration: 2 - Insert sample products
+2025-11-15 05:29:37.692 [main] INFO  c.s.c.d.DatabaseMigrationManager -   - Pending migration: 3 - Create users table
+2025-11-15 05:29:38.092 [main] INFO  c.s.c.d.DatabaseMigrationManager - Successfully applied 3 database migrations
+2025-11-15 05:29:38.121 [main] INFO  c.s.c.d.DatabaseMigrationManager - Current schema version: 3
+2025-11-15 05:29:38.121 [main] INFO  com.spark.collectibles.Application - Applied 3 database migrations
+2025-11-15 05:29:38.152 [main] INFO  c.s.c.d.DatabaseMigrationManager - Database migrations are valid
+2025-11-15 05:29:38.152 [main] INFO  com.spark.collectibles.Application - Database initialization completed successfully
+2025-11-15 05:29:38.155 [main] DEBUG c.s.c.d.DatabaseConnectionManager - Returning existing DatabaseConnectionManager instance. Pool: CollectiblesStorePool
+2025-11-15 05:29:38.157 [main] DEBUG c.s.c.d.DatabaseConnectionManager - Returning existing DatabaseConnectionManager instance. Pool: CollectiblesStorePool
+2025-11-15 05:29:38.159 [main] DEBUG c.s.c.d.DatabaseConnectionManager - Returning existing DatabaseConnectionManager instance. Pool: CollectiblesStorePool
+2025-11-15 05:29:38.179 [main] INFO  s.s.StaticFilesConfiguration - StaticResourceHandler configured with folder = /static
+2025-11-15 05:29:38.179 [main] INFO  com.spark.collectibles.Application - Static files configured at /static
+2025-11-15 05:29:38.205 [main] INFO  com.spark.collectibles.Application - User management routes initialized (ADMIN access required)
+2025-11-15 05:29:38.207 [main] INFO  com.spark.collectibles.Application - Product management routes protected (ADMIN access required for modifications)
+2025-11-15 05:29:38.220 [main] INFO  com.spark.collectibles.Application - API Documentation available at /api/docs
+2025-11-15 05:29:38.221 [main] INFO  com.spark.collectibles.Application - OpenAPI Specification available at /api/openapi.json
+2025-11-15 05:29:38.221 [main] INFO  com.spark.collectibles.Application - Health check endpoint available at /api/health
+2025-11-15 05:29:38.222 [main] INFO  com.spark.collectibles.Application - Collectibles Store API started on port 4567
+2025-11-15 05:29:38.222 [main] INFO  com.spark.collectibles.Application - API Base Path: /api
+2025-11-15 05:29:38.222 [main] INFO  com.spark.collectibles.Application - Environment: development
+2025-11-15 05:29:38.222 [main] INFO  com.spark.collectibles.Application - WebSocket endpoint available at /ws/prices
+2025-11-15 05:29:38.223 [main] INFO  com.spark.collectibles.Application - Authentication enabled - JWT-based authentication
+2025-11-15 05:29:38.223 [main] INFO  com.spark.collectibles.Application - Protected routes require authentication with ADMIN role
+2025-11-15 05:29:38.231 [Thread-3] INFO  org.eclipse.jetty.util.log - Logging initialized @6090ms to org.eclipse.jetty.util.log.Slf4jLog
+2025-11-15 05:29:38.392 [Thread-3] INFO  s.e.jetty.EmbeddedJettyServer - == Spark has ignited ...
+2025-11-15 05:29:38.392 [Thread-3] INFO  s.e.jetty.EmbeddedJettyServer - >> Listening on 0.0.0.0:4567
+2025-11-15 05:29:38.397 [Thread-3] INFO  org.eclipse.jetty.server.Server - jetty-9.4.48.v20220622; built: 2022-06-21T20:42:25.880Z; git: 6b67c5719d1f4371b33655ff2d047d24e171e49a; jvm 17.0.17+10
+2025-11-15 05:29:38.421 [Thread-3] INFO  org.eclipse.jetty.server.session - DefaultSessionIdManager workerName=node0
+2025-11-15 05:29:38.421 [Thread-3] INFO  org.eclipse.jetty.server.session - No SessionScavenger set, using defaults
+2025-11-15 05:29:38.423 [Thread-3] INFO  org.eclipse.jetty.server.session - node0 Scavenging every 660000ms
+2025-11-15 05:29:38.445 [Thread-3] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@6701fca5{/,null,AVAILABLE}
+2025-11-15 05:29:38.498 [Thread-3] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@3c1bf711{HTTP/1.1, (http/1.1)}{0.0.0.0:4567}
+2025-11-15 05:29:38.498 [Thread-3] INFO  org.eclipse.jetty.server.Server - Started @6357ms
+2025-11-15 05:29:40.363 [qtp856080221-29] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Registration attempt from IP: 127.0.0.1
+2025-11-15 05:29:40.366 [qtp856080221-29] DEBUG c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Attempting registration for username: currentuser, email: current@example.com, role: CUSTOMER from IP: 127.0.0.1
+2025-11-15 05:29:40.366 [qtp856080221-29] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 1, Total: 1, Waiting: 0
+2025-11-15 05:29:40.392 [qtp856080221-29] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 1, Total: 1, Waiting: 0
+2025-11-15 05:29:40.523 [qtp856080221-29] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 1, Total: 1, Waiting: 0
+2025-11-15 05:29:40.527 [qtp856080221-29] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 1, Total: 1, Waiting: 0
+2025-11-15 05:29:40.536 [qtp856080221-29] INFO  c.s.c.r.impl.MySQLUserRepository - User created successfully: user1
+2025-11-15 05:29:40.536 [qtp856080221-29] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 1, Idle: 0, Total: 1, Waiting: 0
+2025-11-15 05:29:40.564 [qtp856080221-29] INFO  c.s.collectibles.service.AuthService - User registered successfully: currentuser
+2025-11-15 05:29:40.564 [qtp856080221-29] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Successful registration for user: currentuser (ID: user1) from IP: 127.0.0.1
+2025-11-15 05:29:40.565 [qtp856080221-29] DEBUG c.s.collectibles.routes.AuthRoutes - AuthResponse created - User: currentuser, Token exists: true
+]]></system-out>
+    <system-err><![CDATA[Nov 15, 2025 5:29:37 AM org.flywaydb.core.FlywayExecutor execute
+INFO: Database: jdbc:mysql://localhost:3306/collectibles_store_test (MySQL 8.0)
+Nov 15, 2025 5:29:37 AM org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory allAppliedMigrations
+INFO: Schema history table `collectibles_store_test`.`flyway_schema_history` does not exist yet
+Nov 15, 2025 5:29:37 AM org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory allAppliedMigrations
+INFO: Schema history table `collectibles_store_test`.`flyway_schema_history` does not exist yet
+Nov 15, 2025 5:29:37 AM org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory create
+INFO: Creating Schema History table `collectibles_store_test`.`flyway_schema_history` ...
+Nov 15, 2025 5:29:37 AM org.flywaydb.core.internal.command.DbMigrate migrateGroup
+INFO: Current version of schema `collectibles_store_test`: << Empty Schema >>
+Nov 15, 2025 5:29:37 AM org.flywaydb.core.internal.command.DbMigrate doMigrateGroup
+INFO: Migrating schema `collectibles_store_test` to version "1 - Create products table"
+Nov 15, 2025 5:29:38 AM org.flywaydb.core.internal.command.DbMigrate doMigrateGroup
+INFO: Migrating schema `collectibles_store_test` to version "2 - Insert sample products"
+Nov 15, 2025 5:29:38 AM org.flywaydb.core.internal.command.DbMigrate doMigrateGroup
+INFO: Migrating schema `collectibles_store_test` to version "3 - Create users table"
+Nov 15, 2025 5:29:38 AM org.flywaydb.core.internal.command.DbMigrate logSummary
+INFO: Successfully applied 3 migrations to schema `collectibles_store_test`, now at version v3 (execution time 00:00.113s)
+Nov 15, 2025 5:29:38 AM org.flywaydb.core.internal.command.DbValidate validate
+INFO: Successfully validated 3 migrations (execution time 00:00.009s)
+]]></system-err>
+  </testcase>
+  <testcase name="testProtectedRoute_WithAdminToken" classname="com.spark.collectibles.integration.AuthRoutesIntegrationTest" time="0.146">
+    <failure message="Expected 201 Created or 200 OK ==&gt; expected: &lt;true&gt; but was: &lt;false&gt;" type="org.opentest4j.AssertionFailedError"><![CDATA[org.opentest4j.AssertionFailedError: Expected 201 Created or 200 OK ==> expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:211)
+	at com.spark.collectibles.integration.AuthRoutesIntegrationTest.testProtectedRoute_WithAdminToken(AuthRoutesIntegrationTest.java:289)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:727)
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:217)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:147)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:127)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:90)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:55)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:102)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:86)
+	at org.junit.platform.launcher.core.DefaultLauncherSession$DelegatingLauncher.execute(DefaultLauncherSession.java:86)
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
+]]></failure>
+    <system-out><![CDATA[2025-11-15 05:29:40.589 [qtp856080221-25] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Registration attempt from IP: 127.0.0.1
+2025-11-15 05:29:40.590 [qtp856080221-25] DEBUG c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Attempting registration for username: adminuser, email: admin@example.com, role: ADMIN from IP: 127.0.0.1
+2025-11-15 05:29:40.590 [qtp856080221-25] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:40.592 [qtp856080221-25] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:40.681 [qtp856080221-25] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:40.683 [qtp856080221-25] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:40.686 [qtp856080221-25] INFO  c.s.c.r.impl.MySQLUserRepository - User created successfully: user2
+2025-11-15 05:29:40.686 [qtp856080221-25] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 1, Idle: 1, Total: 2, Waiting: 0
+2025-11-15 05:29:40.688 [qtp856080221-25] INFO  c.s.collectibles.service.AuthService - User registered successfully: adminuser
+2025-11-15 05:29:40.688 [qtp856080221-25] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Successful registration for user: adminuser (ID: user2) from IP: 127.0.0.1
+2025-11-15 05:29:40.688 [qtp856080221-25] DEBUG c.s.collectibles.routes.AuthRoutes - AuthResponse created - User: adminuser, Token exists: true
+2025-11-15 05:29:40.692 [qtp856080221-28] INFO  c.s.collectibles.service.AuthService - AuthService.validateToken() called
+2025-11-15 05:29:40.693 [qtp856080221-28] DEBUG c.s.collectibles.service.AuthService - AuthService.validateToken() - Token length: 4, starts with Bearer: false
+2025-11-15 05:29:40.693 [qtp856080221-28] DEBUG c.s.collectibles.service.AuthService - AuthService.validateToken() - Verifying JWT token signature
+2025-11-15 05:29:40.693 [qtp856080221-28] DEBUG c.s.collectibles.service.AuthService - AuthService.validateToken() - Using JWT secret length: 49
+2025-11-15 05:29:40.693 [qtp856080221-28] DEBUG c.s.collectibles.service.AuthService - AuthService.validateToken() - Token preview: null
+2025-11-15 05:29:40.715 [qtp856080221-28] WARN  c.s.collectibles.service.AuthService - AuthService.validateToken() - JWT verification failed: The token was expected to have 3 parts, but got 0.
+2025-11-15 05:29:40.718 [qtp856080221-28] DEBUG c.s.collectibles.service.AuthService - AuthService.validateToken() - JWT verification exception details
+com.auth0.jwt.exceptions.JWTDecodeException: The token was expected to have 3 parts, but got 0.
+	at com.auth0.jwt.TokenUtils.wrongNumberOfParts(TokenUtils.java:45)
+	at com.auth0.jwt.TokenUtils.splitToken(TokenUtils.java:23)
+	at com.auth0.jwt.JWTDecoder.<init>(JWTDecoder.java:37)
+	at com.auth0.jwt.JWTVerifier.verify(JWTVerifier.java:444)
+	at com.spark.collectibles.service.AuthService.validateToken(AuthService.java:238)
+	at com.spark.collectibles.util.AuthFilter.lambda$requireAuth$0(AuthFilter.java:47)
+	at com.spark.collectibles.util.AuthFilter.lambda$requireRole$1(AuthFilter.java:74)
+	at com.spark.collectibles.Application.lambda$setupProtectedProductRoutes$8(Application.java:312)
+	at spark.FilterImpl$1.handle(FilterImpl.java:73)
+	at spark.http.matching.BeforeFilters.execute(BeforeFilters.java:48)
+	at spark.http.matching.MatcherFilter.doFilter(MatcherFilter.java:133)
+	at spark.embeddedserver.jetty.JettyHandler.doHandle(JettyHandler.java:50)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1598)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:141)
+	at org.eclipse.jetty.server.handler.HandlerList.handle(HandlerList.java:59)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:127)
+	at org.eclipse.jetty.server.Server.handle(Server.java:516)
+	at org.eclipse.jetty.server.HttpChannel.lambda$handle$1(HttpChannel.java:487)
+	at org.eclipse.jetty.server.HttpChannel.dispatch(HttpChannel.java:732)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:479)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:277)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:311)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:105)
+	at org.eclipse.jetty.io.ChannelEndPoint$1.run(ChannelEndPoint.java:104)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:338)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:315)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:173)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:131)
+	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:409)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:883)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:1034)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+2025-11-15 05:29:40.719 [qtp856080221-28] DEBUG c.s.collectibles.service.AuthService - AuthService.validateToken() - Exception type: JWTDecodeException
+2025-11-15 05:29:40.719 [qtp856080221-28] WARN  c.spark.collectibles.util.AuthFilter - Invalid token for path: /api/products
+]]></system-out>
+  </testcase>
+  <testcase name="testRegisterUser_Success" classname="com.spark.collectibles.integration.AuthRoutesIntegrationTest" time="0.094">
+    <system-out><![CDATA[2025-11-15 05:29:40.735 [qtp856080221-24] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Registration attempt from IP: 127.0.0.1
+2025-11-15 05:29:40.735 [qtp856080221-24] DEBUG c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Attempting registration for username: testuser, email: test@example.com, role: CUSTOMER from IP: 127.0.0.1
+2025-11-15 05:29:40.736 [qtp856080221-24] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:40.739 [qtp856080221-24] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:40.817 [qtp856080221-24] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:40.819 [qtp856080221-24] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:40.822 [qtp856080221-24] INFO  c.s.c.r.impl.MySQLUserRepository - User created successfully: user3
+2025-11-15 05:29:40.822 [qtp856080221-24] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 1, Idle: 1, Total: 2, Waiting: 0
+2025-11-15 05:29:40.824 [qtp856080221-24] INFO  c.s.collectibles.service.AuthService - User registered successfully: testuser
+2025-11-15 05:29:40.824 [qtp856080221-24] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Successful registration for user: testuser (ID: user3) from IP: 127.0.0.1
+2025-11-15 05:29:40.824 [qtp856080221-24] DEBUG c.s.collectibles.routes.AuthRoutes - AuthResponse created - User: testuser, Token exists: true
+]]></system-out>
+  </testcase>
+  <testcase name="testRegisterUser_DuplicateUsername" classname="com.spark.collectibles.integration.AuthRoutesIntegrationTest" time="0.095">
+    <system-out><![CDATA[2025-11-15 05:29:40.829 [qtp856080221-28] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Registration attempt from IP: 127.0.0.1
+2025-11-15 05:29:40.829 [qtp856080221-28] DEBUG c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Attempting registration for username: duplicateuser, email: first@example.com, role: CUSTOMER from IP: 127.0.0.1
+2025-11-15 05:29:40.830 [qtp856080221-28] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:40.831 [qtp856080221-28] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:40.910 [qtp856080221-28] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:40.912 [qtp856080221-28] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:40.914 [qtp856080221-28] INFO  c.s.c.r.impl.MySQLUserRepository - User created successfully: user4
+2025-11-15 05:29:40.914 [qtp856080221-28] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 1, Idle: 1, Total: 2, Waiting: 0
+2025-11-15 05:29:40.916 [qtp856080221-28] INFO  c.s.collectibles.service.AuthService - User registered successfully: duplicateuser
+2025-11-15 05:29:40.916 [qtp856080221-28] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Successful registration for user: duplicateuser (ID: user4) from IP: 127.0.0.1
+2025-11-15 05:29:40.916 [qtp856080221-28] DEBUG c.s.collectibles.routes.AuthRoutes - AuthResponse created - User: duplicateuser, Token exists: true
+2025-11-15 05:29:40.919 [qtp856080221-30] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Registration attempt from IP: 127.0.0.1
+2025-11-15 05:29:40.919 [qtp856080221-30] DEBUG c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Attempting registration for username: duplicateuser, email: second@example.com, role: CUSTOMER from IP: 127.0.0.1
+2025-11-15 05:29:40.919 [qtp856080221-30] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:40.920 [qtp856080221-30] WARN  c.s.collectibles.service.AuthService - Registration attempted with existing username: duplicateuser
+2025-11-15 05:29:40.920 [qtp856080221-30] WARN  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Registration failed (duplicate username/email): duplicateuser from IP: 127.0.0.1
+]]></system-out>
+  </testcase>
+  <testcase name="testGetCurrentUser_NoToken" classname="com.spark.collectibles.integration.AuthRoutesIntegrationTest" time="0.003">
+    <system-out><![CDATA[2025-11-15 05:29:40.926 [qtp856080221-28] INFO  c.s.collectibles.routes.AuthRoutes - GET /api/auth/me - Token validation request from IP: 127.0.0.1
+2025-11-15 05:29:40.927 [qtp856080221-28] DEBUG c.s.collectibles.routes.AuthRoutes - GET /api/auth/me - Authorization header present: false, starts with Bearer: false
+2025-11-15 05:29:40.927 [qtp856080221-28] WARN  c.s.collectibles.routes.AuthRoutes - GET /api/auth/me - Missing or invalid Authorization header from IP: 127.0.0.1
+]]></system-out>
+  </testcase>
+  <testcase name="testLogin_WrongPassword" classname="com.spark.collectibles.integration.AuthRoutesIntegrationTest" time="0.169">
+    <system-out><![CDATA[2025-11-15 05:29:40.931 [qtp856080221-31] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Registration attempt from IP: 127.0.0.1
+2025-11-15 05:29:40.931 [qtp856080221-31] DEBUG c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Attempting registration for username: wrongpassuser, email: wrongpass@example.com, role: CUSTOMER from IP: 127.0.0.1
+2025-11-15 05:29:40.931 [qtp856080221-31] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:40.932 [qtp856080221-31] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:41.008 [qtp856080221-31] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:41.011 [qtp856080221-31] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:41.013 [qtp856080221-31] INFO  c.s.c.r.impl.MySQLUserRepository - User created successfully: user5
+2025-11-15 05:29:41.013 [qtp856080221-31] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 1, Idle: 1, Total: 2, Waiting: 0
+2025-11-15 05:29:41.015 [qtp856080221-31] INFO  c.s.collectibles.service.AuthService - User registered successfully: wrongpassuser
+2025-11-15 05:29:41.015 [qtp856080221-31] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Successful registration for user: wrongpassuser (ID: user5) from IP: 127.0.0.1
+2025-11-15 05:29:41.015 [qtp856080221-31] DEBUG c.s.collectibles.routes.AuthRoutes - AuthResponse created - User: wrongpassuser, Token exists: true
+2025-11-15 05:29:41.018 [qtp856080221-30] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/login - Login attempt from IP: 127.0.0.1
+2025-11-15 05:29:41.019 [qtp856080221-30] DEBUG c.s.collectibles.routes.AuthRoutes - POST /api/auth/login - Attempting login for: wrongpassuser from IP: 127.0.0.1
+2025-11-15 05:29:41.019 [qtp856080221-30] DEBUG c.s.collectibles.service.AuthService - AuthService.login() called for: wrongpassuser
+2025-11-15 05:29:41.019 [qtp856080221-30] DEBUG c.s.collectibles.service.AuthService - AuthService.login() - Searching for user by username: wrongpassuser
+2025-11-15 05:29:41.019 [qtp856080221-30] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:41.021 [qtp856080221-30] DEBUG c.s.collectibles.service.AuthService - AuthService.login() - User found: wrongpassuser (ID: user5), checking if active
+2025-11-15 05:29:41.021 [qtp856080221-30] DEBUG c.s.collectibles.service.AuthService - AuthService.login() - Verifying password for user: wrongpassuser
+2025-11-15 05:29:41.096 [qtp856080221-30] WARN  c.s.collectibles.service.AuthService - AuthService.login() - Password verification failed for user: wrongpassuser (ID: user5)
+2025-11-15 05:29:41.096 [qtp856080221-30] WARN  c.s.collectibles.routes.AuthRoutes - POST /api/auth/login - Invalid credentials for: wrongpassuser from IP: 127.0.0.1
+]]></system-out>
+  </testcase>
+  <testcase name="testProtectedRoute_NoToken" classname="com.spark.collectibles.integration.AuthRoutesIntegrationTest" time="0.003">
+    <system-out><![CDATA[2025-11-15 05:29:41.100 [qtp856080221-31] WARN  c.spark.collectibles.util.AuthFilter - Unauthorized access attempt to: /api/products
+]]></system-out>
+  </testcase>
+  <testcase name="testLogin_WithUsername_Success" classname="com.spark.collectibles.integration.AuthRoutesIntegrationTest" time="0.169">
+    <system-out><![CDATA[2025-11-15 05:29:41.104 [qtp856080221-28] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Registration attempt from IP: 127.0.0.1
+2025-11-15 05:29:41.105 [qtp856080221-28] DEBUG c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Attempting registration for username: loginuser, email: login@example.com, role: CUSTOMER from IP: 127.0.0.1
+2025-11-15 05:29:41.105 [qtp856080221-28] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:41.106 [qtp856080221-28] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:41.183 [qtp856080221-28] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:41.185 [qtp856080221-28] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:41.187 [qtp856080221-28] INFO  c.s.c.r.impl.MySQLUserRepository - User created successfully: user6
+2025-11-15 05:29:41.187 [qtp856080221-28] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 1, Idle: 1, Total: 2, Waiting: 0
+2025-11-15 05:29:41.189 [qtp856080221-28] INFO  c.s.collectibles.service.AuthService - User registered successfully: loginuser
+2025-11-15 05:29:41.189 [qtp856080221-28] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Successful registration for user: loginuser (ID: user6) from IP: 127.0.0.1
+2025-11-15 05:29:41.189 [qtp856080221-28] DEBUG c.s.collectibles.routes.AuthRoutes - AuthResponse created - User: loginuser, Token exists: true
+2025-11-15 05:29:41.192 [qtp856080221-30] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/login - Login attempt from IP: 127.0.0.1
+2025-11-15 05:29:41.192 [qtp856080221-30] DEBUG c.s.collectibles.routes.AuthRoutes - POST /api/auth/login - Attempting login for: loginuser from IP: 127.0.0.1
+2025-11-15 05:29:41.192 [qtp856080221-30] DEBUG c.s.collectibles.service.AuthService - AuthService.login() called for: loginuser
+2025-11-15 05:29:41.192 [qtp856080221-30] DEBUG c.s.collectibles.service.AuthService - AuthService.login() - Searching for user by username: loginuser
+2025-11-15 05:29:41.192 [qtp856080221-30] DEBUG c.s.c.d.DatabaseConnectionManager - Getting connection. Pool stats: Pool: CollectiblesStorePool, Active: 0, Idle: 2, Total: 2, Waiting: 0
+2025-11-15 05:29:41.194 [qtp856080221-30] DEBUG c.s.collectibles.service.AuthService - AuthService.login() - User found: loginuser (ID: user6), checking if active
+2025-11-15 05:29:41.194 [qtp856080221-30] DEBUG c.s.collectibles.service.AuthService - AuthService.login() - Verifying password for user: loginuser
+2025-11-15 05:29:41.269 [qtp856080221-30] DEBUG c.s.collectibles.service.AuthService - AuthService.login() - Password verified, generating token for user: loginuser
+2025-11-15 05:29:41.270 [qtp856080221-30] INFO  c.s.collectibles.service.AuthService - AuthService.login() - Login successful for user: loginuser (ID: user6), token generated
+2025-11-15 05:29:41.270 [qtp856080221-30] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/login - Successful login for user: loginuser (ID: user6) from IP: 127.0.0.1
+2025-11-15 05:29:41.270 [qtp856080221-30] DEBUG c.s.collectibles.routes.AuthRoutes - POST /api/auth/login - Token generated, length: 201
+2025-11-15 05:29:41.270 [qtp856080221-30] DEBUG c.s.collectibles.routes.AuthRoutes - POST /api/auth/login - Token preview: eyJhbGciOiJIUzI1NiIs...
+2025-11-15 05:29:41.270 [qtp856080221-30] DEBUG c.s.collectibles.routes.AuthRoutes - AuthResponse created - User: loginuser, Token exists: true
+2025-11-15 05:29:41.270 [qtp856080221-30] DEBUG c.s.collectibles.routes.AuthRoutes - POST /api/auth/login - AuthResponse created, token in response: true
+]]></system-out>
+  </testcase>
+  <testcase name="testRegisterUser_InvalidEmail" classname="com.spark.collectibles.integration.AuthRoutesIntegrationTest" time="0.003">
+    <failure message="Expected 400 Bad Request ==&gt; expected: &lt;400&gt; but was: &lt;409&gt;" type="org.opentest4j.AssertionFailedError"><![CDATA[org.opentest4j.AssertionFailedError: Expected 400 Bad Request ==> expected: <400> but was: <409>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:560)
+	at com.spark.collectibles.integration.AuthRoutesIntegrationTest.testRegisterUser_InvalidEmail(AuthRoutesIntegrationTest.java:136)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:727)
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:217)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:147)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:127)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:90)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:55)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:102)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:86)
+	at org.junit.platform.launcher.core.DefaultLauncherSession$DelegatingLauncher.execute(DefaultLauncherSession.java:86)
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
+]]></failure>
+    <system-out><![CDATA[2025-11-15 05:29:41.275 [qtp856080221-28] INFO  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Registration attempt from IP: 127.0.0.1
+2025-11-15 05:29:41.275 [qtp856080221-28] DEBUG c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Attempting registration for username: testuser2, email: invalid-email, role: CUSTOMER from IP: 127.0.0.1
+2025-11-15 05:29:41.275 [qtp856080221-28] WARN  c.s.collectibles.service.AuthService - Registration attempted with invalid email: invalid-email
+2025-11-15 05:29:41.275 [qtp856080221-28] WARN  c.s.collectibles.routes.AuthRoutes - POST /api/auth/register - Registration failed (duplicate username/email): testuser2 from IP: 127.0.0.1
+]]></system-out>
+  </testcase>
+</testsuite>

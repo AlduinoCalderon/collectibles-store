@@ -51,6 +51,18 @@ public class AuthRoutes {
                     return new ErrorResponse("Username, email, and password are required");
                 }
                 
+                // Validate email format
+                String email = registerRequest.email.trim();
+                if (!email.contains("@") || !email.contains(".") || 
+                    email.indexOf("@") == 0 || email.indexOf("@") == email.length() - 1 ||
+                    email.indexOf(".") < email.indexOf("@") + 2 || 
+                    email.lastIndexOf(".") == email.length() - 1) {
+                    logger.warn("POST /api/auth/register - Invalid email format: {} from IP: {}", 
+                              email, clientIp);
+                    response.status(400);
+                    return new ErrorResponse("Invalid email format");
+                }
+                
                 // Validate password strength
                 if (registerRequest.password.length() < 6) {
                     logger.warn("POST /api/auth/register - Password too short for username: {} from IP: {}", 
