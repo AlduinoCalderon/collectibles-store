@@ -56,7 +56,7 @@ class AuthFilterTest {
     void testRequireAuth_ValidToken() {
         // Arrange
         when(request.headers("Authorization")).thenReturn("Bearer valid-token");
-        when(authService.validateToken("Bearer valid-token")).thenReturn(testUser);
+        when(authService.validateToken("valid-token")).thenReturn(testUser);
         
         // Act
         spark.Filter filter = authFilter.requireAuth();
@@ -71,7 +71,7 @@ class AuthFilterTest {
             }
         });
         
-        verify(authService).validateToken("Bearer valid-token");
+        verify(authService).validateToken("valid-token");
     }
     
     @Test
@@ -113,7 +113,7 @@ class AuthFilterTest {
     void testRequireAuth_InvalidToken() {
         // Arrange
         when(request.headers("Authorization")).thenReturn("Bearer invalid-token");
-        when(authService.validateToken("Bearer invalid-token")).thenReturn(null);
+        when(authService.validateToken("invalid-token")).thenReturn(null);
         when(request.pathInfo()).thenReturn("/api/products");
         
         // Act
@@ -124,7 +124,7 @@ class AuthFilterTest {
             filter.handle(request, response);
         });
         
-        verify(authService).validateToken("Bearer invalid-token");
+        verify(authService).validateToken("invalid-token");
     }
     
     @Test
@@ -132,7 +132,7 @@ class AuthFilterTest {
     void testRequireRole_AdminRole() {
         // Arrange
         when(request.headers("Authorization")).thenReturn("Bearer valid-token");
-        when(authService.validateToken("Bearer valid-token")).thenReturn(testUser);
+        when(authService.validateToken("valid-token")).thenReturn(testUser);
         
         // Act
         spark.Filter filter = authFilter.requireRole(User.UserRole.ADMIN);
@@ -157,7 +157,7 @@ class AuthFilterTest {
         customerUser.setActive(true);
         
         when(request.headers("Authorization")).thenReturn("Bearer valid-token");
-        when(authService.validateToken("Bearer valid-token")).thenReturn(customerUser);
+        when(authService.validateToken("valid-token")).thenReturn(customerUser);
         when(request.pathInfo()).thenReturn("/api/products");
         
         // Act
@@ -199,7 +199,7 @@ class AuthFilterTest {
         customerUser.setActive(true);
         
         when(request.headers("Authorization")).thenReturn("Bearer valid-token");
-        when(authService.validateToken("Bearer valid-token")).thenReturn(customerUser);
+        when(authService.validateToken("valid-token")).thenReturn(customerUser);
         when(request.pathInfo()).thenReturn("/api/products");
         
         // Act
@@ -211,6 +211,7 @@ class AuthFilterTest {
         });
     }
 }
+
 
 
 
