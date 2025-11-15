@@ -1,0 +1,27 @@
+erDiagram
+    PRODUCTS {
+        VARCHAR_50 id PK "Primary Key"
+        VARCHAR_255 name "Product Name"
+        TEXT description "Product Description"
+        DECIMAL_10_2 price "Product Price"
+        VARCHAR_3 currency "Currency Code"
+        VARCHAR_100 category "Product Category"
+        BOOLEAN is_active "Active Status"
+        BOOLEAN is_deleted "Soft Delete Flag"
+        TIMESTAMP created_at "Creation Timestamp"
+        TIMESTAMP updated_at "Last Update Timestamp"
+        TIMESTAMP deleted_at "Deletion Timestamp"
+    }
+    
+    USERS {
+        VARCHAR_50 id PK "Primary Key"
+        VARCHAR_100 username UK "Unique Username"
+        VARCHAR_255 email UK "Unique Email"
+        VARCHAR_255 password_hash "BCrypt Hash"
+        VARCHAR_100 first_name "First Name"
+        VARCHAR_100 last_name "Last Name"
+        ENUM role "ADMIN, CUSTOMER, MODERATOR"
+        BOOLEAN is_active "Active Status"
+        TIMESTAMP created_at "Creation Timestamp"
+        TIMESTAMP updated_at "Last Update Timestamp"
+    }
