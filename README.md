@@ -1,5 +1,8 @@
 # Collectibles Store API
 
+[![Test and Coverage](https://github.com/AlduinoCalderon/collectibles-store/actions/workflows/test-and-coverage.yml/badge.svg)](https://github.com/AlduinoCalderon/collectibles-store/actions/workflows/test-and-coverage.yml)
+[![Health Check](https://github.com/AlduinoCalderon/collectibles-store/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/AlduinoCalderon/collectibles-store/actions/workflows/ci-cd.yml)
+
 A RESTful e-commerce API for managing collectible items using Java and the Spark framework with MySQL database integration. This project implements a modern web service architecture following SOLID principles with proper error handling, validation, comprehensive documentation, and JWT-based authentication.
 
 **🌐 Live Demo**: [https://collectibles-store-09ew.onrender.com](https://collectibles-store-09ew.onrender.com)
@@ -317,6 +320,12 @@ The project includes comprehensive test coverage for both backend (Java) and fro
 ```powershell
 # Windows PowerShell
 .\run-tests.ps1
+```
+
+```bash
+# Linux / macOS
+chmod +x run-tests.sh
+./run-tests.sh
 ```
 
 **Or run Maven directly:**
