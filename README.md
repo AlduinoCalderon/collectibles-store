@@ -212,7 +212,9 @@ collectibles-store/
 ├── CONTRIBUTING.md                                          # Contribution guidelines
 ├── CODE_DOCS.md                                             # Code documentation guide
 ├── run.bat                                                  # Windows run script
-└── run.sh                                                   # Unix/Linux run script
+├── run.sh                                                   # Unix/Linux run script
+├── run-tests.ps1                                            # Windows test runner script
+└── run-tests.sh                                             # Linux/macOS test runner script
 ```
 
 ## 🚀 Getting Started
