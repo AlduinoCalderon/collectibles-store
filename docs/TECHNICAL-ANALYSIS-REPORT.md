@@ -25,32 +25,14 @@ The Collectibles Store addresses these challenges through a modern web architect
 
 The application follows a three-tier architecture:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Presentation Layer                    │
-│  • Mustache Templates (HTML/CSS/JS)                      │
-│  • Product Browsing Interface                            │
-│  • Admin Management Panel                                │
-│  • WebSocket Client for Real-Time Updates               │
-└─────────────────────────────────────────────────────────┘
-                           ↓↑
-┌─────────────────────────────────────────────────────────┐
-│                     Business Logic Layer                 │
-│  • Spark Java Framework (HTTP Server)                    │
-│  • RESTful API Endpoints                                 │
-│  • WebSocket Handler for Real-Time Communication        │
-│  • Service Layer (ProductService)                        │
-│  • Validation & Exception Handling                       │
-└─────────────────────────────────────────────────────────┘
-                           ↓↑
-┌─────────────────────────────────────────────────────────┐
-│                      Data Layer                          │
-│  • MySQL 8+ Database                                     │
-│  • HikariCP Connection Pool                              │
-│  • Flyway Database Migrations                            │
-│  • Repository Pattern Implementation                     │
-└─────────────────────────────────────────────────────────┘
-```
+![Three-Tier Architecture](../diagrams/three-tier-architecture.png)
+
+**Source**: [docs/diagrams/three-tier-architecture.mmd](../diagrams/three-tier-architecture.mmd)
+
+This architecture provides clear separation of concerns:
+- **Presentation Layer**: Handles user interface and client-side logic
+- **Business Logic Layer**: Contains application services, API endpoints, and validation
+- **Data Layer**: Manages database connections, migrations, and data access through repositories
 
 ### Technology Stack
 
@@ -74,10 +56,23 @@ The application follows a three-tier architecture:
 - **Jetty WebSocket**: Built-in support from Spark framework
 - **No Additional Dependencies**: Simplifies deployment and reduces complexity
 
+#### Security & Authentication
+- **JWT (Auth0)**: JSON Web Token implementation for stateless authentication
+- **BCrypt**: Secure password hashing with configurable rounds
+- **Role-Based Access Control**: ADMIN and CUSTOMER roles with permission-based authorization
+
+#### Testing & Quality Assurance
+- **JUnit 5**: Modern testing framework for unit and integration tests
+- **Mockito 5.3.1**: Powerful mocking framework for isolated unit testing
+- **JaCoCo 0.8.11**: Code coverage analysis and reporting
+- **Checkstyle**: Code style verification and enforcement
+- **SpotBugs**: Static code analysis for bug detection
+- **Jest**: JavaScript testing framework for frontend unit tests
+
 #### Development & Deployment
 - **Maven**: Dependency management and build automation
 - **Docker**: Containerization for consistent deployment
-- **GitHub Actions**: CI/CD pipeline for automated deployment
+- **GitHub Actions**: CI/CD pipeline for automated testing and deployment
 
 ### Architectural Patterns
 
@@ -239,7 +234,39 @@ ws.onmessage = (event) => {
 - Delete confirmation to prevent accidents
 - Success/error feedback messages
 
-### 4. Exception Handling & Validation
+### 4. Authentication & Authorization
+
+**JWT-Based Authentication**:
+- Stateless token-based authentication using JSON Web Tokens
+- Token expiration (configurable, default 24 hours)
+- Secure password hashing with BCrypt (configurable rounds)
+- Role-based access control (ADMIN, CUSTOMER)
+
+**Implementation Details**:
+```java
+// User registration with password hashing
+AuthResult result = authService.register(username, email, password, ...);
+
+// Login with credential verification
+AuthResult login = authService.login(usernameOrEmail, password);
+
+// Token validation for protected routes
+User user = authService.validateToken(token);
+```
+
+**Security Features**:
+- Passwords never stored in plaintext
+- Password hashes never exposed in API responses
+- JWT secrets managed via environment variables
+- Automatic token expiration
+- User account status validation (active/inactive)
+
+**Protected Routes**:
+- Product creation/modification/deletion (ADMIN only)
+- User profile endpoints (authenticated users)
+- Admin panel access (ADMIN role required)
+
+### 5. Exception Handling & Validation
 
 **Multi-Layer Security**:
 
@@ -247,21 +274,34 @@ ws.onmessage = (event) => {
    - SQL injection prevention through parameterized queries
    - XSS protection via input sanitization
    - Type checking and range validation
+   - Email format validation
+   - Password strength requirements
 
 2. **Custom Exceptions**:
    - `ProductNotFoundException` → 404
    - `ProductValidationException` → 400
    - `DuplicateProductException` → 409
    - `DatabaseException` → 500
+   - `UnauthorizedException` → 401
+   - `ForbiddenException` → 403
 
 3. **Centralized Handling**:
    - Single point of error processing
    - Consistent error response format
    - Proper logging for debugging
+   - No sensitive data in error messages
 
-### 5. Database Design
+### 6. Database Design
 
-**Optimized Schema**:
+**Database Schema**:
+
+![Database Schema](../diagrams/database-schema.png)
+
+**Source**: [docs/diagrams/database-schema.mmd](../diagrams/database-schema.mmd)
+
+The database consists of two main tables:
+
+**Products Table**:
 ```sql
 CREATE TABLE products (
     id VARCHAR(50) PRIMARY KEY,
@@ -274,17 +314,42 @@ CREATE TABLE products (
     is_deleted BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL
+    deleted_at TIMESTAMP NULL,
+    INDEX idx_category (category),
+    INDEX idx_is_active (is_active)
 );
 ```
 
-**Features**:
-- Soft delete (preserves data for audit)
-- Check constraints (data integrity)
-- Timestamps (tracking and debugging)
-- Indexed fields (performance)
+**Users Table** (Authentication):
+```sql
+CREATE TABLE users (
+    id VARCHAR(50) PRIMARY KEY,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    role ENUM('ADMIN', 'CUSTOMER', 'MODERATOR') NOT NULL DEFAULT 'CUSTOMER',
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_username (username),
+    INDEX idx_email (email),
+    INDEX idx_role (role),
+    INDEX idx_is_active (is_active)
+);
+```
 
-### 6. Connection Pooling
+**Key Features**:
+- **Soft delete** on products (preserves data for audit)
+- **Check constraints** for data integrity (e.g., price > 0)
+- **Timestamps** for tracking and debugging
+- **Indexed fields** for optimal query performance
+- **Unique constraints** for username and email (users table)
+- **Role-based access** with ENUM type for data validation
+- **Security**: Password hashes stored separately, never exposed in API responses
+
+### 7. Connection Pooling
 
 **Configuration**:
 ```java
@@ -306,36 +371,141 @@ config.setJdbcUrl(databaseUrl);
 - Basic CRUD operations
 - Input validation
 
-**Sprint 2**: User Interface
+**Sprint 2**: User Interface & Authentication
 - Mustache templates
 - Admin forms
+- JWT authentication implementation
+- User registration and login
+- Role-based access control
 - Exception handling
 - Product filtering
 
-**Sprint 3**: Real-Time Features
+**Sprint 3**: Real-Time Features & Testing
 - WebSocket implementation
 - Price update broadcasting
 - Admin UI enhancements
 - Advanced filtering
+- Comprehensive test suite
+- Code coverage analysis
+
+**Sprint 4**: Quality Assurance & Documentation
+- Code quality tools integration (Checkstyle, SpotBugs)
+- Test coverage improvements (90%+ target)
+- Documentation standards (Javadoc, JSDoc)
+- Contributing guidelines
+- Technical documentation
 
 ### Quality Assurance
 
-**Code Quality**:
-- SOLID principles adherence
-- Comprehensive logging
-- Error handling at every layer
-- Input validation and sanitization
+#### Code Quality Standards
 
-**Testing**:
-- Unit tests for utilities
-- Integration tests for API endpoints
-- Manual testing for UI flows
+**Static Analysis**:
+- **Checkstyle**: Enforces Java coding standards and style guidelines
+- **SpotBugs**: Detects potential bugs and code quality issues
+- **Code Reviews**: All code changes reviewed before merging
+- **SOLID Principles**: Strict adherence to object-oriented design principles
 
-**Documentation**:
-- Inline code comments
-- README with examples
-- API documentation (OpenAPI)
-- Architecture decisions documented
+**Code Documentation**:
+- **Javadoc**: Comprehensive documentation for all public Java classes and methods
+- **JSDoc**: Complete documentation for all exported JavaScript functions
+- **Inline Comments**: Explanatory comments for complex business logic
+- **API Documentation**: OpenAPI specification with interactive documentation
+
+**Documentation Standards** (See `CODE_DOCS.md`):
+- All public APIs must be documented
+- Parameter and return value descriptions required
+- Exception documentation mandatory
+- Code examples for complex APIs
+- Consistent documentation style across codebase
+
+#### Testing Strategy
+
+**Test Coverage**:
+- **Target**: 90%+ code coverage for critical components
+- **Tools**: JaCoCo for Java, Jest coverage for JavaScript
+- **Reports**: Automated coverage reports in CI/CD pipeline
+- **Minimum Requirements**: 70% overall, 90%+ for services and repositories
+
+**Test Types**:
+
+1. **Unit Tests**:
+   - Isolated testing of individual components
+   - Mocking of external dependencies (database, services)
+   - Fast execution (< 100ms per test)
+   - Coverage: All service methods, utilities, filters
+
+2. **Integration Tests**:
+   - End-to-end API endpoint testing
+   - Real database interactions (test database)
+   - WebSocket connection testing
+   - Authentication flow validation
+
+3. **Frontend Tests**:
+   - JavaScript unit tests with Jest
+   - DOM manipulation testing
+   - API interaction mocking
+   - Storage utility testing
+
+**Test Infrastructure** (See `TESTS-README.md`):
+- JUnit 5 with Mockito for Java backend
+- Jest for JavaScript frontend
+- Integration test extensions for server lifecycle
+- Automated test execution in CI/CD
+
+**Key Test Achievements**:
+- ✅ Comprehensive unit tests for `AuthService` (15+ tests)
+- ✅ Token validation edge case coverage (8+ test scenarios)
+- ✅ Integration tests for authentication endpoints (8+ tests)
+- ✅ Product service test coverage (12+ tests)
+- ✅ Filter and utility test coverage
+- ✅ Frontend JavaScript test suite (12+ tests)
+
+**Testing Best Practices**:
+- Test-driven development where applicable
+- Test both success and failure paths
+- Edge case coverage (null inputs, empty strings, invalid data)
+- Clear, descriptive test names
+- Independent, isolated tests
+- Fast feedback loop (< 30 seconds for full suite)
+
+#### Contributing Guidelines
+
+**Development Process** (See `CONTRIBUTING.md`):
+- Feature branch workflow
+- Atomic commits with descriptive messages
+- Pull request process with automated checks
+- Code review requirements
+- Test coverage requirements for new code
+
+**Commit Standards**:
+- Conventional commit message format
+- Type prefixes: `feat`, `fix`, `docs`, `test`, `refactor`
+- Scope indication: `auth`, `product`, `api`, `frontend`
+- Clear descriptions of changes
+
+**Pull Request Requirements**:
+- All tests must pass
+- Code coverage maintained or improved
+- Documentation updated
+- No merge conflicts
+- Code style compliance
+- Security scanning passed
+
+#### Continuous Integration
+
+**CI/CD Pipeline**:
+- Automated test execution on every push
+- Code coverage reporting
+- Static code analysis (Checkstyle, SpotBugs)
+- Security scanning (GitGuardian)
+- Automated deployment on successful builds
+
+**Quality Gates**:
+- All tests must pass
+- Minimum code coverage threshold (70%)
+- No critical bugs from static analysis
+- No security vulnerabilities
+- Documentation completeness check
 
 ## Deployment & DevOps
 
@@ -413,19 +583,84 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 - Consistent error responses
 
 ### Authentication & Authorization
-- Ready for integration (architecture supports it)
-- CORS properly configured
-- Secure cookie handling ready
+- ✅ JWT-based authentication implemented
+- ✅ Role-based access control (ADMIN, CUSTOMER)
+- ✅ Secure password hashing (BCrypt)
+- ✅ Token validation and expiration
+- ✅ Protected routes with authentication filters
+- ✅ CORS properly configured
+- ✅ Security best practices followed
+
+## Code Quality & Testing Achievements
+
+### Testing Infrastructure
+
+**Backend Testing**:
+- ✅ JUnit 5 test framework integrated
+- ✅ Mockito for dependency mocking
+- ✅ JaCoCo code coverage reporting
+- ✅ Unit tests for all service classes
+- ✅ Integration tests for API endpoints
+- ✅ Test utilities and extensions
+
+**Frontend Testing**:
+- ✅ Jest testing framework configured
+- ✅ Unit tests for authentication modules
+- ✅ Storage utility tests
+- ✅ API interaction tests
+- ✅ UI component tests
+
+**Code Quality Tools**:
+- ✅ Checkstyle for code style enforcement
+- ✅ SpotBugs for static analysis
+- ✅ Automated code quality checks in CI/CD
+- ✅ Code review process established
+
+### Documentation Standards
+
+**Code Documentation**:
+- ✅ Javadoc standards established (`CODE_DOCS.md`)
+- ✅ JSDoc standards for JavaScript
+- ✅ Comprehensive inline comments
+- ✅ API documentation with OpenAPI
+
+**Project Documentation**:
+- ✅ Comprehensive README
+- ✅ Contributing guidelines (`CONTRIBUTING.md`)
+- ✅ Testing guide (`TESTS-README.md`)
+- ✅ Technical analysis report
+- ✅ Technical difficulties and solutions documented
+
+### Quality Metrics
+
+**Code Coverage**:
+- Target: 90%+ for critical components
+- Achieved: Comprehensive test suite across all layers
+- Ongoing: Continuous improvement through CI/CD
+
+**Code Quality**:
+- SOLID principles adherence
+- Clean architecture patterns
+- Comprehensive error handling
+- Security best practices
+
+**Maintainability**:
+- Well-documented codebase
+- Clear project structure
+- Established development workflows
+- Comprehensive testing strategy
 
 ## Future Enhancements
 
 ### Potential Improvements
-1. **User Authentication**: OAuth2 or JWT implementation
+1. **Enhanced Authentication**: OAuth2 integration, token refresh mechanism
 2. **Shopping Cart**: Session-based cart management
 3. **Payment Integration**: Stripe or PayPal integration
 4. **Search Enhancement**: Full-text search with Lucene
 5. **Caching Layer**: Redis for frequently accessed data
 6. **Mobile App**: API ready for mobile clients
+7. **Advanced Testing**: Performance testing, load testing
+8. **Monitoring**: Application performance monitoring (APM)
 
 ### Scalability Path
 - Load balancing with multiple instances
@@ -436,12 +671,15 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 ## Success Metrics
 
 ### Technical Achievements
-✅ **Code Quality**: SOLID principles, clean architecture
+✅ **Code Quality**: SOLID principles, clean architecture, static analysis
+✅ **Testing**: Comprehensive test suite (unit + integration), 90%+ coverage target
+✅ **Documentation**: Javadoc/JSDoc standards, comprehensive guides, API docs
 ✅ **Performance**: < 50ms response times, efficient resource usage
 ✅ **Reliability**: Comprehensive error handling, soft deletes
-✅ **Security**: Input validation, SQL injection protection
+✅ **Security**: JWT authentication, BCrypt password hashing, input validation, SQL injection protection
 ✅ **Scalability**: Stateless design, connection pooling
-✅ **Maintainability**: Well-documented, modular code
+✅ **Maintainability**: Well-documented, modular code, contribution guidelines
+✅ **Development Workflow**: CI/CD pipeline, code review process, quality gates
 
 ### Business Value
 ✅ **User Experience**: Real-time updates, intuitive interface
@@ -453,21 +691,35 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 
 The Collectibles Store demonstrates a robust, production-ready web application built with modern Java technologies. The architecture successfully balances simplicity with functionality, delivering a platform that is:
 
-- **Easy to Understand**: Clear structure, minimal dependencies
-- **Easy to Maintain**: SOLID principles, comprehensive documentation
-- **Easy to Deploy**: Docker support, environment-based configuration
-- **Easy to Extend**: Modular design, clear interfaces
+- **Easy to Understand**: Clear structure, minimal dependencies, comprehensive documentation
+- **Easy to Maintain**: SOLID principles, extensive test coverage, code quality tools
+- **Easy to Deploy**: Docker support, environment-based configuration, CI/CD pipeline
+- **Easy to Extend**: Modular design, clear interfaces, contribution guidelines
+- **Easy to Test**: Comprehensive test suite, test utilities, clear testing standards
 
 The WebSocket implementation for real-time price updates showcases advanced features while maintaining simplicity. The project demonstrates proficiency in:
 
-- Backend API development
+- Backend API development with modern Java practices
+- Authentication and security (JWT, BCrypt, role-based access control)
 - Database design and optimization
 - Real-time communication
 - User interface development
 - DevOps and deployment
 - Software architecture principles
+- **Testing and quality assurance** (comprehensive test coverage, code quality tools)
+- **Code documentation and standards** (Javadoc, JSDoc, contribution guidelines)
 
-The solution is ready for production deployment and can scale to handle growing user bases with minimal modifications.
+### Quality Assurance Excellence
+
+This project places a strong emphasis on code quality and testing:
+
+- **Comprehensive Test Suite**: Unit tests, integration tests, and frontend tests covering all critical functionality
+- **Code Coverage**: Target of 90%+ coverage for critical components, with ongoing improvements
+- **Static Analysis**: Checkstyle and SpotBugs integrated for code quality enforcement
+- **Documentation Standards**: Established Javadoc/JSDoc standards ensuring maintainable codebase
+- **Contribution Guidelines**: Clear processes for code reviews, testing, and documentation
+
+The solution is ready for production deployment and can scale to handle growing user bases with minimal modifications. The comprehensive testing infrastructure and code quality standards ensure long-term maintainability and team scalability.
 
 ---
 
