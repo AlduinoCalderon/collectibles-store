@@ -312,6 +312,15 @@ The project includes comprehensive test coverage for both backend (Java) and fro
 
 ### Running Backend Tests
 
+**Recommended: Use the test runner script (automatically detects MySQL and runs appropriate tests):**
+
+```powershell
+# Windows PowerShell
+.\run-tests.ps1
+```
+
+**Or run Maven directly:**
+
 ```bash
 # Run all unit tests (excludes integration tests by default)
 # This excludes tests ending in *IntegrationTest.java (which require MySQL)
@@ -327,6 +336,13 @@ start target/site/jacoco/index.html
 # Note: This will fail locally if MySQL is not running
 mvn test -Dtest="**/*Test"
 ```
+
+**The `run-tests.ps1` script provides:**
+- Automatic MySQL detection
+- Clear summary of which tests ran and why
+- Instructions for running integration tests if MySQL is not available
+- Coverage report location information
+- Detailed test results by class
 
 **Important Notes:**
 - **Local Development:** By default, `mvn test` excludes integration tests (those ending in `*IntegrationTest.java`) because they require a MySQL database connection
